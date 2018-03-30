@@ -6,8 +6,7 @@
 "use strict";
 
 const expect = require("expect.js");
-const GiveMeTheService= require("givemetheservice");
-const http = require("http");
+const DamLess = require("../../index");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");

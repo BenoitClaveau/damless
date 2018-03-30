@@ -85,7 +85,7 @@ class InfoService {
 
 	uploadImage(context, stream, headers) {
 		stream.mode("buffer");
-		stream.on("file", (file, filename, encoding, mimetype) => {
+		stream.on("file", (fieldname, file, filename, encoding, mimetype) => {
 			const parsed = path.parse(filename);
 			const filepath = `${__dirname}/../data/output/${parsed.name}.server${parsed.ext}`;
 			if (fs.existsSync(filepath)) fs.unlinkSync(filepath);

@@ -5,9 +5,8 @@
  */
 "use strict";
 
-const GiveMeTheService= require("givemetheservice");
+const DamLess = require("../../index");
 const Options = require('../../lib/routes/options');
-const http = require("http");
 
 describe("options", () => {
 

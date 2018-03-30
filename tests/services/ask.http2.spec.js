@@ -6,14 +6,12 @@
 "use strict";
 
 const expect = require("expect.js");
-const damlessTheService= require("damlesstheservice");
-const http = require("http");
+const DamLess = require("../../index");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
 const process = require("process");
 const { inspect } = require("util");
-const DamLess = require("../../index");
 
 process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
@@ -32,8 +30,9 @@ afterEach(async () => await damless.stop());
 describe("http2 ask", () => {
 
     it("post object -> object", async () => {
+        damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveOne");
+        await damless.post("/save", "info", "saveOne");
 
         const client = await damless.resolve("client");
         const res = await client.post({ url: "https://localhost:8443/save", rejectUnauthorized: false, json: {
@@ -49,7 +48,7 @@ describe("http2 ask", () => {
     it("upload image", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/upload", "info", "uploadImage");
+        await damless.post("/upload", "info", "uploadImage");
         
         const requestOptions = {
             formData : {

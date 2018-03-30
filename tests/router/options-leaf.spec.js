@@ -6,7 +6,7 @@
 "use strict";
 
 const expect = require("expect.js");
-const GiveMeTheService= require("givemetheservice");
+const DamLess = require("../../index");
 const request = require("request");
 const process = require("process");
 const { inspect } = require("util");
@@ -15,18 +15,16 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let giveme;
-beforeEach(() => giveme = new GiveMeTheService({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await giveme.unload());
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
+afterEach(async () => await damless.unload());
 
 describe("options-leaf", () => {
 
     it("/info", async () => {
-        giveme.inject("http", "../../index");
-        giveme.inject("info", "../services/info");
-        await giveme.load();
-        const http = await giveme.resolve("http");
-        await http.post("/info", "info", "getInfo");
+        damless.inject("info", "../services/info");
+        await damless.start();
+        await damless.post("/info", "info", "getInfo");
 
         const requestOptions = {
             method : "OPTIONS",

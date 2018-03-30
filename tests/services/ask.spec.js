@@ -7,7 +7,6 @@
 
 const expect = require("expect.js");
 const DamLess = require("../../index");
-const http = require("http");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
@@ -29,9 +28,9 @@ afterEach(async () => await damless.stop());
 describe("ask", () => {
 
     it("post object -> object", async () => {
-        iveme.inject("info", "./info");
+        damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveOne");
+        await damless.post("/save", "info", "saveOne");
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
@@ -46,7 +45,7 @@ describe("ask", () => {
     it("post object -> array", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveMany");
+        await damless.post("/save", "info", "saveMany");
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
@@ -62,7 +61,7 @@ describe("ask", () => {
     it("post array -> object", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveOne");
+        await damless.post("/save", "info", "saveOne");
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
@@ -84,7 +83,7 @@ describe("ask", () => {
     it("post array -> array", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveMany");
+        await damless.post("/save", "info", "saveMany");
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
@@ -110,7 +109,7 @@ describe("ask", () => {
     it("upload json stream", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveMany");
+        await damless.post("/save", "info", "saveMany");
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
@@ -141,7 +140,7 @@ describe("ask", () => {
     it("upload image stream", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/save", "info", "saveMany");
+        await damless.post("/save", "info", "saveMany");
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
@@ -172,7 +171,7 @@ describe("ask", () => {
     it("upload json stream", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/upload", "info", "saveFile");
+        await damless.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -196,7 +195,7 @@ describe("ask", () => {
     it("upload json object", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/upload", "info", "saveFile");
+        await damless.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -220,7 +219,7 @@ describe("ask", () => {
     it("upload image stream", async () => {
         damless.inject("info", "./info");
         await damless.start();
-        await await damless.post("/upload", "info", "uploadImage");
+        await damless.post("/upload", "info", "uploadImage");
 
         const requestOptions = {
             formData : {

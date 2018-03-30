@@ -1,5 +1,4 @@
 const expect = require("expect.js");
-const http = require("http");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
