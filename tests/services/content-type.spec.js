@@ -1,6 +1,6 @@
 /*!
- * qwebs
- * Copyright(c) 2016 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";

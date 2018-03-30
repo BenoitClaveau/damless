@@ -1,12 +1,12 @@
 /*!
- * qwebs-auth-jwt
- * Copyright(c) 2017 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less-auth-jwt
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
 const Auth = require("../../lib/services/auth-jwt-token");
-const Qwebs = require("qwebs");
+const DamLess = require("../../index");
 const expect = require("expect.js");
 const process = require("process");
 const { inspect } = require("util");
@@ -44,15 +44,13 @@ describe("auth-jwt-token", () => {
     });
 
     it("identify", async () => {
-        let qwebs = new Qwebs({ dirname: __dirname, config: config });
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        http.get("/info", "info", "httpAuthInfo");
-        http.post("/connect", "info", "connect");
+        let damless = new DamLess({ dirname: __dirname, config: config });
+        damless.inject("info", "./info");
+        await damless.start();
+        await damless.get("/info", "info", "httpAuthInfo");
+        await damless.post("/connect", "info", "connect");
         
-        const client = await qwebs.resolve("client");
+        const client = await damless.resolve("client");
         try {
             const res1 = await client.get({ url: "http://localhost:3000/info", json: true });
             throw new Error("Mustn't be executed.")
@@ -65,6 +63,6 @@ describe("auth-jwt-token", () => {
         const res3 = await client.get({ url: "http://localhost:3000/info", auth: { "bearer": res2.body.token }, json: true });
         console.log(res3.body)
         expect(res3.body).to.eql({ id: 1024 });
-        qwebs.unload();
+        damless.unload();
     });
 });

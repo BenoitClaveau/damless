@@ -1,12 +1,12 @@
 /*!
- * qwebs
- * Copyright(c) 2017 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
 const expect = require("expect.js");
-const Qwebs = require("qwebs");
+const DamLess = require("../../index");
 const http = require("http");
 const request = require("request");
 const fs = require("fs");
@@ -18,20 +18,21 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let qwebs;
-beforeEach(() => qwebs = new Qwebs({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await qwebs.unload());
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { 
+    http: { 
+        port: 3000, 
+    },
+}}));
+afterEach(async () => await damless.stop());
 
 describe("ask", () => {
 
     it("post object -> object", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveOne");
-        const client = await qwebs.resolve("client");
+        iveme.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveOne");
+        const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
             value: 0,
@@ -43,13 +44,10 @@ describe("ask", () => {
     });
 
     it("post object -> array", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveMany");
-        const client = await qwebs.resolve("client");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveMany");
+        const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
             value: 0,
@@ -62,13 +60,10 @@ describe("ask", () => {
     });
 
     it("post array -> object", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveOne");
-        const client = await qwebs.resolve("client");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveOne");
+        const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
                 name: "ben",
@@ -87,13 +82,10 @@ describe("ask", () => {
     });
     
     it("post array -> array", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveMany");
-        const client = await qwebs.resolve("client");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveMany");
+        const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
                 name: "ben",
@@ -116,12 +108,10 @@ describe("ask", () => {
     });
 
     it("upload json stream", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveMany");
-        const jsonstream = await qwebs.resolve("json-stream");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveMany");
+        const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
         let sending = false;
@@ -149,12 +139,10 @@ describe("ask", () => {
     });
 
     it("upload image stream", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        await http.post("/save", "info", "saveMany");
-        const jsonstream = await qwebs.resolve("json-stream");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/save", "info", "saveMany");
+        const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
         let sending = false;
@@ -182,11 +170,9 @@ describe("ask", () => {
     });
 
     it("upload json stream", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        await http.post("/upload", "info", "saveFile");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -208,11 +194,9 @@ describe("ask", () => {
     });
 
     it("upload json object", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        await http.post("/upload", "info", "saveFile");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -234,11 +218,9 @@ describe("ask", () => {
     });
 
     it("upload image stream", async () => {
-        qwebs.inject("http", "../../index");
-        qwebs.inject("info", "./info");
-        await qwebs.load();
-        const http = await qwebs.resolve("http");
-        await http.post("/upload", "info", "uploadImage");
+        damless.inject("info", "./info");
+        await damless.start();
+        await await damless.post("/upload", "info", "uploadImage");
 
         const requestOptions = {
             formData : {

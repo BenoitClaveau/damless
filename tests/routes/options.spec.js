@@ -1,11 +1,11 @@
 /*!
- * qwebs
- * Copyright(c) 2016 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
-const Qwebs = require("qwebs");
+const GiveMeTheService= require("givemetheservice");
 const Options = require('../../lib/routes/options');
 const http = require("http");
 
@@ -13,9 +13,9 @@ describe("options", () => {
 
     // it("*", done => {
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
-    //         return qwebs.load().then(() => {
-    //             let router = qwebs.resolve("router");
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
+    //         return giveme.load().then(() => {
+    //             let router = giveme.resolve("router");
     //             let options = new Options(router);
                 
     //             let request = new http.IncomingMessage();
@@ -32,13 +32,13 @@ describe("options", () => {
 
     // it("get", done => {
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
             
-    //         qwebs.inject("info", "../services/info");
-    //         qwebs.get("/get", "info", "getInfo");
+    //         giveme.inject("info", "../services/info");
+    //         giveme.get("/get", "info", "getInfo");
 
-    //         return qwebs.load().then(() => {
-    //             let router = qwebs.resolve("router");
+    //         return giveme.load().then(() => {
+    //             let router = giveme.resolve("router");
     //             let options = new Options(router);
 
     //             let request = new http.IncomingMessage();
@@ -56,13 +56,13 @@ describe("options", () => {
 
     // it("post", done => {
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
             
-    //         qwebs.inject("info", "../services/info");
-    //         qwebs.post("/save", "info", "save");
+    //         giveme.inject("info", "../services/info");
+    //         giveme.post("/save", "info", "save");
 
-    //         return qwebs.load().then(() => {
-    //             let router = qwebs.resolve("router");
+    //         return giveme.load().then(() => {
+    //             let router = giveme.resolve("router");
     //             let options = new Options(router);
 
     //             let request = new http.IncomingMessage();
@@ -80,13 +80,13 @@ describe("options", () => {
 
     // it("put", done => {
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
             
-    //         qwebs.inject("info", "../services/info");
-    //         qwebs.put("/update", "info", "update");
+    //         giveme.inject("info", "../services/info");
+    //         giveme.put("/update", "info", "update");
 
-    //         return qwebs.load().then(() => {
-    //             let router = qwebs.resolve("router");
+    //         return giveme.load().then(() => {
+    //             let router = giveme.resolve("router");
     //             let options = new Options(router);
 
     //             let request = new http.IncomingMessage();
@@ -104,13 +104,13 @@ describe("options", () => {
 
     // it("delete", done => {
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
             
-    //         qwebs.inject("info", "../services/info");
-    //         qwebs.delete("/delete", "info", "delete");
+    //         giveme.inject("info", "../services/info");
+    //         giveme.delete("/delete", "info", "delete");
 
-    //         return qwebs.load().then(() => {
-    //             let router = qwebs.resolve("router");
+    //         return giveme.load().then(() => {
+    //             let router = giveme.resolve("router");
     //             let options = new Options(router);
 
     //             let request = new http.IncomingMessage();

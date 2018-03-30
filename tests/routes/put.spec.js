@@ -1,11 +1,11 @@
 /*!
- * qwebs
- * Copyright(c) 2016 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
-const Qwebs = require("qwebs");
+const GiveMeTheService= require("givemetheservice");
 const http = require("http");
 const request = require('request');
 
@@ -14,19 +14,19 @@ describe("put", () => {
     // it("put", done => {
     //     let server = null;
     //     return Promise.resolve().then(() => {
-    //         let qwebs = new Qwebs({ dirname: __dirname, config: {}});
+    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
             
-    //         qwebs.inject("info", "../services/info");
-    //         qwebs.put("/update", "info", "update");
+    //         giveme.inject("info", "../services/info");
+    //         giveme.put("/update", "info", "update");
 
-    //         return qwebs.load().then(() => {
+    //         return giveme.load().then(() => {
     //             server = http.createServer((request, response) => {
-    //                 return qwebs.invoke(request, response).catch(error => {
+    //                 return giveme.invoke(request, response).catch(error => {
     //                     return response.send({ statusCode: 500, request: request, content: error }); //close request
     //                 });
     //             }).listen(1337);
             
-    //             let client = qwebs.resolve("client");
+    //             let client = giveme.resolve("client");
     //             return client.put({ url: "http://localhost:1337/update", json: { login: "test" }}).then(res => {
     //                 expect(res.body.status).toBe("updated");
     //             });

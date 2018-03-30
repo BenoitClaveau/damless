@@ -1,12 +1,12 @@
 /*!
- * qwebs
- * Copyright(c) 2017 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
 const expect = require("expect.js");
-const Qwebs = require("qwebs");
+const GiveMeTheService= require("givemetheservice");
 const http = require("http");
 const request = require("request");
 const fs = require("fs");
@@ -23,24 +23,24 @@ process.on("unhandledRejection", (reason, p) => {
 
 //     it("create", done => {
 //         return Promise.resolve().then(() => {
-//             let qwebs = new Qwebs({ dirname: __dirname, config: { folder: false }});
-//             return qwebs.load().then(() => {
-//                 let config = qwebs.resolve("config");
-//                 let router = qwebs.resolve("http-router");
+//             let giveme = new GiveMeTheService({ dirname: __dirname, config: { folder: false }});
+//             return giveme.load().then(() => {
+//                 let config = giveme.resolve("config");
+//                 let router = giveme.resolve("http-router");
                 
-//                 let asset = new Asset(qwebs, config, "/api", "text/css");
+//                 let asset = new Asset(giveme, config, "/api", "text/css");
 //             });
 //         }).then(done);
 //     });
     
 //     it("create empty route", done => {
 //         return Promise.resolve().then(() => {
-//             let qwebs = new Qwebs({ dirname: __dirname, config: { folder: false }});
-//             return qwebs.load().then(() => {
-//                 let config = qwebs.resolve("config");
-//                 let router = qwebs.resolve("router");
+//             let giveme = new GiveMeTheService({ dirname: __dirname, config: { folder: false }});
+//             return giveme.load().then(() => {
+//                 let config = giveme.resolve("config");
+//                 let router = giveme.resolve("router");
                 
-//                 let asset = new Asset(qwebs, config, null);
+//                 let asset = new Asset(giveme, config, null);
 //             });
 //         }).catch(error => {
 //             expect(error.message).toEqual("Route is not defined.");
@@ -49,12 +49,12 @@ process.on("unhandledRejection", (reason, p) => {
     
 //     it("invoke", done => {
 //         return Promise.resolve().then(() => {
-//             let qwebs = new Qwebs({ dirname: __dirname, config: { folder: false }});
-//             return qwebs.load().then(() => {
-//                 let config = qwebs.resolve("config");
-//                 let router = qwebs.resolve("router");
+//             let giveme = new GiveMeTheService({ dirname: __dirname, config: { folder: false }});
+//             return giveme.load().then(() => {
+//                 let config = giveme.resolve("config");
+//                 let router = giveme.resolve("router");
                 
-//                 let asset = new Asset(qwebs, config, "/api", "text/css");
+//                 let asset = new Asset(giveme, config, "/api", "text/css");
                 
 //                 let request = new http.IncomingMessage();
 //                 request.url = "/api";
@@ -73,11 +73,11 @@ process.on("unhandledRejection", (reason, p) => {
     
 //     it("bundle css", done => {
 //         return Promise.resolve().then(() => {
-//             let qwebs = new Qwebs({ dirname: __dirname, config: { folder: "public" }});
-//             let config = qwebs.resolve("config");
-//             let router = qwebs.resolve("router");
+//             let giveme = new GiveMeTheService({ dirname: __dirname, config: { folder: "public" }});
+//             let config = giveme.resolve("config");
+//             let router = giveme.resolve("router");
             
-//             let asset = new Asset(qwebs, config, "app.css");
+//             let asset = new Asset(giveme, config, "app.css");
 //             return asset.initFromFiles(["../loaders/web/components.css", "../loaders/web/master.css"]);
 //         }).then(asset => {
 //             expect(asset.route).toEqual("app.css");
@@ -90,11 +90,11 @@ process.on("unhandledRejection", (reason, p) => {
     
 //     it("bundle js", done => {
 //         return Promise.resolve().then(() => {
-//             let qwebs = new Qwebs({ dirname: __dirname, config: { folder: "public" }});
-//             let config = qwebs.resolve("config");
-//             let router = qwebs.resolve("router");
+//             let giveme = new GiveMeTheService({ dirname: __dirname, config: { folder: "public" }});
+//             let config = giveme.resolve("config");
+//             let router = giveme.resolve("router");
             
-//             let asset = new Asset(qwebs, config, "app.js");
+//             let asset = new Asset(giveme, config, "app.js");
 //             return asset.initFromFile("../loaders/web/controller.js");
 //         }).then(asset => {
 //             expect(asset.route).toEqual("app.js");

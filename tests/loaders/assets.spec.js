@@ -1,12 +1,12 @@
 /*!
- * qwebs
- * Copyright(c) 2017 Benoît Claveau <benoit.claveau@gmail.com>
+ * dam-less
+ * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 "use strict";
 
 const expect = require("expect.js");
-const Qwebs = require("qwebs");
+const GiveMeTheService= require("givemetheservice");
 const process = require("process");
 const { inspect } = require("util");
 
@@ -14,15 +14,15 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let qwebs;
-beforeEach(() => qwebs = new Qwebs({ dirname: __dirname }));
-afterEach(async () => await qwebs.unload());
+let giveme;
+beforeEach(() => giveme = new GiveMeTheService({ dirname: __dirname }));
+afterEach(async () => await giveme.unload());
 
 describe("Assets loader", () => {
 
     it("assets", async () => {
-        await qwebs.load();
-        const isitasset = await qwebs.resolve("isitasset");
+        await giveme.load();
+        const isitasset = await giveme.resolve("isitasset");
         expect(isitasset.nodes.length).to.be(2);
         expect(isitasset.nodes[0].token).to.be("main.html");
         expect(isitasset.nodes[1].token).to.be("assets");
