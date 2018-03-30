@@ -1,0 +1,49 @@
+{
+  "name": "dam-less",
+  "version": "1.0.0",
+  "description": "Streamify your web server",
+  "main": "index.js",
+  "dependencies": {
+    "busboy": "latest",
+    "chalk": "latest",
+    "file-type": "latest",
+    "isitforme": "latest",
+    "jwt-simple": "latest",
+    "oups": "latest",
+    "pump": "latest",
+    "givemetheservice": "latest",
+    "uuid": "latest",
+    "vinyl": "latest"
+  },
+  "devDependencies": {
+    "JSONStream": "latest",
+    "coveralls": "latest",
+    "expect.js": "latest",
+    "istanbul": "latest",
+    "mocha": "latest"
+  },
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --recursive tests/**/*.spec.js",
+    "test-cover": "node_modules/.bin/istanbul cover node_modules/mocha/bin/mocha --recursive tests/**/*.spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BenoitClaveau/dam-less.git"
+  },
+  "keywords": [
+    "https",
+    "givemetheservice",
+    "config",
+    "webserver",
+    "promise"
+  ],
+  "author": {
+    "name": "Benoît Claveau",
+    "email": "benoit.claveau@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BenoitClaveau/dam-less/issues"
+  },
+  "homepage": "https://github.com/BenoitClaveau/dam-less"
+}

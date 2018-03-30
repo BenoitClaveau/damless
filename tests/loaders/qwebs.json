@@ -1,0 +1,7 @@
+{
+    "assets": "./public",
+    "http": {
+        "port": 3000
+    },
+    "services": "./services.json"
+}
