@@ -1,7 +1,17 @@
 # DamLess
- Streamify your web server.
- 
- DamLess is the first NodeJs web server dedicated to streamify all responses.
+
+Streamify your web server.
+
+```json
+stream.write({ word: "Dam" });
+stream.end({ word: "Less" });
+```
+
+DamLess is the first NodeJS web server dedicated to streamify all responses.
+
+```shell
+npm install damless --save
+```
 
  [![NPM][npm-image]][npm-url]
  [![Build Status][travis-image]][travis-url]
@@ -11,26 +21,17 @@
 
 # Features
 
-  * Every things is Stream.
-  * Structured your project using services.
-  * Dependency Injection to override default behavior.
-  * [Object oriented programming (OOP)](#oop) 
-  * [Compression & minification](#bundle) 
-  * [0 disk access at runtime](#disk) 
+  * [Structured your project using services](#services).
+  * [Dependency Injection to override default behavior](#di).
+  * Compression & minification
+  * 0 disk access at runtime
   * [Configuration](#config)
   * [Security](https://github.com/shieldfy/API-Security-Checklist)
 
-# Installation
 
-```shell
-npm install $damless --save
-```
-
-## Service.js
+## Service.js <a href="#services" />
 
 ```service.js
-
-
 class Service {	
 };
 
@@ -47,19 +48,23 @@ json(context, stream, headers) {
 exports = module.exports = Service;
 ```
 
-## Dependency Injection
+## Dependency Injection <a href="#di" />
+
+Inject your service and define a new http route.
+
+Override core services to custom DamLess.
 
 ```services.json
 {
   "services": [
     { "name": "service", "location": "./service"}
   ]
-  "http-routes": [     
+  "http-routes": [   
   ]
 }
 ```
 
-## Configuration damless.json
+## DamLess Configuration <a href="#config" />
 
 ```config.json
 {
@@ -84,21 +89,16 @@ await damless.start();
 
 Run server on http://localhost:3000
 
-## Others Services
+## Use other DamLess services to develop as fast as a rocket
   
-  * [$http](https://www.npmjs.com/package/damless)
-  * [$https](https://www.npmjs.com/package/damless-https)
-  * [$http-to-https](https://www.npmjs.com/package/damless-to-https)
   * [$mongo](https://www.npmjs.com/package/damless-mongo)
-  * [$authentication](https://www.npmjs.com/package/damless-auth-jwt)
-  * [$https](https://www.npmjs.com/package/damless-https)
   * [$nodemailer](https://www.npmjs.com/package/damless-nodemailer)
   * [$bitbucket](https://www.npmjs.com/package/damless-bitbucket-deploy)
   * [$aws-s3](https://www.npmjs.com/package/damless-aws-s3)
   * [$aws-ses](https://www.npmjs.com/package/damless-aws-ses)
   * [aws api gateway](https://www.npmjs.com/package/damless-aws-api-gateway)
 
-## Examples
+## You want to see some examples
 
 To run our examples, clone the Qwebs repo and install the dependencies.
 
