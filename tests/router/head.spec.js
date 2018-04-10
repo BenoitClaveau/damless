@@ -1,9 +1,8 @@
 /*!
- * dam-less
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
-"use strict";
 
 const expect = require("expect.js");
 const DamLess = require("../../index");

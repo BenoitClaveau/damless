@@ -1,17 +1,17 @@
 /*!
- * dam-less
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
-'use strict';
+
 
 const GiveMeTheService = require('givemetheservice');
 
 class DamLessServer {
     constructor(options) {
         this.giveme = new GiveMeTheService(options);                    //Create the container
-        this.giveme.inject("dam-less", `${__dirname}/lib/dam-less`);    //Inject dam-less service
+        this.giveme.inject("damless", `${__dirname}/lib/damless`);    //Inject damless service
     }
 
     async start() {
@@ -31,32 +31,32 @@ class DamLessServer {
     }
 
     async get(route, service, method, options) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.get(route, service, method, options);
     }
 
     async post(route, service, method, options) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.post(route, service, method, options);
     }
 
     async put(route, service, method, options) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.put(route, service, method, options);
     }
 
     async delete(route, service, method, options) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.delete(route, service, method, options);
     }
 
     async patch(route, service, method, options) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.patch(route, service, method, options);
     }
 
     async asset(route, filepath) {
-        const damless = await this.giveme.resolve("dam-less");
+        const damless = await this.giveme.resolve("damless");
         await damless.asset(route, filepath);
     }
 }

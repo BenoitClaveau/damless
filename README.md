@@ -23,13 +23,13 @@
 # Installation
 
 ```shell
-npm install $dam-less --save
+npm install $damless --save
 ```
 
 ## Service.js
 
 ```service.js
-"use strict";
+
 
 class Service {	
 };
@@ -75,7 +75,7 @@ exports = module.exports = Service;
 Create a server.js
 
 ```server.js
-"use strict";
+
 
 const DamLess = require("damless");
 const damless = new Damless();
@@ -86,25 +86,25 @@ Run server on http://localhost:3000
 
 ## Others Services
   
-  * [$http](https://www.npmjs.com/package/dam-less)
-  * [$https](https://www.npmjs.com/package/qwebs-https)
-  * [$http-to-https](https://www.npmjs.com/package/dam-less-to-https)
-  * [$mongo](https://www.npmjs.com/package/qwebs-mongo)
-  * [$authentication](https://www.npmjs.com/package/qwebs-auth-jwt)
-  * [$https](https://www.npmjs.com/package/qwebs-https)
-  * [$nodemailer](https://www.npmjs.com/package/qwebs-nodemailer)
-  * [$bitbucket](https://www.npmjs.com/package/qwebs-bitbucket-deploy)
-  * [$aws-s3](https://www.npmjs.com/package/qwebs-aws-s3)
-  * [$aws-ses](https://www.npmjs.com/package/qwebs-aws-ses)
-  * [aws api gateway](https://www.npmjs.com/package/qwebs-aws-api-gateway)
+  * [$http](https://www.npmjs.com/package/damless)
+  * [$https](https://www.npmjs.com/package/damless-https)
+  * [$http-to-https](https://www.npmjs.com/package/damless-to-https)
+  * [$mongo](https://www.npmjs.com/package/damless-mongo)
+  * [$authentication](https://www.npmjs.com/package/damless-auth-jwt)
+  * [$https](https://www.npmjs.com/package/damless-https)
+  * [$nodemailer](https://www.npmjs.com/package/damless-nodemailer)
+  * [$bitbucket](https://www.npmjs.com/package/damless-bitbucket-deploy)
+  * [$aws-s3](https://www.npmjs.com/package/damless-aws-s3)
+  * [$aws-ses](https://www.npmjs.com/package/damless-aws-ses)
+  * [aws api gateway](https://www.npmjs.com/package/damless-aws-api-gateway)
 
 ## Examples
 
 To run our examples, clone the Qwebs repo and install the dependencies.
 
 ```bash
-$ git clone https://github.com/BenoitClaveau/qwebs --depth 1
-$ cd qwebs
+$ git clone https://github.com/BenoitClaveau/damless --depth 1
+$ cd damless
 $ npm install
 $ cd exemples/helloworld
 $ node server.js
@@ -115,19 +115,19 @@ $ node server.js
 To run our tests, clone the Qwebs repo and install the dependencies.
 
 ```bash
-$ git clone https://github.com/BenoitClaveau/qwebs --depth 1
-$ cd qwebs
+$ git clone https://github.com/BenoitClaveau/damless --depth 1
+$ cd damless
 $ npm install
 $ cd tests
 $ node.exe "../node_modules/mocha/bin/mocha" .
 ```
 
-[npm-image]: https://img.shields.io/npm/v/qwebs.svg
-[npm-image-download]: https://img.shields.io/npm/dm/qwebs.svg
-[npm-url]: https://npmjs.org/package/qwebs
-[travis-image]: https://travis-ci.org/BenoitClaveau/qwebs.svg?branch=master
-[travis-url]: https://travis-ci.org/BenoitClaveau/qwebs
-[coveralls-image]: https://coveralls.io/repos/BenoitClaveau/qwebs/badge.svg?branch=master&service=github
-[coveralls-url]: https://coveralls.io/github/BenoitClaveau/qwebs?branch=master
-[david-dm-image]: https://david-dm.org/BenoitClaveau/qwebs/status.svg
-[david-dm-url]: https://david-dm.org/BenoitClaveau/qwebs
+[npm-image]: https://img.shields.io/npm/v/damless.svg
+[npm-image-download]: https://img.shields.io/npm/dm/damless.svg
+[npm-url]: https://npmjs.org/package/damless
+[travis-image]: https://travis-ci.org/BenoitClaveau/damless.svg?branch=master
+[travis-url]: https://travis-ci.org/BenoitClaveau/damless
+[coveralls-image]: https://coveralls.io/repos/BenoitClaveau/damless/badge.svg?branch=master&service=github
+[coveralls-url]: https://coveralls.io/github/BenoitClaveau/damless?branch=master
+[david-dm-image]: https://david-dm.org/BenoitClaveau/damless/status.svg
+[david-dm-url]: https://david-dm.org/BenoitClaveau/damless

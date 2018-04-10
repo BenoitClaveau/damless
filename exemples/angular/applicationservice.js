@@ -1,7 +1,7 @@
 /*!
  * giveme service
  */
-"use strict";
+
 
 class ApplicationService {
     constructor() {

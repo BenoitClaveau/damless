@@ -1,12 +1,11 @@
 /*!
- * dam-less
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
-"use strict";
 
 const expect = require("expect.js");
-const GiveMeTheService= require("givemetheservice");
+const GiveMeTheService = require("givemetheservice");
 const process = require("process");
 const { inspect } = require("util");
 

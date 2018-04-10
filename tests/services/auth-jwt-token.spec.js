@@ -1,9 +1,8 @@
 /*!
- * dam-less-auth-jwt
+ * damless-auth-jwt
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
-"use strict";
 
 const Auth = require("../../lib/services/auth-jwt-token");
 const DamLess = require("../../index");

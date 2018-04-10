@@ -1,4 +1,4 @@
-"use strict";
+
 
 const DamLess = require('../../index');
 const damless = new DamLess({ config: { http: { port: 1337 }}});

@@ -1,9 +1,13 @@
 /*!
- * dam-less
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
 */
-const { Readable, Writable, Transform } = require('stream');
+const { 
+	Readable, 
+	Writable, 
+	Transform 
+} = require('stream');
 const fs = require('fs');
 const path = require('path');
 const pump = require('pump');
