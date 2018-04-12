@@ -1,5 +1,5 @@
 {
-  "name": "damless",
+  "name": "dambreaker",
   "version": "1.0.0",
   "description": "Streamify your web server",
   "main": "index.js",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BenoitClaveau/damless.git"
+    "url": "https://github.com/BenoitClaveau/dambreaker.git"
   },
   "keywords": [
     "https",
@@ -43,7 +43,7 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BenoitClaveau/damless/issues"
+    "url": "https://github.com/BenoitClaveau/dambreaker/issues"
   },
-  "homepage": "https://github.com/BenoitClaveau/damless"
+  "homepage": "https://github.com/BenoitClaveau/dambreaker"
 }

@@ -1,11 +1,11 @@
 /*!
- * damless
+ * dambreaker
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const expect = require("expect.js");
-const DamLess = require("../../index");
+const DamBreaker = require("../../index");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
@@ -16,21 +16,21 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { 
+let dambreaker;
+beforeEach(() => dambreaker = new DamBreaker({ dirname: __dirname, config: { 
     http: { 
         port: 3000, 
     },
 }}));
-afterEach(async () => await damless.stop());
+afterEach(async () => await dambreaker.stop());
 
 describe("ask", () => {
 
     it("post object -> object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveOne");
-        const client = await damless.resolve("client");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveOne");
+        const client = await dambreaker.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
             value: 0,
@@ -42,10 +42,10 @@ describe("ask", () => {
     });
 
     it("post object -> array", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
-        const client = await damless.resolve("client");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveMany");
+        const client = await dambreaker.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
             value: 0,
@@ -58,10 +58,10 @@ describe("ask", () => {
     });
 
     it("post array -> object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveOne");
-        const client = await damless.resolve("client");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveOne");
+        const client = await dambreaker.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
                 name: "ben",
@@ -80,10 +80,10 @@ describe("ask", () => {
     });
     
     it("post array -> array", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
-        const client = await damless.resolve("client");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveMany");
+        const client = await dambreaker.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
                 name: "ben",
@@ -106,10 +106,10 @@ describe("ask", () => {
     });
 
     it("upload json stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
-        const jsonstream = await damless.resolve("json-stream");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveMany");
+        const jsonstream = await dambreaker.resolve("json-stream");
 
         let receive = false;
         let sending = false;
@@ -137,10 +137,10 @@ describe("ask", () => {
     });
 
     it("upload image stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
-        const jsonstream = await damless.resolve("json-stream");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/save", "info", "saveMany");
+        const jsonstream = await dambreaker.resolve("json-stream");
 
         let receive = false;
         let sending = false;
@@ -168,9 +168,9 @@ describe("ask", () => {
     });
 
     it("upload json stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "saveFile");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -192,9 +192,9 @@ describe("ask", () => {
     });
 
     it("upload json object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "saveFile");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/upload", "info", "saveFile");
 
         const requestOptions = {
             formData : {
@@ -216,9 +216,9 @@ describe("ask", () => {
     });
 
     it("upload image stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "uploadImage");
+        dambreaker.inject("info", "./info");
+        await dambreaker.start();
+        await dambreaker.post("/upload", "info", "uploadImage");
 
         const requestOptions = {
             formData : {

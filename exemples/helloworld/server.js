@@ -1,8 +1,8 @@
 
 
-const DamLess = require('../../index');
-const damless = new DamLess({ config: { http: { port: 1337 }}});
+const DamBreaker = require('../../index');
+const dambreaker = new DamBreaker({ config: { http: { port: 1337 }}});
 
-await damless.inject("app", "./applicationservice");
-damless.get("/", "app", "getHelloWorld");
-await damless.start();
+await dambreaker.inject("app", "./applicationservice");
+dambreaker.get("/", "app", "getHelloWorld");
+await dambreaker.start();
