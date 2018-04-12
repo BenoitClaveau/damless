@@ -62,4 +62,7 @@ class DamLessServer {
 }
 
 module.exports = DamLessServer;
-module.exports.AuthJwtToken = require('./lib/services/auth-jwt-token');
+module.exports.Services = {
+    ...require('givemetheservice/lib/services'),
+    ...require('./lib/services')
+};
