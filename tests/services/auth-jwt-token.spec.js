@@ -1,11 +1,11 @@
 /*!
- * dambreaker-auth-jwt
+ * damless-auth-jwt
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const Auth = require("../../lib/services/auth-jwt-token");
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const expect = require("expect.js");
 const process = require("process");
 const { inspect } = require("util");
@@ -43,13 +43,13 @@ describe("auth-jwt-token", () => {
     });
 
     it("identify", async () => {
-        let dambreaker = new DamBreaker({ dirname: __dirname, config: config });
-        dambreaker.inject("info", "./info");
-        await dambreaker.start();
-        await dambreaker.get("/info", "info", "httpAuthInfo");
-        await dambreaker.post("/connect", "info", "connect");
+        let damless = new DamLess({ dirname: __dirname, config: config });
+        damless.inject("info", "./info");
+        await damless.start();
+        await damless.get("/info", "info", "httpAuthInfo");
+        await damless.post("/connect", "info", "connect");
         
-        const client = await dambreaker.resolve("client");
+        const client = await damless.resolve("client");
         try {
             const res1 = await client.get({ url: "http://localhost:3000/info", json: true });
             throw new Error("Mustn't be executed.")
@@ -62,6 +62,6 @@ describe("auth-jwt-token", () => {
         const res3 = await client.get({ url: "http://localhost:3000/info", auth: { "bearer": res2.body.token }, json: true });
         console.log(res3.body)
         expect(res3.body).to.eql({ id: 1024 });
-        dambreaker.unload();
+        damless.unload();
     });
 });

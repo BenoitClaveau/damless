@@ -1,10 +1,10 @@
 /*!
- * dambreaker
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const request = require('request');
 
 describe("patch", () => {

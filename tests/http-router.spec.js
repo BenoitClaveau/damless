@@ -1,11 +1,11 @@
 /*!
- * dambreaker
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const expect = require("expect.js");
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const process = require("process");
 const { inspect } = require("util");
 
@@ -13,32 +13,32 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let dambreaker;
-beforeEach(() => dambreaker = new DamBreaker({ dirname: __dirname, config: { 
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { 
     http: { 
         port: 3000, 
     },
 }}));
-afterEach(async () => await dambreaker.stop());
+afterEach(async () => await damless.stop());
 
 describe("http-router", () => {
 
     it("single route", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/whoiam", "info", "whoiam");
-        await dambreaker.get("/helloworld", "info", "helloworld");
-        const client = await dambreaker.resolve("client");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/whoiam", "info", "whoiam");
+        await damless.get("/helloworld", "info", "helloworld");
+        const client = await damless.resolve("client");
         const res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
     });
 
     it("multiple route", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/whoiam", "info", "whoiam");
-        await dambreaker.get("/helloworld", "info", "helloworld");
-        const client = await dambreaker.resolve("client");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/whoiam", "info", "whoiam");
+        await damless.get("/helloworld", "info", "helloworld");
+        const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
         res = await client.get("http://localhost:3000/helloworld");
@@ -46,11 +46,11 @@ describe("http-router", () => {
     });
 
     it("default route", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/helloworld", "info", "helloworld");
-        await dambreaker.get("/*", "info", "whoiam");
-        const client = await dambreaker.resolve("client");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/helloworld", "info", "helloworld");
+        await damless.get("/*", "info", "whoiam");
+        const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
         res = await client.get("http://localhost:3000/test");
@@ -60,11 +60,11 @@ describe("http-router", () => {
     });
 
     it("default route inverted", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/*", "info", "whoiam");
-        await dambreaker.get("/helloworld", "info", "helloworld");
-        const client = await dambreaker.resolve("client");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/*", "info", "whoiam");
+        await damless.get("/helloworld", "info", "helloworld");
+        const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
         res = await client.get("http://localhost:3000/test");
@@ -74,11 +74,11 @@ describe("http-router", () => {
     });
 
     it("multiple token", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/*", "info", "whoiam");
-        await dambreaker.get("/*/*", "info", "helloworld");
-        const client = await dambreaker.resolve("client");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/*", "info", "whoiam");
+        await damless.get("/*/*", "info", "helloworld");
+        const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
         res = await client.get("http://localhost:3000/test");
@@ -90,9 +90,9 @@ describe("http-router", () => {
     });
 
     it("multiple end route", async () => {
-        dambreaker.inject("info", "./services/info");
-        await dambreaker.start();
-        await dambreaker.get("/whoiam", "info", "whoiam");
-        await dambreaker.get("/whoiam", "info", "helloworld");
+        damless.inject("info", "./services/info");
+        await damless.start();
+        await damless.get("/whoiam", "info", "whoiam");
+        await damless.get("/whoiam", "info", "helloworld");
     });
 });

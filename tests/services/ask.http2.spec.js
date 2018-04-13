@@ -1,11 +1,11 @@
 /*!
- * dambreaker
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const expect = require("expect.js");
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
@@ -16,24 +16,24 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let dambreaker;
-beforeEach(() => dambreaker = new DamBreaker({ dirname: __dirname, config: { 
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { 
     http2: { 
         port: 8443, 
         cert: `${__dirname}/../certificates/certificate.pem`,
         key: `${__dirname}/../certificates/private-key.pem`,
     },
 }}));
-afterEach(async () => await dambreaker.stop());
+afterEach(async () => await damless.stop());
 
 describe("http2 ask", () => {
 
     it("post object -> object", async () => {
-        dambreaker.inject("info", "./info");
-        await dambreaker.start();
-        await dambreaker.post("/save", "info", "saveOne");
+        damless.inject("info", "./info");
+        await damless.start();
+        await damless.post("/save", "info", "saveOne");
 
-        const client = await dambreaker.resolve("client");
+        const client = await damless.resolve("client");
         const res = await client.post({ url: "https://localhost:8443/save", rejectUnauthorized: false, json: {
             name: "ben",
             value: 0,
@@ -45,9 +45,9 @@ describe("http2 ask", () => {
     }).timeout(60000);
     
     it("upload image", async () => {
-        dambreaker.inject("info", "./info");
-        await dambreaker.start();
-        await dambreaker.post("/upload", "info", "uploadImage");
+        damless.inject("info", "./info");
+        await damless.start();
+        await damless.post("/upload", "info", "uploadImage");
         
         const requestOptions = {
             formData : {

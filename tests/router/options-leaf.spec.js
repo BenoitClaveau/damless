@@ -1,11 +1,11 @@
 /*!
- * dambreaker
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const expect = require("expect.js");
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const request = require("request");
 const process = require("process");
 const { inspect } = require("util");
@@ -14,16 +14,16 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let dambreaker;
-beforeEach(() => dambreaker = new DamBreaker({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await dambreaker.unload());
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
+afterEach(async () => await damless.unload());
 
 describe("options-leaf", () => {
 
     it("/info", async () => {
-        dambreaker.inject("info", "../services/info");
-        await dambreaker.start();
-        await dambreaker.post("/info", "info", "getInfo");
+        damless.inject("info", "../services/info");
+        await damless.start();
+        await damless.post("/info", "info", "getInfo");
 
         const requestOptions = {
             method : "OPTIONS",

@@ -1,4 +1,4 @@
-# DamBreaker
+# DamLess
 
 Streamify your web server.
 
@@ -7,10 +7,10 @@ stream.write({ word: "Dam" });
 stream.end({ word: "Less" });
 ```
 
-DamBreaker is the first NodeJS web server dedicated to streamify all responses.
+DamLess is the first NodeJS web server dedicated to streamify all responses.
 
 ```shell
-npm install dambreaker --save
+npm install damless --save
 ```
 
  [![NPM][npm-image]][npm-url]
@@ -52,7 +52,7 @@ exports = module.exports = Service;
 
 Inject your service and define a new http route.
 
-Override core services to custom DamBreaker.
+Override core services to custom DamLess.
 
 ```services.json
 {
@@ -64,7 +64,7 @@ Override core services to custom DamBreaker.
 }
 ```
 
-## DamBreaker Configuration <a href="#config" />
+## DamLess Configuration <a href="#config" />
 
 ```config.json
 {
@@ -82,29 +82,29 @@ Create a server.js
 ```server.js
 
 
-const DamBreaker = require("dambreaker");
-const dambreaker = new Damless();
-await dambreaker.start();
+const DamLess = require("damless");
+const damless = new Damless();
+await damless.start();
 ```
 
 Run server on http://localhost:3000
 
-## Use other DamBreaker services to develop as fast as a rocket
+## Use other DamLess services to develop as fast as a rocket
   
-  * [$mongo](https://www.npmjs.com/package/dambreaker-mongo)
-  * [$nodemailer](https://www.npmjs.com/package/dambreaker-nodemailer)
-  * [$bitbucket](https://www.npmjs.com/package/dambreaker-bitbucket-deploy)
-  * [$aws-s3](https://www.npmjs.com/package/dambreaker-aws-s3)
-  * [$aws-ses](https://www.npmjs.com/package/dambreaker-aws-ses)
-  * [aws api gateway](https://www.npmjs.com/package/dambreaker-aws-api-gateway)
+  * [$mongo](https://www.npmjs.com/package/damless-mongo)
+  * [$nodemailer](https://www.npmjs.com/package/damless-nodemailer)
+  * [$bitbucket](https://www.npmjs.com/package/damless-bitbucket-deploy)
+  * [$aws-s3](https://www.npmjs.com/package/damless-aws-s3)
+  * [$aws-ses](https://www.npmjs.com/package/damless-aws-ses)
+  * [aws api gateway](https://www.npmjs.com/package/damless-aws-api-gateway)
 
 ## You want to see some examples
 
 To run our examples, clone the Qwebs repo and install the dependencies.
 
 ```bash
-$ git clone https://github.com/BenoitClaveau/dambreaker --depth 1
-$ cd dambreaker
+$ git clone https://github.com/BenoitClaveau/damless --depth 1
+$ cd damless
 $ npm install
 $ cd exemples/helloworld
 $ node server.js
@@ -115,19 +115,19 @@ $ node server.js
 To run our tests, clone the Qwebs repo and install the dependencies.
 
 ```bash
-$ git clone https://github.com/BenoitClaveau/dambreaker --depth 1
-$ cd dambreaker
+$ git clone https://github.com/BenoitClaveau/damless --depth 1
+$ cd damless
 $ npm install
 $ cd tests
 $ node.exe "../node_modules/mocha/bin/mocha" .
 ```
 
-[npm-image]: https://img.shields.io/npm/v/dambreaker.svg
-[npm-image-download]: https://img.shields.io/npm/dm/dambreaker.svg
-[npm-url]: https://npmjs.org/package/dambreaker
-[travis-image]: https://travis-ci.org/BenoitClaveau/dambreaker.svg?branch=master
-[travis-url]: https://travis-ci.org/BenoitClaveau/dambreaker
-[coveralls-image]: https://coveralls.io/repos/BenoitClaveau/dambreaker/badge.svg?branch=master&service=github
-[coveralls-url]: https://coveralls.io/github/BenoitClaveau/dambreaker?branch=master
-[david-dm-image]: https://david-dm.org/BenoitClaveau/dambreaker/status.svg
-[david-dm-url]: https://david-dm.org/BenoitClaveau/dambreaker
+[npm-image]: https://img.shields.io/npm/v/damless.svg
+[npm-image-download]: https://img.shields.io/npm/dm/damless.svg
+[npm-url]: https://npmjs.org/package/damless
+[travis-image]: https://travis-ci.org/BenoitClaveau/damless.svg?branch=master
+[travis-url]: https://travis-ci.org/BenoitClaveau/damless
+[coveralls-image]: https://coveralls.io/repos/BenoitClaveau/damless/badge.svg?branch=master&service=github
+[coveralls-url]: https://coveralls.io/github/BenoitClaveau/damless?branch=master
+[david-dm-image]: https://david-dm.org/BenoitClaveau/damless/status.svg
+[david-dm-url]: https://david-dm.org/BenoitClaveau/damless

@@ -1,11 +1,11 @@
 /*!
- * dambreaker
+ * damless
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
 
 const expect = require("expect.js");
-const DamBreaker = require("../../index");
+const DamLess = require("../../index");
 const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
