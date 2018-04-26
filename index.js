@@ -22,6 +22,10 @@ class DamLessServer {
         await this.giveme.unload();
     }
 
+    get config() {
+        return this.giveme.config;
+    }
+
     inject(name, location, options) {
         this.giveme.inject(name, location, options)
     }
