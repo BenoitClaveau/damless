@@ -62,6 +62,6 @@ describe("auth-jwt-token", () => {
         const res3 = await client.get({ url: "http://localhost:3000/info", auth: { "bearer": res2.body.token }, json: true });
         console.log(res3.body)
         expect(res3.body).to.eql({ id: 1024 });
-        damless.unload();
+        damless.stop();
     });
 });

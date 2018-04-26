@@ -16,7 +16,7 @@ process.on("unhandledRejection", (reason, p) => {
 
 let damless;
 beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await damless.unload());
+afterEach(async () => await damless.stop());
 
 describe("options-leaf", () => {
 
