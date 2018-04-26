@@ -13,18 +13,15 @@ const path = require('path');
 const pump = require('pump');
 
 class InfoService {
-	constructor(auth) {	
-		this.auth = auth;
+	constructor() {	
 	};
 	
 	whoiam(context, stream, headers) {
-		stream.contentType("text/html");
-		stream.end("I'm Info service.");
+		stream.respond({ contentType: "text/html" }).end("I'm Info service.");
 	};
 
 	helloworld(context, stream, headers) {
-		stream.contentType("text/html");
-		stream.end("Hello world.");
+		stream.respond({ contentType: "text/html" }).end("Hello world.");
 	};
 
 	getInfo(context, stream, headers) {
@@ -36,7 +33,7 @@ class InfoService {
 	};
 
 	getFile(context, stream, headers) {
-		stream.contentType("text/html");
+		stream.respond({ contentType: "text/html" });
 		fs.createReadStream(`${__dirname}/../data/npm.array.json`).pipe(stream);
 	};
 
@@ -99,14 +96,14 @@ class InfoService {
 		})
 	};
 
-	async connect(context, stream, headers) {
-		const self = this;
-		stream.mode("object");
-        stream.pipe(new Transform({ objectMode: true, async transform(chunk, enc, callback) {
-            const token = self.auth.encode(chunk);
-            callback(null, {token});
-        }})).pipe(stream);
-	};
+	// async connect(context, stream, headers) {
+	// 	const self = this;
+	// 	stream.mode("object");
+    //     stream.pipe(new Transform({ objectMode: true, async transform(chunk, enc, callback) {
+    //         const token = self.auth.encode(chunk);
+    //         callback(null, {token});
+    //     }})).pipe(stream);
+	// };
 };
 
 exports = module.exports = InfoService;

@@ -9,7 +9,8 @@
 const GiveMeTheService = require('givemetheservice');
 
 class DamLessServer {
-    constructor(options) {
+    constructor(options = {}) {
+        options.config = options.config || "./damless.json";
         this.giveme = new GiveMeTheService(options);                    //Create the container
         this.giveme.inject("damless", `${__dirname}/lib/damless`);    //Inject damless service
     }

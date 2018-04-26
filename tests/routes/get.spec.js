@@ -4,34 +4,29 @@
  * MIT Licensed
  */
 
+const expect = require("expect.js");
 const DamLess = require("../../index");
-const request = require('request');
+const request = require("request");
+const process = require("process");
+const { inspect } = require("util");
+
+process.on("unhandledRejection", (reason, p) => {
+    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
+});
+
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
+afterEach(async () => await damless.stop());
 
 describe("get", () => {
 
-    // it("get", done => {
-    //     let server = null;
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-            
-    //         giveme.inject("info", "../services/info");
-    //         giveme.get("/get", "info", "getInfo");
+    it("/info", async () => {
+        damless.inject("info", "../services/info");
+        await damless.start();
+        await damless.get("/info", "info", "getInfo");
 
-    //         return giveme.load().then(() => {
-    //             server = http.createServer((request, response) => {
-    //                 return giveme.invoke(request, response).catch(error => {
-    //                     return response.send({ statusCode: 500, request: request, content: error }); //close request
-    //                 });
-    //             }).listen(1337);
-                
-    //             let client = giveme.resolve("client");
-    //             return client.get({ url: "http://localhost:1337/get", json: true }).then(res => {
-    //                 expect(res.body.whoiam).toBe("I'm Info service.");
-    //             });
-    //         });
-    //     }).catch(fail).then(() => {
-    //         if (server) server.close();
-    //         done();
-    //     });
-    // });
+        const client = await damless.resolve("client");
+        const res = await client.get({ url: "http://localhost:3000/info", json: true })
+        expect(res.body[0].text).to.be("I'm Info service.");
+    });
 });

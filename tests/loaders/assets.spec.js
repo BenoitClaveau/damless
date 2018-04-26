@@ -5,7 +5,7 @@
  */
 
 const expect = require("expect.js");
-const GiveMeTheService = require("givemetheservice");
+const DamLess = require("../../index");
 const process = require("process");
 const { inspect } = require("util");
 
@@ -13,15 +13,15 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let giveme;
-beforeEach(() => giveme = new GiveMeTheService({ dirname: __dirname }));
-afterEach(async () => await giveme.unload());
+let damless;
+beforeEach(() => damless = new DamLess({ dirname: __dirname }));
+afterEach(async () => await damless.stop());
 
 describe("Assets loader", () => {
 
     it("assets", async () => {
-        await giveme.load();
-        const isitasset = await giveme.resolve("isitasset");
+        await damless.start();
+        const isitasset = await damless.resolve("isitasset");
         expect(isitasset.nodes.length).to.be(2);
         expect(isitasset.nodes[0].token).to.be("main.html");
         expect(isitasset.nodes[1].token).to.be("assets");

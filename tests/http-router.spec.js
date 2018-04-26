@@ -5,7 +5,7 @@
  */
 
 const expect = require("expect.js");
-const DamLess = require("../../index");
+const DamLess = require("../index");
 const process = require("process");
 const { inspect } = require("util");
 
@@ -93,6 +93,13 @@ describe("http-router", () => {
         damless.inject("info", "./services/info");
         await damless.start();
         await damless.get("/whoiam", "info", "whoiam");
-        await damless.get("/whoiam", "info", "helloworld");
+        try {
+            await damless.get("/whoiam", "info", "helloworld");
+            throw new Error("Failed");
+        } 
+        catch(error) {
+            if (error.message == "Failed the register helloworld of info for GET:/whoiam") return;
+            throw error;
+        }
     });
 });

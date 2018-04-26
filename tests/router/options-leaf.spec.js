@@ -20,7 +20,7 @@ afterEach(async () => await damless.stop());
 
 describe("options-leaf", () => {
 
-    it("/info", async () => {
+    xit("/info", async () => {
         damless.inject("info", "../services/info");
         await damless.start();
         await damless.post("/info", "info", "getInfo");

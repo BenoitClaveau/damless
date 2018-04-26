@@ -42,12 +42,12 @@ describe("auth-jwt-token", () => {
         expect(payload.version).to.be(3);
     });
 
-    it("identify", async () => {
+    xit("identify", async () => {
         let damless = new DamLess({ dirname: __dirname, config: config });
         damless.inject("info", "./info");
         await damless.start();
         await damless.get("/info", "info", "httpAuthInfo");
-        await damless.post("/connect", "info", "connect");
+        //await damless.post("/connect", "info", "connect");
         
         const client = await damless.resolve("client");
         try {
