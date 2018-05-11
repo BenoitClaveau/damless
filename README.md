@@ -21,17 +21,17 @@ npm install damless --save
 
 # Features
 
-  * [Structured your project using services](#services)
+  [Structured your project using services](#services)
   
-  * [Dependency Injection to override default behavior](#di)
+  [Dependency Injection to override default behavior](#di)
   
-  * Compression & minification
+  Compression & minification
   
-  * 0 disk access at runtime
+  0 disk access at runtime
   
-  * [Configuration](#config)
+  [Configuration](#config)
   
-  * [Security](https://github.com/shieldfy/API-Security-Checklist)
+  [Security](https://github.com/shieldfy/API-Security-Checklist)
 
 
 ## Service.js <a href="#services" />
