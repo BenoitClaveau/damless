@@ -163,7 +163,7 @@ describe("ask", () => {
             })
     });
 
-    it("upload json stream", async () => {
+    xit("upload json stream", async () => {
         damless.inject("info", "./info");
         await damless.start();
         await damless.post("/upload", "info", "saveFile");
