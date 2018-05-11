@@ -21,8 +21,8 @@ npm install damless --save
 
 # Features
 
-  * [Structured your project using services](#services).
-  * [Dependency Injection to override default behavior](#di).
+  * [Structured your project using services](#services)
+  * [Dependency Injection to override default behavior](#di)
   * Compression & minification
   * 0 disk access at runtime
   * [Configuration](#config)
