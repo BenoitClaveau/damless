@@ -3,8 +3,8 @@
 Streamify your web server.
 
 ```.js
-stream.write({ word: "Dam" });
-stream.end({ word: "Less" });
+stream.write("Hello");
+stream.end("world")
 ```
 
 DamLess has been designed to think the web as a stream. 
