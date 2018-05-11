@@ -44,7 +44,7 @@ describe("http2 ask", () => {
         expect(res.body.test).to.be(454566);
     }).timeout(60000);
     
-    it("upload image", async () => {
+    xit("upload image", async () => {
         damless.inject("info", "./info");
         await damless.start();
         await damless.post("/upload", "info", "uploadImage");
