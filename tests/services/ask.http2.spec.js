@@ -8,7 +8,6 @@ const expect = require("expect.js");
 const DamLess = require("../../index");
 const request = require("request");
 const fs = require("fs");
-const JSONStream = require("JSONStream");
 const process = require("process");
 const { inspect } = require("util");
 

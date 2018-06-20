@@ -4,13 +4,11 @@
  * MIT Licensed
 */
 const { 
-	Readable, 
-	Writable, 
-	Transform 
+    Readable,
+    Transform,
 } = require('stream');
 const fs = require('fs');
 const path = require('path');
-const pump = require('pump');
 
 class InfoService {
 	constructor() {	
@@ -42,26 +40,29 @@ class InfoService {
 	};
 
 	getStream(context, stream, headers) {
-		const stream = Readable({ objectMode: true, read() {}}); 
-		stream.pipe(stream);
-		stream.push({ id: 1 });
-    	stream.push({ id: 2 });
-        stream.push(null);
+		const readable = Readable({ objectMode: true, read() {}}); 
+		readable.pipe(stream);
+		readable.push({ id: 1 });
+    	readable.push({ id: 2 });
+        readable.push(null);
 	};
 
 	getStreamWithTimeout(context, stream, headers) {
-		const stream = Readable({ objectMode: true, read() {}}); 
-		stream.pipe(stream);
+		const readable = Readable({ objectMode: true, read() {}}); 
+		readable.pipe(stream);
 		setTimeout(() => {
-			stream.push({ id: 3 });
-			stream.push({ id: 4 });
-			stream.push(null);
+			readable.push({ id: 3 });
+			readable.push({ id: 4 });
+			readable.push(null);
 		}, 100);
 	};
 
 	saveOne(context, stream, headers) {
 		stream.mode("object");
-		stream.pipe(stream);
+		stream.pipe(new Transform({ objectMode: true, transform(chunk, encoding, callback) {
+            console.log(`Save ${chunk.name}`)
+            callback(null, chunk);
+        }})).pipe(stream)
 	};
 
 	saveMany(context, stream, headers) {
@@ -69,10 +70,10 @@ class InfoService {
 	};
 
 	saveFile(context, stream, headers) {
-		const stream = Readable({ objectMode: true, read() {}}); 
-		stream.pipe(stream);
+		const readable = Readable({ objectMode: true, read() {}}); 
+		readable.pipe(stream);
 
-		stream.on("file", (fieldname, file, filename, encoding, mimetype) => {
+		readable.on("file", (fieldname, file, filename, encoding, mimetype) => {
 			const filepath = `${__dirname}/../data/output/${filename}`;
 			if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
