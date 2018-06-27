@@ -15,7 +15,7 @@ npm install damless --save
 
  [![NPM][npm-image]][npm-url]
  [![Build Status][travis-image]][travis-url]
- [![Coverage Status][coveralls-image]][coveralls-url]
+ [![Coverage Status](https://coveralls.io/repos/github/BenoitClaveau/damless/badge.svg?branch=master)](https://coveralls.io/github/BenoitClaveau/damless?branch=master)
  [![NPM Download][npm-image-download]][npm-url]
  [![Dependencies Status][david-dm-image]][david-dm-url]
 
