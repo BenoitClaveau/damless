@@ -1,8 +1,8 @@
 {
     "services": [
-        { "name": "$info", "location": "../services/info"}
+        { "name": "info", "location": "../services/info"}
     ],
     "http-routes": [
-        { "get": "/info", "service": "$info", "method": "getInfo"}
+        { "get": "/info", "service": "info", "method": "getInfo"}
     ]
 }
