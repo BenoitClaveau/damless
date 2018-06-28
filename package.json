@@ -20,11 +20,12 @@
     "coveralls": "latest",
     "expect.js": "latest",
     "istanbul": "latest",
-    "mocha": "latest"
+    "mocha": "latest",
+    "nyc": "latest"
   },
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha --recursive tests/**/*.spec.js",
-    "test-cover": "node_modules/.bin/istanbul cover node_modules/mocha/bin/mocha --recursive tests/**/*.spec.js"
+    "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",
+    "test-cover": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
