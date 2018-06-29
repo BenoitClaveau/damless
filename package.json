@@ -1,50 +1,55 @@
 {
-  "name": "damless",
-  "version": "0.0.6",
-  "description": "Streamify your web server",
-  "main": "index.js",
-  "dependencies": {
-    "busboy": "latest",
-    "chalk": "latest",
-    "file-type": "latest",
-    "isitforme": "latest",
-    "jwt-simple": "latest",
-    "oups": "latest",
-    "pump": "latest",
-    "givemetheservice": "latest",
-    "uuid": "latest",
-    "vinyl": "latest"
-  },
-  "devDependencies": {
-    "JSONStream": "latest",
-    "coveralls": "latest",
-    "expect.js": "latest",
-    "istanbul": "latest",
-    "mocha": "latest",
-    "nyc": "latest"
-  },
-  "scripts": {
-    "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/BenoitClaveau/damless.git"
-  },
-  "keywords": [
-    "https",
-    "givemetheservice",
-    "config",
-    "webserver",
-    "promise"
-  ],
-  "author": {
-    "name": "Benoît Claveau",
-    "email": "benoit.claveau@gmail.com"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/BenoitClaveau/damless/issues"
-  },
-  "homepage": "https://github.com/BenoitClaveau/damless"
+    "name": "damless",
+    "version": "0.0.6",
+    "description": "Streamify your web server",
+    "main": "index.js",
+    "dependencies": {
+        "busboy": "latest",
+        "chalk": "latest",
+        "file-type": "latest",
+        "isitforme": "latest",
+        "jwt-simple": "latest",
+        "oups": "latest",
+        "pump": "latest",
+        "givemetheservice": "latest",
+        "uuid": "latest",
+        "vinyl": "latest"
+    },
+    "devDependencies": {
+        "JSONStream": "latest",
+        "coveralls": "latest",
+        "expect.js": "latest",
+        "istanbul": "latest",
+        "mocha": "latest",
+        "nyc": "latest"
+    },
+    "scripts": {
+        "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",
+        "coverage": "nyc report --reporter=text-lcov | coveralls"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BenoitClaveau/damless.git"
+    },
+    "keywords": [
+        "https",
+        "givemetheservice",
+        "config",
+        "webserver",
+        "promise"
+    ],
+    "author": {
+        "name": "Benoît Claveau",
+        "email": "benoit.claveau@gmail.com"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/BenoitClaveau/damless/issues"
+    },
+    "homepage": "https://github.com/BenoitClaveau/damless",
+    "nyc": {
+        "include": [
+            "lib/**/*.js"
+        ]
+    }
 }
