@@ -67,7 +67,24 @@ class DamLessServer {
 }
 
 module.exports = DamLessServer;
-module.exports.Services = {
-    ...require('givemetheservice/lib/services'),
-    ...require('./lib/services')
-};
+// Export givemetheservice services
+module.exports.Client = require("givemetheservice").Client;
+module.exports.Crypto = require("givemetheservice").Crypto;
+module.exports.Event = require("givemetheservice").Event;
+module.exports.FS = require("givemetheservice").FS;
+module.exports.JsonStream = require("givemetheservice").JsonStream;
+module.exports.Json = require("givemetheservice").Json;
+module.exports.Password = require("givemetheservice").Password;
+module.exports.QJimp = require("givemetheservice").QJimp;
+module.exports.RepositoryFactory = require("givemetheservice").RepositoryFactory;
+module.exports.String = require("givemetheservice").String;
+module.exports.Walk = require("givemetheservice").Walk;
+// Export damless services
+module.exports.AskReply = require("./lib/services/ask-reply");
+module.exports.AuthJwtToken = require("./lib/services/auth-jwt-token");
+module.exports.CompressedStream = require("./lib/services/compressed-stream");
+module.exports.ContentType = require("./lib/services/content-type");
+module.exports.ContextFactory = require("./lib/services/context-factory");
+module.exports.IsItForMe = require("./lib/services/isitforme");
+module.exports.QueryString = require("./lib/services/querystring");
+module.exports.QueryParams = require("./lib/services/queryparams");
