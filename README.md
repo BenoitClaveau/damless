@@ -29,7 +29,9 @@ npm install damless --save
   
   0 disk access at runtime
   
-  [Configuration](#config)
+  [Configuration manager](#config)
+
+  [Json serializer](#json)
   
   [Security](https://github.com/shieldfy/API-Security-Checklist)
 
@@ -41,8 +43,8 @@ class Service {
 };
 
 text(context, stream, headers) {
- stream.write("Hello");
- stream.end("world")
+  stream.write("Hello");
+  stream.end("world")
 };
 
 json(context, stream, headers) {
@@ -62,14 +64,15 @@ Override core services to custom DamLess.
 ```services.json
 {
   "services": [
-    { "name": "service", "location": "./service"}
+    { "name": "info", "location": "../services/info"}
   ]
-  "http-routes": [   
+  "http-routes": [
+     { "get": "/info", "service": "info", "method": "getInfo"}
   ]
 }
 ```
 
-## DamLess Configuration <a href="#config" />
+## DamLess configuration manager <a href="#config" />
 
 ```config.json
 {
@@ -77,6 +80,49 @@ Override core services to custom DamLess.
     "http": {
         "port": 3000
     }
+}
+```
+
+Retrieve the config object in your service.
+
+```.js
+class Service {	
+    constructor(config) {
+        console.log(config.http.port);
+    }
+};
+```
+
+## Customize the json serializer <a href="#json" />
+
+```json.js
+const { Json } = require("damless");
+const moment = require("moment");
+const { ObjectID } = require("bson");
+
+class CustomJson extends Json {
+
+    constructor() {
+        super();
+    }
+
+    onValue(key, value) {
+        if (/\d{2}-\d{2}-\d{2}/.test(value)) return moment(value, "YYYY-MM-DD").toDate();
+        if (ObjectID.isValid(value)) return new ObjectID(value);
+        return super.onValue(key, value);
+    }
+}
+
+exports = module.exports = CustomJson;
+```
+
+Override core json serializer to custom DamLess.
+
+```services.json
+{
+  "services": [
+    { "name": "json", "location": "./services/json"}
+  ]
 }
 ```
 
