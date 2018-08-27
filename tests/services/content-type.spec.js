@@ -20,7 +20,7 @@ describe("ContentType", () => {
     it("get", () => {
         expect(contentType.get(".json")).to.be("application/json");
         expect(contentType.get(".png")).to.be("image/png");
-        expect(contentType.get(".jpg")).to.be("image/jpg");
+        expect(contentType.get(".jpg")).to.be("image/jpeg");
         expect(contentType.get(".gif")).to.be("image/gif");
         expect(contentType.get(".svg")).to.be("image/svg+xml");
         expect(contentType.get(".js")).to.be("application/javascript");
