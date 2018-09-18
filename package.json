@@ -1,6 +1,6 @@
 {
     "name": "damless",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "description": "Streamify your web server",
     "main": "index.js",
     "dependencies": {
@@ -10,7 +10,6 @@
         "isitforme": "latest",
         "jwt-simple": "latest",
         "oups": "latest",
-        "pump": "latest",
         "givemetheservice": "latest",
         "uuid": "latest",
         "vinyl": "latest"
