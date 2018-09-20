@@ -64,6 +64,11 @@ class DamLessServer {
         const damless = await this.giveme.resolve("damless");
         await damless.asset(route, filepath);
     }
+
+    async on(type, listener) {
+        const damless = await this.giveme.resolve("damless");
+        damless.on(type, listener);
+    }
 }
 
 module.exports = DamLessServer;
