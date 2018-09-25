@@ -36,10 +36,10 @@ npm install damless --save
   [Security](https://github.com/shieldfy/API-Security-Checklist)
 
 
-## Service.js <a href="#services" />
+## Services/info.js <a href="#services" />
 
-```service.js
-class Service {	
+```services/info.js
+class ServiceInfo {	
 };
 
 text(context, stream, headers) {
@@ -52,7 +52,7 @@ json(context, stream, headers) {
   stream.end({ name: "folk" });
 };
 
-exports = module.exports = Service;
+exports = module.exports = ServiceInfo;
 ```
 
 ## Dependency Injection <a href="#di" />
@@ -63,18 +63,26 @@ Override core services to custom DamLess.
 
 ```services.json
 {
-  "services": [
-    { "name": "info", "location": "../services/info"}
-  ]
-  "http-routes": [
-     { "get": "/info", "service": "info", "method": "getInfo"}
-  ]
+    "services": [
+        {
+            "name": "info",
+            "location": "./services/info"
+        }
+    ],
+    "http-routes": [
+        {
+            "get": "/",
+            "service": "info",
+            "method": "text",
+            "auth": "false"
+        }
+    ]
 }
 ```
 
-## DamLess configuration manager <a href="#config" />
+## DamLess configuration manager (damless.json) <a href="#config" />
 
-```config.json
+```damless.json
 {
     "services": "./services.json",
     "http": {
@@ -86,11 +94,21 @@ Override core services to custom DamLess.
 Retrieve the config object in your service.
 
 ```.js
-class Service {	
-    constructor(config) {
+class ServiceInfo {	
+    constructor(config) {       // config has been injected
         console.log(config.http.port);
     }
 };
+```
+
+## Enjoy
+
+Create a server.js
+
+```server.js
+const DamLess = require("damless");
+const damless = new DamLess();
+damless.start();
 ```
 
 ## Customize the json serializer <a href="#json" />
@@ -124,16 +142,6 @@ Override core json serializer to custom DamLess.
     { "name": "json", "location": "./services/json"}
   ]
 }
-```
-
-## Enjoy
-
-Create a server.js
-
-```server.js
-const DamLess = require("damless");
-const damless = new Damless();
-await damless.start();
 ```
 
 Run server on http://localhost:3000
