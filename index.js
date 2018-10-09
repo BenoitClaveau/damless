@@ -81,7 +81,8 @@ const {
     noop,
     getFirst,
     getAll,
-    ending
+    ending,
+    toStream
 } = require('./lib/core');
 
 const {
@@ -127,3 +128,4 @@ module.exports.getFirst = getFirst;
 module.exports.getAll = getAll;
 module.exports.ending = ending;
 module.exports.noop = noop;
+module.exports.toStream = toStream;
