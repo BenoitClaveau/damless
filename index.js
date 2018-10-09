@@ -4,8 +4,6 @@
  * MIT Licensed
  */
 
-
-
 const GiveMeTheService = require('givemetheservice');
 
 class DamLessServer {
@@ -66,25 +64,66 @@ class DamLessServer {
     }
 }
 
+const {
+    AskReply,
+    AuthJwtToken,
+    CompressedStream,
+    ContentType,
+    ContextFactory,
+    IsItForMe,
+    QueryString,
+    QueryParams
+} = require('./lib/services');
+
+const {
+    transform,
+    streamify,
+    noop,
+    getFirst,
+    getAll,
+    ending
+} = require('./lib/core');
+
+const {
+    Client,
+    Crypto: CryptoService,
+    Event: EventService,
+    FS,
+    JsonStream,
+    Json,
+    Password,
+    QJimp,
+    RepositoryFactory,
+    String: StringService,
+    Walk
+} = require('givemetheservice');
+
 module.exports = DamLessServer;
 // Export givemetheservice services
-module.exports.Client = require("givemetheservice").Client;
-module.exports.Crypto = require("givemetheservice").Crypto;
-module.exports.Event = require("givemetheservice").Event;
-module.exports.FS = require("givemetheservice").FS;
-module.exports.JsonStream = require("givemetheservice").JsonStream;
-module.exports.Json = require("givemetheservice").Json;
-module.exports.Password = require("givemetheservice").Password;
-module.exports.QJimp = require("givemetheservice").QJimp;
-module.exports.RepositoryFactory = require("givemetheservice").RepositoryFactory;
-module.exports.String = require("givemetheservice").String;
-module.exports.Walk = require("givemetheservice").Walk;
+module.exports.Client = Client;
+module.exports.Crypto = CryptoService;
+module.exports.Event = EventService;
+module.exports.FS = FS;
+module.exports.JsonStream = JsonStream;
+module.exports.Json = Json;
+module.exports.Password = Password;
+module.exports.QJimp = QJimp;
+module.exports.RepositoryFactory = RepositoryFactory;
+module.exports.String = StringService;
+module.exports.Walk = Walk;
 // Export damless services
-module.exports.AskReply = require("./lib/services/ask-reply");
-module.exports.AuthJwtToken = require("./lib/services/auth-jwt-token");
-module.exports.CompressedStream = require("./lib/services/compressed-stream");
-module.exports.ContentType = require("./lib/services/content-type");
-module.exports.ContextFactory = require("./lib/services/context-factory");
-module.exports.IsItForMe = require("./lib/services/isitforme");
-module.exports.QueryString = require("./lib/services/querystring");
-module.exports.QueryParams = require("./lib/services/queryparams");
+module.exports.AskReply = AskReply;
+module.exports.AuthJwtToken = AuthJwtToken;
+module.exports.CompressedStream = CompressedStream;
+module.exports.ContentType = ContentType;
+module.exports.ContextFactory = ContextFactory;
+module.exports.IsItForMe = IsItForMe;
+module.exports.QueryString = QueryString;
+module.exports.QueryParams = QueryParams;
+// Export damless core
+module.exports.transform = transform;
+module.exports.streamify = streamify;
+module.exports.getFirst = getFirst;
+module.exports.getAll = getAll;
+module.exports.ending = ending;
+module.exports.noop = noop;
