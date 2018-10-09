@@ -81,6 +81,7 @@ const {
     noop,
     getFirst,
     getAll,
+    getBuffer,
     ending,
     toStream
 } = require('./lib/core');
@@ -126,6 +127,7 @@ module.exports.transform = transform;
 module.exports.streamify = streamify;
 module.exports.getFirst = getFirst;
 module.exports.getAll = getAll;
+module.exports.getBuffer = getBuffer;
 module.exports.ending = ending;
 module.exports.noop = noop;
 module.exports.toStream = toStream;
