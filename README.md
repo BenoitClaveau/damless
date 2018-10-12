@@ -2,16 +2,32 @@
 
 Streamify your web server.
 
-```.js
-stream.write("Hello");
-stream.end("world")
-```
-
-DamLess has been designed to think the web as a stream. 
-
 ```shell
 npm install damless --save
 ```
+
+## Create a server.js
+
+```server.js
+const DamLess = require("damless");
+const damless = new DamLess();
+damless.start();
+```
+
+## Create services.
+
+```.js
+class Service {	
+};
+
+say_hello(context, stream, headers) {
+  stream.write("Hello");
+  stream.end("world");
+};
+
+```
+
+DamLess has been designed to think the web as a stream. 
 
  [![NPM][npm-image]][npm-url]
  [![Build Status][travis-image]][travis-url]
@@ -99,16 +115,6 @@ class ServiceInfo {
         console.log(config.http.port);
     }
 };
-```
-
-## Enjoy
-
-Create a server.js
-
-```server.js
-const DamLess = require("damless");
-const damless = new DamLess();
-damless.start();
 ```
 
 ## Customize the json serializer <a href="#json" />
