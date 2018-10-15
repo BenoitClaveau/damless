@@ -34,37 +34,37 @@ class DamLessServer {
     }
 
     async get(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.get(route, service, method, options);
     }
 
     async post(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.post(route, service, method, options);
     }
 
     async put(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.put(route, service, method, options);
     }
 
     async delete(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.delete(route, service, method, options);
     }
 
     async patch(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.patch(route, service, method, options);
     }
 
     async asset(route, filepath) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         await damless.asset(route, filepath);
     }
 
     async on(type, listener) {
-        const damless = await this.giveme.resolve("damless");
+        const damless = await this.giveme.resolve("damless", { mount : false });
         damless.on(type, listener);
     }
 }
