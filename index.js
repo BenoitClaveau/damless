@@ -5,28 +5,36 @@
  */
 
 const GiveMeTheService = require('givemetheservice');
+const EventEmitter = require(`events`);
 
 class DamLessServer {
     constructor(options = {}) {
         options.config = options.config || "./damless.json";
+        this.eventEmitter = new EventEmitter();
         this.giveme = new GiveMeTheService(options);                    //Create the container
-        this.giveme.inject("damless", `${__dirname}/lib/damless`);    //Inject damless service
+        this.giveme.inject("eventEmitter", this.eventEmitter);          //Event emmitter
+        this.giveme.inject("damless", `${__dirname}/lib/damless`);      //Inject damless service
+        
     }
 
     async start() {
         await this.giveme.load();
+        return this;
     }
 
     async stop() {
         await this.giveme.unload();
+        return this;
     }
 
-    get config() {
-        return this.giveme.config;
+    config(fn) {
+        fn(this.giveme.config);
+        return this;
     }
 
     inject(name, location, options) {
-        this.giveme.inject(name, location, options)
+        this.giveme.inject(name, location, options);
+        return this;
     }
 
     async resolve(name) {
@@ -34,38 +42,38 @@ class DamLessServer {
     }
 
     async get(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.get(route, service, method, options);
     }
 
     async post(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.post(route, service, method, options);
     }
 
     async put(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.put(route, service, method, options);
     }
 
     async delete(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.delete(route, service, method, options);
     }
 
     async patch(route, service, method, options) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.patch(route, service, method, options);
     }
 
     async asset(route, filepath) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
+        const damless = await this.giveme.resolve("damless", { mount: false });
         await damless.asset(route, filepath);
     }
 
-    async on(type, listener) {
-        const damless = await this.giveme.resolve("damless", { mount : false });
-        damless.on(type, listener);
+    on(type, listener) {
+        this.eventEmitter.on(type, listener);
+        return this;
     }
 }
 
