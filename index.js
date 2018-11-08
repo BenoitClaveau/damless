@@ -96,8 +96,8 @@ const {
     getAll,
     getBuffer,
     ending,
-    toStream,
-    flow
+    ArrayToStream,
+    StreamFlow
 } = require('./lib/core');
 
 const {
@@ -144,5 +144,5 @@ module.exports.getAll = getAll;
 module.exports.getBuffer = getBuffer;
 module.exports.ending = ending;
 module.exports.noop = noop;
-module.exports.toStream = toStream;
-module.exports.flow = flow;
+module.exports.ArrayToStream = ArrayToStream;
+module.exports.StreamFlow = StreamFlow;
