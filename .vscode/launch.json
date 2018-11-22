@@ -16,8 +16,11 @@
             "name": "Tests",
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "args": [
+                "--color",
                 "--recursive",
-                "tests/**/*.spec.js"
+                "--grep",
+                "identify",
+                "${workspaceRoot}/tests/services/*.spec.js"
             ],
             "cwd": "${workspaceRoot}"
           }

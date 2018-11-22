@@ -9,9 +9,11 @@ const {
 } = require('stream');
 const fs = require('fs');
 const path = require('path');
+const { AuthJwtToken } = require("../../index");
 
-class InfoService {
-	constructor() {	
+class InfoService extends AuthJwtToken {
+	constructor(config) {	
+        super(config);
 	};
 	
 	whoiam(context, stream, headers) {
@@ -27,7 +29,9 @@ class InfoService {
 	};
 
 	httpAuthInfo(context, stream, headers) {
-		stream.end({ text: "I'm Info service." });
+        stream
+            .mode("object")
+            .end({ text: "I'm Info service." });
 	};
 
 	getFile(context, stream, headers) {
@@ -86,25 +90,31 @@ class InfoService {
 	};
 
 	uploadImage(context, stream, headers) {
-		stream.mode("buffer");
-		stream.on("file", (fieldname, file, filename, encoding, mimetype) => {
-			const parsed = path.parse(filename);
-			const filepath = `${__dirname}/../data/output/${parsed.name}.server${parsed.ext}`;
-			if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-			file.pipe(fs.createWriteStream(filepath)).on("finish", () => {
-				fs.createReadStream(filepath).pipe(stream);
-			})
-		})
+        stream
+            .mode("buffer")
+		    .on("file", (fieldname, file, filename, encoding, mimetype) => {
+                const parsed = path.parse(filename);
+                const filepath = `${__dirname}/../data/output/${parsed.name}.server${parsed.ext}`;
+                if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+                file.pipe(fs.createWriteStream(filepath)).on("finish", () => {
+                    fs.createReadStream(filepath).pipe(stream);
+                })
+		    })
 	};
 
-	// async connect(context, stream, headers) {
-	// 	const self = this;
-	// 	stream.mode("object");
-    //     stream.pipe(new Transform({ objectMode: true, async transform(chunk, enc, callback) {
-    //         const token = self.auth.encode(chunk);
-    //         callback(null, {token});
-    //     }})).pipe(stream);
-	// };
+	async connect(context, stream, headers) {
+        //await super.authenticate(context, stream, headers);
+        stream
+            .mode("object")
+            .pipe(new Transform({ 
+                objectMode: true, 
+                transform: (chunk, enc, callback) => {
+                    const token = this.encode(chunk);
+                    callback(null, {token});
+                }
+            }))
+            .pipe(stream);
+	};
 };
 
 exports = module.exports = InfoService;

@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-const Auth2 = require("../../lib/services/auth2");
 const DamLess = require("../../index");
 const expect = require("expect.js");
 const process = require("process");
@@ -14,7 +13,7 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-describe("auth2", () => {
+describe("querystring", () => {
 
     let damless;
     before(async () => {
@@ -23,7 +22,12 @@ describe("auth2", () => {
     });
     after(async () => await damless.stop());
 
-    xit("authenticate", async () => {
+    it("parse querystring", async () => {
+        const qs = await damless.resolve("querystring");
+        const query = qs.parse("price=10");
+        expect(query).to.eql({
+            price: 10
+        });
     });
 
 });
