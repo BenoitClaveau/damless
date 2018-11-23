@@ -20,7 +20,7 @@
                 "--recursive",
                 "--grep",
                 "identify",
-                "${workspaceRoot}/tests/services/*.spec.js"
+                "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}"
           }
