@@ -19,7 +19,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "identify",
+                "createToken",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}"

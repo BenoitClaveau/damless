@@ -1,0 +1,43 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+
+<body>
+  <button id="btn-login">
+        Log In
+    </button>
+  <script src="http://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.auth0.com/js/auth0/9.5.1/auth0.min.js"></script>
+  <script>
+    (function () {
+      var webAuth = new auth0.WebAuth({
+        domain: 'YOUR_AUTH0_DOMAIN',
+        clientID: 'YOUR_CLIENT_ID',
+        redirectUri: 'http://localhost:3000',
+        responseType: 'id_token',
+        scope: 'openid profile'
+      });
+
+      var loginBtn = document.getElementById('btn-login');
+      loginBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        webAuth.authorize();
+      });
+
+      function handleAuthentication() {
+        webAuth.parseHash(function (err, authResult) {
+          if (authResult && authResult.idTokenPayload) {
+            window.location.hash = '';
+            alert('your user_id is: ' + authResult.idTokenPayload.sub);
+          }
+        });
+      }
+
+      handleAuthentication();
+    })();
+  </script>
+</body>
+</html>
