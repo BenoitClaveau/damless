@@ -43,9 +43,12 @@ describe("auth2", () => {
 
     it("should authenticate the request", async () => {
         const res = await fetch("http://localhost:3000", {
-            method: "GET"
+            method: "GET",
+            headers: {
+                'Authorization': 'Bearer foobar'
+            }
         });
-        except(res.ok).to.be(false);
+        expect(res.ok).to.be(false);
 
     }).timeout(30000);
 
