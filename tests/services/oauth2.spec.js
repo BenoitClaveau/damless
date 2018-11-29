@@ -8,6 +8,7 @@ const OAuth2 = require("../../lib/services/oauth2");
 const DamLess = require("../../index");
 const expect = require("expect.js");
 const process = require("process");
+const fetch = require("node-fetch");
 const { inspect } = require("util");
 const ClientOAuth2 = require('client-oauth2')
 
@@ -26,14 +27,24 @@ describe("auth2", () => {
     let damless;
     before(async () => {
         damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } });
-        damless.inject("aoth2", OAuth2)
+        damless.inject("oauth2", OAuth2);
+        await damless.post("/oauth/authorize", "oauth2", "authorize");
         await damless.start();
-        
-
     });
     after(async () => await damless.stop());
 
-    it("createToken via github", async () => {
+    it("should authenticate the request", async () => {
+        const res = await fetch("http://localhost:3000", {
+            method: "POST"
+        });
+        except(res.ok).to.be(false);
+
+    }).timeout(30000);
+
+
+
+
+    xit("createToken via github", async () => {
         const auth = new ClientOAuth2({
             clientId: 'abc',
             clientSecret: '123',
@@ -56,7 +67,7 @@ describe("auth2", () => {
         expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
     }).timeout(20000);
 
-    it("createToken via damless", async () => {
+    xit("createToken via damless", async () => {
         const auth = new ClientOAuth2({
             clientId: 'abc',
             clientSecret: '123',
@@ -71,7 +82,7 @@ describe("auth2", () => {
 
         var obj = user.sign({
             method: 'GET',
-            url: 'http://api.github.com/user',
+            url: 'http://localhost:3000/info',
             headers: {
                 'accept': '*/*'
             }

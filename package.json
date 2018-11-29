@@ -21,7 +21,9 @@
         "expect.js": "latest",
         "istanbul": "latest",
         "mocha": "latest",
-        "nyc": "latest"
+        "node-fetch": "latest",
+        "nyc": "latest",
+        "blue-tape": "latest"
     },
     "scripts": {
         "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",

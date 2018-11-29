@@ -32,6 +32,12 @@ class InfoService extends AuthJwtToken {
         stream
             .mode("object")
             .end({ text: "I'm Info service." });
+    };
+    
+    httpOAuth2Info(context, stream, headers) {
+        stream
+            .mode("object")
+            .end({ text: "I'm Info service." });
 	};
 
 	getFile(context, stream, headers) {
