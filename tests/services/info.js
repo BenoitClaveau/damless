@@ -68,11 +68,15 @@ class InfoService extends AuthJwtToken {
 	};
 
 	saveOne(context, stream, headers) {
-		stream.mode("object");
-		stream.pipe(new Transform({ objectMode: true, transform(chunk, encoding, callback) {
-            console.log(`Save ${chunk.name}`)
-            callback(null, chunk);
-        }})).pipe(stream)
+        stream
+            .mode("object")
+		    .pipe(new Transform({ 
+                objectMode: true, 
+                transform(chunk, encoding, callback) {
+                    console.log(`Save ${chunk.name}`)
+                    callback(null, chunk);
+                }
+            })).pipe(stream);
 	};
 
 	saveMany(context, stream, headers) {

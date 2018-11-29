@@ -22,20 +22,28 @@ const config = {
     refreshAccessToken: 'def456token'
 }
 
+const info = new class {
+    index (context, stream, headers) {
+		stream.end({ text: "I'm Info service." });
+	};
+}
+
 describe("auth2", () => {
 
     let damless;
     before(async () => {
         damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } });
-        damless.inject("oauth2", OAuth2);
-        await damless.post("/oauth/authorize", "oauth2", "authorize");
+        damless.inject("auth", OAuth2);
+        damless.inject("info", info);
+        await damless.post("/oauth/authorize", "auth", "authorize");
+        await damless.get("/", "info", "index", { auth: true });
         await damless.start();
     });
     after(async () => await damless.stop());
 
     it("should authenticate the request", async () => {
         const res = await fetch("http://localhost:3000", {
-            method: "POST"
+            method: "GET"
         });
         except(res.ok).to.be(false);
 

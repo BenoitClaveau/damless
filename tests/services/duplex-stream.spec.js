@@ -32,10 +32,12 @@ describe("duplex stream", () => {
 
     xit("readable -> transform -> writable", async () => {  
         const readable = new Readable({ read: () => {}});
-        const transform = new Transform({ transform(chunk, encoding, callback) {
-            this.push(chunk.toString().toUpperCase());
-            callback();
-        }});
+        const transform = new Transform({ 
+            transform(chunk, encoding, callback) {
+                this.push(chunk.toString().toUpperCase());
+                callback();
+            }
+        });
         const writable = new Writable({ write(chunk, encoding, callback) {
             console.log(chunk.toString())
             callback();
@@ -56,10 +58,12 @@ describe("duplex stream", () => {
                 callback();
             }
         });
-        const transform = new Transform({ transform(chunk, encoding, callback) {
-            this.push(chunk.toString().toUpperCase());
-            callback();
-        }});
+        const transform = new Transform({ 
+            transform(chunk, encoding, callback) {
+                this.push(chunk.toString().toUpperCase());
+                callback();
+            }
+        });
 
         duplex.pipe(transform).pipe(duplex);
         duplex.write("command 1");
@@ -92,13 +96,15 @@ describe("duplex stream", () => {
     }).timeout(30000);
 
     xit("(duplex -> transform) as readable -> duplex", async () => {
-        const transform = new Transform({ transform(chunk, encoding, callback) {
-            const data = chunk.toString().toUpperCase();
-            console.log("[transform]", data)
-            this.push("transformation#1:" + data);
-            this.push("transformation#2:" + data);
-            callback();
-        }});
+        const transform = new Transform({ 
+            transform(chunk, encoding, callback) {
+                const data = chunk.toString().toUpperCase();
+                console.log("[transform]", data)
+                this.push("transformation#1:" + data);
+                this.push("transformation#2:" + data);
+                callback();
+            }
+        });
 
         const data = ["command 1", "command 2"];
         const duplex = new Duplex({
