@@ -7,10 +7,10 @@
         "busboy": "latest",
         "chalk": "latest",
         "file-type": "latest",
+        "givemetheservice": "latest",
         "isitforme": "latest",
         "jwt-simple": "latest",
         "oups": "latest",
-        "givemetheservice": "latest",
         "uuid": "latest",
         "vinyl": "latest"
     },

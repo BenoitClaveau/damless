@@ -22,7 +22,7 @@ describe("querystring", () => {
     });
     after(async () => await damless.stop());
 
-    it("parse querystring", async () => {
+    it("parse querystring price =", async () => {
         const qs = await damless.resolve("querystring");
         const query = qs.parse("price=10");
         expect(query).to.eql({
@@ -30,4 +30,11 @@ describe("querystring", () => {
         });
     });
 
+    it("parse querystring multiple price =", async () => {
+        const qs = await damless.resolve("querystring");
+        const query = qs.parse("price=10&&price=11");
+        expect(query).to.eql({
+            price: [10, 11]
+        });
+    });
 });
