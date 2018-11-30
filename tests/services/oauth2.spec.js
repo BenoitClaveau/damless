@@ -4,7 +4,6 @@
  * MIT Licensed
  */
 
-const OAuth2 = require("../../lib/services/oauth2");
 const DamLess = require("../../index");
 const expect = require("expect.js");
 const process = require("process");
@@ -33,9 +32,9 @@ describe("auth2", () => {
     let damless;
     before(async () => {
         damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } });
-        damless.inject("auth", OAuth2);
+        damless.use("oauth2");
         damless.inject("info", info);
-        await damless.post("/oauth/authorize", "auth", "authorize");
+        await damless.post("/oauth/authorize", "oauth2", "authorize");
         await damless.get("/", "info", "index", { auth: true });
         await damless.start();
     });
@@ -48,7 +47,7 @@ describe("auth2", () => {
                 'Authorization': 'Bearer foobar'
             }
         });
-        //expect(res.ok).to.be(false);
+        expect(res.ok).to.be(true);
 
     }).timeout(30000);
 

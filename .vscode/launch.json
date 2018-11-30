@@ -19,7 +19,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "opacity",
+                "post array -> array",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

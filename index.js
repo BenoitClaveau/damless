@@ -31,7 +31,8 @@ class DamLessServer {
         this.giveme.inject("crypto", `${__dirname}/lib/services/core/crypto`);
         this.giveme.inject("password", `${__dirname}/lib/services/core/password`);
         this.giveme.inject("repository-factory", `${__dirname}/lib/services/core/repository-factory`);
-        this.giveme.inject("damless", `${__dirname}/lib/damless`);      //Inject damless service TODO rename to http
+        this.giveme.inject("damless", `${__dirname}/lib/damless`);
+        this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`); // After damless beacause http-router must be created.
     }
 
     async start() {
@@ -88,6 +89,12 @@ class DamLessServer {
         await damless.asset(route, filepath);
     }
 
+    async use(middlewareName) {
+        const middleware = await this.giveme.resolve("middleware", { mount: false });
+        middleware.push(middlewareName);
+        return this;
+    }
+
     on(type, listener) {
         this.eventEmitter.on(type, listener);
         return this;
@@ -116,7 +123,8 @@ const {
     ContextFactory,
     IsItForMe,
     QueryString,
-    QueryParams
+    QueryParams,
+    Middleware
 } = require('./lib/services');
 
 const {
@@ -153,6 +161,7 @@ module.exports.ContextFactory = ContextFactory;
 module.exports.IsItForMe = IsItForMe;
 module.exports.QueryString = QueryString;
 module.exports.QueryParams = QueryParams;
+module.exports.Middleware = Middleware;
 // Export damless core
 module.exports.transform = transform;
 module.exports.streamify = streamify;

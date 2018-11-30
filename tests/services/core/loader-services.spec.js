@@ -15,6 +15,6 @@ describe("ServicesLoader", () => {
     
     it("load", async () => {
         let injector = await damless.resolve("injector");
-        expect(Object.entries(injector.container).length).to.be(16);
+        expect(Object.entries(injector.container).length).to.be(17);
     });
 });

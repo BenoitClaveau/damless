@@ -4,15 +4,9 @@
  * MIT Licensed
  */
 
-const Auth = require("../../lib/services/auth-jwt-token");
+const Auth = require("../../lib/services/middlewares/auth-jwt");
 const DamLess = require("../../index");
 const expect = require("expect.js");
-const process = require("process");
-const { inspect } = require("util");
-
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
 
 const config = {
     http: {
@@ -23,7 +17,7 @@ const config = {
     }
 }
 
-describe("auth-jwt-token", () => {
+describe("auth-jwt", () => {
 
     it("encode", () => {
         const auth = new Auth(config);
@@ -43,12 +37,15 @@ describe("auth-jwt-token", () => {
     });
 
     it("identify", async () => {
-        let damless = new DamLess({ dirname: __dirname, config: config });
+        const damless = new DamLess({ dirname: __dirname, config: config });
+
         try {
-            damless.inject("info", "./info");
+            damless.inject("info", "./info")
+                   .use("auth-jwt"); // use auth2 middleware
+
             await damless.start();
-            await damless.get("/info", "info", "httpAuthInfo", { auth: true });
-            await damless.post("/connect", "info", "connect");
+            await damless.get("/info", "info", "httpAuthInfo");
+            await damless.post("/connect", "info", "connect", { auth: false });
             
             const client = await damless.resolve("client");
             try {
