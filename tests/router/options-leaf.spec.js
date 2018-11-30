@@ -21,9 +21,10 @@ afterEach(async () => await damless.stop());
 describe("options-leaf", () => {
 
     xit("/info", async () => {
-        damless.inject("info", "../services/info");
-        await damless.start();
-        await damless.post("/info", "info", "getInfo");
+        await damless
+            .inject("info", "../services/info")
+            .get("/info", "info", "getInfo")
+            .start();
 
         const requestOptions = {
             method : "OPTIONS",

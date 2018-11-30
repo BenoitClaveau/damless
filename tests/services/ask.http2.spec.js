@@ -28,9 +28,10 @@ afterEach(async () => await damless.stop());
 describe("http2 ask", () => {
 
     it("post object -> object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveOne");
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveOne")
+            .start();
 
         const client = await damless.resolve("client");
         const res = await client.post({ url: "https://localhost:8443/save", rejectUnauthorized: false, json: {
@@ -44,9 +45,10 @@ describe("http2 ask", () => {
     }).timeout(60000);
     
     xit("upload image", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "uploadImage");
+        await damless
+            .inject("info", "./info")
+            .post("/upload", "info", "uploadImage")
+            .start();
         
         const requestOptions = {
             formData : {

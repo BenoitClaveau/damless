@@ -20,7 +20,9 @@ afterEach(async () => await damless.stop());
 describe("Assets loader", () => {
 
     it("assets", async () => {
-        await damless.start();
+        await damless
+            .start();
+
         const isitasset = await damless.resolve("isitasset");
         expect(isitasset.nodes.length).to.be(2);
         expect(isitasset.nodes[0].token).to.be("main.html");

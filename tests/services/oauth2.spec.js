@@ -31,11 +31,11 @@ describe("auth2", () => {
 
     let damless;
     before(async () => {
-        damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } });
-        damless.use("oauth2");
-        damless.inject("info", info);
-        await damless.post("/oauth/authorize", "oauth2", "authorize");
-        await damless.get("/", "info", "index", { auth: true });
+        damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } })
+                    .use("oauth2")
+                    .inject("info", info)
+                    .post("/oauth/authorize", "oauth2", "authorize")
+                    .get("/", "info", "index", { auth: true });
         await damless.start();
     });
     after(async () => await damless.stop());

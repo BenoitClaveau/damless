@@ -9,13 +9,14 @@ const {
 } = require('stream');
 const fs = require('fs');
 const path = require('path');
-const { AuthJwtToken } = require("../../index");
+const { AuthJWT } = require("../../index");
 
-class InfoService extends AuthJwtToken {
-	constructor(config) {	
+class InfoService extends AuthJWT {
+
+    constructor(config) {
         super(config);
-	};
-	
+    }
+
 	whoiam(context, stream, headers) {
 		stream.respond({ contentType: "text/html" }).end("I'm Info service.");
 	};

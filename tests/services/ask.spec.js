@@ -6,15 +6,9 @@
 
 const expect = require("expect.js");
 const DamLess = require("../../index");
+const { ending } = require("../../index");
 const request = require("request");
 const fs = require("fs");
-const JSONStream = require("JSONStream");
-const process = require("process");
-const { inspect } = require('util');
-
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
 
 let damless;
 beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
@@ -23,9 +17,10 @@ afterEach(async () => await damless.stop());
 describe("ask", () => {
 
     it("post object -> object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveOne");
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveOne")
+            .start();
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
@@ -38,9 +33,10 @@ describe("ask", () => {
     });
 
     it("post object -> array", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveMany")
+            .start();
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
@@ -54,9 +50,10 @@ describe("ask", () => {
     });
 
     it("post array -> object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveOne");
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveOne")
+            .start();
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
@@ -76,9 +73,10 @@ describe("ask", () => {
     });
     
     it("post array -> array", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveMany")
+            .start();
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
@@ -101,144 +99,158 @@ describe("ask", () => {
         expect(res.body[1].test).to.be("zz");
     });
 
-    xit("upload json stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
+    it("save json stream", async () => {
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveMany")
+            .start();
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
         let sending = false;
 
-        fs.createReadStream(`${__dirname}/../data/npm.array.json`)
-            .on("data", data => {
-                if (!sending) console.log("FIRST SENDING", new Date())
-                sending = sending || true;
-            })
-            .on("end", () => {
-                console.log("FILE END", new Date())
-            })
-            .pipe(request.post("http://localhost:3000/save"))
-            .on("response", response => {
-                expect(response.headers["content-type"]).to.be("application/json");
-            })
-            .pipe(jsonstream.parse())
-            .on("end", data => {
-                console.log("REQUEST END", new Date())
-            })
-            .on("data", data => {
-                if (!receive) console.log("FIRST RECEIVE", new Date())
-                receive = receive || true;
-            })
+        await ending(
+            fs.createReadStream(`${__dirname}/../data/npm.array.json`)
+                .on("data", data => {
+                    if (!sending) console.log("FIRST SENDING", new Date())
+                    sending = sending || true;
+                })
+                .on("end", () => {
+                    console.log("FILE END", new Date())
+                })
+                .pipe(request.post("http://localhost:3000/save"))
+                .on("response", response => {
+                    expect(response.headers["content-type"]).to.be("application/json; charset=utf-8");
+                })
+                .pipe(jsonstream.parse())
+                .on("end", data => {
+                    console.log("REQUEST END", new Date())
+                })
+                .on("data", data => {
+                    if (!receive) console.log("FIRST RECEIVE", new Date())
+                    receive = receive || true;
+                })
+        );
     });
 
-    xit("upload image stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/save", "info", "saveMany");
+    it("upload image stream", async () => {
+        await damless
+            .inject("info", "./info")
+            .post("/save", "info", "saveMany")
+            .start();
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
         let sending = false;
 
-        fs.createReadStream(`${__dirname}/../data/npm.array.json`)
-            .on("data", data => {
-                if (!sending) console.log("FIRST SENDING", new Date())
-                sending = sending || true;
-            })
-            .on("end", () => {
-                console.log("FILE END", new Date())
-            })
-            .pipe(request.post("http://localhost:3000/save"))
-            .on("response", response => {
-                expect(response.headers["content-type"]).to.be("application/json");
-            })
-            .pipe(jsonstream.parse())
-            .on("end", data => {
-                console.log("REQUEST END", new Date())
-            })
-            .on("data", data => {
-                if (!receive) console.log("FIRST RECEIVE", new Date())
-                receive = receive || true;
-            })
+        await ending(
+            fs.createReadStream(`${__dirname}/../data/npm.array.json`)
+                .on("data", data => {
+                    if (!sending) console.log("FIRST SENDING", new Date())
+                    sending = sending || true;
+                })
+                .on("end", () => {
+                    console.log("FILE END", new Date())
+                })
+                .pipe(request.post("http://localhost:3000/save"))
+                .on("response", response => {
+                    expect(response.headers["content-type"]).to.be("application/json; charset=utf-8");
+                })
+                .pipe(jsonstream.parse())
+                .on("data", data => {
+                    if (!receive) console.log("FIRST RECEIVE", new Date())
+                    receive = receive || true;
+                })
+                .on("end", () => {
+                    console.log("REQUEST END", new Date())
+                })
+        );
+            
     });
 
-    xit("upload json stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "saveFile");
+    // it("upload json stream", async () => {
+    //     await damless
+    //         .inject("info", "./info")
+    //         .post("/upload", "info", "saveFile")
+    //         .start();
 
-        const requestOptions = {
-            formData : {
-              file : fs.createReadStream(`${__dirname}/../data/npm.array.json`)
-            },
-            method : "POST",
-            url    : "http://localhost:3000/upload",
-            json: true
-          };
+    //     const requestOptions = {
+    //         formData : {
+    //           file : fs.createReadStream(`${__dirname}/../data/npm.array.json`)
+    //         },
+    //         method : "POST",
+    //         url    : "http://localhost:3000/upload",
+    //         json: true
+    //       };
         
-        request(requestOptions, (error, response, body) => {
-            expect(body.length).to.be(1);
-            expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.array.json`);
-        }).on("data", chunk => {
-            process.stdout.write(".");
-        }).on("response", response => {
-            expect(response.headers["content-type"]).to.be("application/json")
-        });
-    });
+    //     await ending(
+    //         request(requestOptions, (error, response, body) => {
+    //             expect(body.length).to.be(1);
+    //             expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.array.json`);
+    //         }).on("data", chunk => {
+    //             process.stdout.write(".");
+    //         }).on("response", response => {
+    //             expect(response.headers["content-type"]).to.be("application/json")
+    //         }).on("end", chunk => {
+    //             console.log("66666644444444444444555555555555555")
+    //         })
+    //     );
+    // });
 
-    xit("upload json object", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "saveFile");
+    // xit("upload json object", async () => {
+    //     await damless
+    //         .inject("info", "./info")
+    //         .post("/upload", "info", "saveFile")
+    //         .start();
 
-        const requestOptions = {
-            formData : {
-              file : fs.createReadStream(`${__dirname}/../data/npm.object.json`)
-            },
-            method : "POST",
-            url    : "http://localhost:3000/upload",
-            json: true
-          };
+    //     const requestOptions = {
+    //         formData : {
+    //           file : fs.createReadStream(`${__dirname}/../data/npm.object.json`)
+    //         },
+    //         method : "POST",
+    //         url    : "http://localhost:3000/upload",
+    //         json: true
+    //       };
         
-        request(requestOptions, (error, response, body) => {
-            expect(body.length).to.be(1);
-            expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.object.json`);
-        }).on("data", chunk => {
-            process.stdout.write(".");
-        }).on("response", response => {
-            expect(response.headers["content-type"]).to.be("application/json")
-        });
-    });
+    //     request(requestOptions, (error, response, body) => {
+    //         expect(body.length).to.be(1);
+    //         expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.object.json`);
+    //     }).on("data", chunk => {
+    //         process.stdout.write(".");
+    //     }).on("response", response => {
+    //         expect(response.headers["content-type"]).to.be("application/json")
+    //     });
+    // });
 
-    xit("upload image stream", async () => {
-        damless.inject("info", "./info");
-        await damless.start();
-        await damless.post("/upload", "info", "uploadImage");
+    // it("upload image stream", async () => {
+    //     await damless
+    //         .inject("info", "./info")
+    //         .post("/upload", "info", "uploadImage")
+    //         .start();
 
-        const requestOptions = {
-            formData : {
-                file : fs.createReadStream(`${__dirname}/../data/world.png`)
-            },
-            method : "POST",
-            url    : "http://localhost:3000/upload"
-        };
+    //     const requestOptions = {
+    //         formData : {
+    //             file : fs.createReadStream(`${__dirname}/../data/world.png`)
+    //         },
+    //         method : "POST",
+    //         url    : "http://localhost:3000/upload"
+    //     };
         
-        const filepath = `${__dirname}/../data/output/world.png`;
-        if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
+    //     const filepath = `${__dirname}/../data/output/world.png`;
+    //     if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
-        const output = fs.createWriteStream(filepath);
+    //     const output = fs.createWriteStream(filepath);
         
-        request(requestOptions, (error, response, body) => {
-            //console.log(body)
-        }).on("data", chunk => {
-            process.stdout.write(".");
-        }).on("response", response => {
-            expect(response.headers["content-type"]).to.be("image/png");
-        }).pipe(output).on("finish", () => {
-            expect(fs.existsSync(filepath)).to.be(true);
-        });
-    });
+    //     request(requestOptions, (error, response, body) => {
+    //         //console.log(body)
+    //     }).on("data", chunk => {
+    //         process.stdout.write(".");
+    //     }).on("response", response => {
+    //         expect(response.headers["content-type"]).to.be("image/png");
+    //     }).pipe(output).on("finish", () => {
+    //         expect(fs.existsSync(filepath)).to.be(true);
+    //     });
+    // });
 
     
 });

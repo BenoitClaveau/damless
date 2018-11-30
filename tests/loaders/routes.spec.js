@@ -21,7 +21,8 @@ afterEach(async () => await damless.stop());
 describe("routes", () => {
     
     it("read services.json", async () => {
-        await damless.start();
+        await damless
+            .start();
         const isitget = await damless.resolve("isitasset");
         expect(isitget.nodes.length).to.be(2);
         // expect(isitget.nodes[0].router.methodName).to.be("getInfo");

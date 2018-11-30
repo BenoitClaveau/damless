@@ -24,20 +24,22 @@ afterEach(async () => await damless.stop());
 describe("http-router", () => {
 
     it("single route", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/whoiam", "info", "whoiam");
-        await damless.get("/helloworld", "info", "helloworld");
+        await damless
+            .inject("info", "./services/info")
+            .get("/whoiam", "info", "whoiam")
+            .get("/helloworld", "info", "helloworld")
+            .start();
         const client = await damless.resolve("client");
         const res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
     });
 
     it("multiple route", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/whoiam", "info", "whoiam");
-        await damless.get("/helloworld", "info", "helloworld");
+        await damless
+            .inject("info", "./services/info")
+            .get("/whoiam", "info", "whoiam")
+            .get("/helloworld", "info", "helloworld")
+            .start();
         const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
@@ -46,10 +48,11 @@ describe("http-router", () => {
     });
 
     it("default route", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/helloworld", "info", "helloworld");
-        await damless.get("/*", "info", "whoiam");
+        await damless
+            .inject("info", "./services/info")
+            .get("/helloworld", "info", "helloworld")
+            .get("/*", "info", "whoiam")
+            .start();
         const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
@@ -60,10 +63,11 @@ describe("http-router", () => {
     });
 
     it("default route inverted", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/*", "info", "whoiam");
-        await damless.get("/helloworld", "info", "helloworld");
+        await damless
+            .inject("info", "./services/info")
+            .get("/*", "info", "whoiam")
+            .get("/helloworld", "info", "helloworld")
+            .start();
         const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
@@ -74,10 +78,11 @@ describe("http-router", () => {
     });
 
     it("multiple token", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/*", "info", "whoiam");
-        await damless.get("/*/*", "info", "helloworld");
+        await damless
+            .inject("info", "./services/info")
+            .get("/*", "info", "whoiam")
+            .get("/*/*", "info", "helloworld")
+            .start();
         const client = await damless.resolve("client");
         let res = await client.get("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
@@ -90,16 +95,32 @@ describe("http-router", () => {
     });
 
     it("multiple end route", async () => {
-        damless.inject("info", "./services/info");
-        await damless.start();
-        await damless.get("/whoiam", "info", "whoiam");
         try {
-            await damless.get("/whoiam", "info", "helloworld");
+            await damless
+                .inject("info", "./services/info")
+                .get("/whoiam", "info", "whoiam")
+                .get("/whoiam", "info", "helloworld")
+                .start();
             throw new Error("Failed");
         } 
         catch(error) {
-            if (error.message == "Failed the register helloworld of info for GET:/whoiam") return;
-            throw error;
+            expect(error.message).to.be("Failed the register helloworld of info for GET:/whoiam");
         }
-    });
+    }).timeout(20000);
+
+    it("add multiple end route after start", async () => {
+        try {
+            await damless
+                .inject("info", "./services/info")
+                .get("/whoiam", "info", "whoiam")
+                .start();
+            
+            damless.get("/whoiam", "info", "helloworld");
+            await damless.apply(); // need to call apply to apply new config.
+            throw new Error("Failed");
+        } 
+        catch(error) {
+            expect(error.message).to.be("Failed the register helloworld of info for GET:/whoiam");
+        }
+    }).timeout(20000);
 });

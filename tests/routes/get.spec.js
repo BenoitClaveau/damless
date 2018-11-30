@@ -21,9 +21,10 @@ afterEach(async () => await damless.stop());
 describe("get", () => {
 
     it("/info", async () => {
-        damless.inject("info", "../services/info");
-        await damless.start();
-        await damless.get("/info", "info", "getInfo");
+        await damless
+            .inject("info", "../services/info")
+            .get("/info", "info", "getInfo")
+            .start();
 
         const client = await damless.resolve("client");
         const res = await client.get({ url: "http://localhost:3000/info", json: true })

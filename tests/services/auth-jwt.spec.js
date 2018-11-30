@@ -40,13 +40,13 @@ describe("auth-jwt", () => {
         const damless = new DamLess({ dirname: __dirname, config: config });
 
         try {
-            damless.inject("info", "./info")
-                   .use("auth-jwt"); // use auth2 middleware
+            await damless
+                .use("auth-jwt") // use auth2 middleware
+                .inject("info", "./info")
+                .get("/info", "info", "httpAuthInfo")
+                .post("/connect", "info", "connect", { auth: false })
+                .start();
 
-            await damless.start();
-            await damless.get("/info", "info", "httpAuthInfo");
-            await damless.post("/connect", "info", "connect", { auth: false });
-            
             const client = await damless.resolve("client");
             try {
                 const res1 = await client.get({ url: "http://localhost:3000/info", json: true });
