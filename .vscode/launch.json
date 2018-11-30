@@ -19,10 +19,14 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "should authenticate the request",
+                "opacity",
                 "${workspaceRoot}/**/*.spec.js"
             ],
-            "cwd": "${workspaceRoot}"
+            "cwd": "${workspaceRoot}",
+            "skipFiles": [
+                "<node_internals>/**/*.js",
+                "${workspaceFolder}/node_modules/core-js/**/*.js"
+            ]
           }
     ]
 }

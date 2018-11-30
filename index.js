@@ -4,17 +4,34 @@
  * MIT Licensed
  */
 
-const GiveMeTheService = require('givemetheservice');
-const EventEmitter = require(`events`);
+const path = require("path");
+const GiveMeTheService = require("givemetheservice");
+const EventEmitter = require("events");
 
 class DamLessServer {
+
     constructor(options = {}) {
         options.config = options.config || "./damless.json";
-        this.eventEmitter = new EventEmitter();
-        this.giveme = new GiveMeTheService(options);                    //Create the container
-        this.giveme.inject("eventEmitter", this.eventEmitter);          //Event emmitter
-        this.giveme.inject("damless", `${__dirname}/lib/damless`);      //Inject damless service
         
+        this.eventEmitter = new EventEmitter();
+        this.giveme = new GiveMeTheService({ dirname: options.dirname }); // Create the container
+        this.config = typeof options.config == "object" ? options.config : require(path.resolve(this.giveme.root, options.config));
+
+        // inject all core services
+        this.giveme.inject("config", this.config);
+        this.giveme.inject("eventEmitter", this.eventEmitter);
+        this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
+        this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
+        this.giveme.inject("event", `${__dirname}/lib/services/core/event`);
+        this.giveme.inject("json", `${__dirname}/lib/services/core/json`);
+        this.giveme.inject("json-stream", `${__dirname}/lib/services/core/json-stream`);
+        this.giveme.inject("qjimp", `${__dirname}/lib/services/core/qjimp`);
+        this.giveme.inject("client", `${__dirname}/lib/services/core/client`);
+        this.giveme.inject("walk", `${__dirname}/lib/services/core/walk`);
+        this.giveme.inject("crypto", `${__dirname}/lib/services/core/crypto`);
+        this.giveme.inject("password", `${__dirname}/lib/services/core/password`);
+        this.giveme.inject("repository-factory", `${__dirname}/lib/services/core/repository-factory`);
+        this.giveme.inject("damless", `${__dirname}/lib/damless`);      //Inject damless service TODO rename to http
     }
 
     async start() {
@@ -78,6 +95,20 @@ class DamLessServer {
 }
 
 const {
+    Client,
+    Crypto: CryptoService,
+    Event: EventService,
+    FS,
+    JsonStream,
+    Json,
+    Password,
+    QJimp,
+    RepositoryFactory,
+    String: StringService,
+    Walk
+} = require('./lib/services/core');
+
+const {
     AskReply,
     AuthJwtToken,
     CompressedStream,
@@ -99,20 +130,6 @@ const {
     ArrayToStream,
     StreamFlow
 } = require('./lib/core');
-
-const {
-    Client,
-    Crypto: CryptoService,
-    Event: EventService,
-    FS,
-    JsonStream,
-    Json,
-    Password,
-    QJimp,
-    RepositoryFactory,
-    String: StringService,
-    Walk
-} = require('givemetheservice');
 
 module.exports = DamLessServer;
 // Export givemetheservice services
