@@ -17,7 +17,7 @@ let damless;
 beforeEach(() => damless = new DamLess({ dirname: __dirname }));
 afterEach(async () => await damless.stop());
 
-describe("Assets loader", () => {
+describe("Load assets", () => {
 
     it("assets", async () => {
         await damless

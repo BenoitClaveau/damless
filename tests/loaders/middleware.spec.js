@@ -18,15 +18,13 @@ let damless;
 beforeEach(() => damless = new DamLess({ dirname: __dirname }));
 afterEach(async () => await damless.stop());
 
-describe("Load routes", () => {
+describe("Load middleware", () => {
     
-    it("read services.json", async () => {
+    it("Load middleware from service.json", async () => {
         await damless
             .start();
-        const isitget = await damless.resolve("isitasset");
-        expect(isitget.nodes.length).to.be(2);
-        // expect(isitget.nodes[0].router.methodName).to.be("getInfo");
-        // expect(isitget.nodes[0].router.route).to.be("/info");
-        // expect(isitget.nodes[0].router.serviceName).to.be("info");
+
+        const middleware = await damless.resolve("middleware");
+        expect(middleware.middlewares.length).to.be(2);
     }).timeout(5000);
 })

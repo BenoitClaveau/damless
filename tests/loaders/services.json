@@ -2,6 +2,9 @@
     "services": [
         { "name": "info", "location": "../services/info"}
     ],
+    "middleware": [
+        { "name": "auth-jwt" }
+    ],
     "http-routes": [
         { "get": "/info", "service": "info", "method": "getInfo"}
     ]

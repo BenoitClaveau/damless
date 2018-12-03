@@ -159,7 +159,7 @@ const {
     IsItForMe,
     QueryString,
     QueryParams,
-    Middleware
+    Middlewares
 } = require('./lib/services');
 
 const {
@@ -201,8 +201,8 @@ module.exports.ContextFactory = ContextFactory;
 module.exports.IsItForMe = IsItForMe;
 module.exports.QueryString = QueryString;
 module.exports.QueryParams = QueryParams;
-module.exports.Middleware = Middleware;
-// Export damless middlewares
+module.exports.Middlewares = Middlewares;
+// Export damless middleware
 module.exports.AuthJWT = AuthJWT;
 module.exports.ForwardToAsset = ForwardToAsset;
 module.exports.OAuth2 = OAuth2;

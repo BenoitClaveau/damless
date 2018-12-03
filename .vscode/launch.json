@@ -19,7 +19,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "identify",
+                "Load middleware from service.json",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
