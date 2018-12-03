@@ -5,6 +5,7 @@
  */
 
 const path = require("path");
+var fs = require('fs');
 const GiveMeTheService = require("givemetheservice");
 const EventEmitter = require("events");
 
@@ -15,10 +16,16 @@ class DamLessServer {
         this.commands = [];
         this.eventEmitter = new EventEmitter();
         this.giveme = new GiveMeTheService({ dirname: options.dirname }); // Create the container
-        const config = typeof options.config == "object" ? options.config : require(path.resolve(this.giveme.root, options.config));
+        this._config = {};
+        if (typeof options.config == "object")
+            this._config = options.config;
+        if (typeof options.config == "string") {
+            const file = path.resolve(this.giveme.root, options.config);
+            if (fs.existsSync(file)) this._config = require(file);
+        }
 
         // inject all core services
-        this.giveme.inject("config", config);
+        this.giveme.inject("config", this._config);
         this.giveme.inject("eventEmitter", this.eventEmitter);
         this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
         this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
@@ -66,7 +73,7 @@ class DamLessServer {
     }
 
     config(fn) {
-        fn(this.giveme.config);
+        fn(this._config);
         return this;
     }
 
@@ -123,10 +130,10 @@ class DamLessServer {
         return this;
     }
 
-    use(middlewareName) {
+    use(middleware) {
         this.addCommand(async () => {
-            const middleware = await this.resolve("middleware", { mount: false });
-            middleware.push(middlewareName);
+            const m = await this.resolve("middleware", { mount: false });
+            m.push(middleware);
         });
         return this;
     }
