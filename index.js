@@ -17,6 +17,7 @@ class DamLessServer {
         this.giveme = new GiveMeTheService(); // Create the container
         this._config = {};
         // inject all core services
+        this.giveme.inject("damless", this);
         this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
         this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
         this.giveme.inject("json", `${__dirname}/lib/services/core/json`);
@@ -35,14 +36,17 @@ class DamLessServer {
 
     async start() {
         await this.giveme.load();
+        return this;
     }
 
     async stop() {
         await this.giveme.unload();
+        return this;
     }
 
-    async resolve(name, options) {
-        return await this.giveme.resolve(name, options);
+    cwd(value) {
+        this.giveme.root = value;
+        return this;
     }
 
     config(data) {
@@ -64,6 +68,26 @@ class DamLessServer {
         return this;
     }
 
+    use(middleware) {
+        this.commands.push(async () => {
+            const service = await this.resolve("middleware", { mount: false });
+            service.push(middleware);
+        });
+        return this;
+    }
+
+    on(service, event, listener) {
+        this.commands.push(async () => {
+            const s = await this.resolve(service, { mount: false });
+            s.on(event, listener);
+        });
+        return this;
+    }
+
+    async resolve(name, options) {
+        return await this.giveme.resolve(name, options);
+    }
+
     inject(name, location, options) {
         this.commands.push(async () => {
             this.giveme.inject(name, location, options);
@@ -73,62 +97,49 @@ class DamLessServer {
 
     get(route, service, method, options) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.get(route, service, method, options);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.get(route, service, method, options);
         });
         return this;
     }
 
     post(route, service, method, options) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.post(route, service, method, options);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.post(route, service, method, options);
         });
         return this;
     }
 
     put(route, service, method, options) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.put(route, service, method, options);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.put(route, service, method, options);
         });
         return this;
     }
 
     delete(route, service, method, options) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.delete(route, service, method, options);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.delete(route, service, method, options);
         });
         return this;
     }
 
     patch(route, service, method, options) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.patch(route, service, method, options);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.patch(route, service, method, options);
         });
         return this;
     }
 
     asset(route, filepath) {
         this.commands.push(async () => {
-            const damless = await this.resolve("damless", { mount: false });
-            await damless.asset(route, filepath);
+            const httpServer = await this.resolve("http-server", { mount: false });
+            await httpServer.asset(route, filepath);
         });
-        return this;
-    }
-
-    use(middleware) {
-        this.commands.push(async () => {
-            const m = await this.resolve("middleware", { mount: false });
-            m.push(middleware);
-        });
-        return this;
-    }
-
-    cwd(value) {
-        this.giveme.root = value;
         return this;
     }
 }
