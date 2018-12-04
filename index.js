@@ -70,15 +70,15 @@ class DamLessServer {
 
     use(middleware) {
         this.commands.push(async () => {
-            const service = await this.resolve("middleware", { mount: false });
-            service.push(middleware);
+            const service = await this.resolve("middleware");
+            await service.push(middleware);
         });
         return this;
     }
 
     on(service, event, listener) {
         this.commands.push(async () => {
-            const s = await this.resolve(service, { mount: false });
+            const s = await this.resolve(service);
             s.on(event, listener);
         });
         return this;
@@ -97,7 +97,7 @@ class DamLessServer {
 
     get(route, service, method, options) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.get(route, service, method, options);
         });
         return this;
@@ -105,7 +105,7 @@ class DamLessServer {
 
     post(route, service, method, options) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.post(route, service, method, options);
         });
         return this;
@@ -113,7 +113,7 @@ class DamLessServer {
 
     put(route, service, method, options) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.put(route, service, method, options);
         });
         return this;
@@ -121,7 +121,7 @@ class DamLessServer {
 
     delete(route, service, method, options) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.delete(route, service, method, options);
         });
         return this;
@@ -129,7 +129,7 @@ class DamLessServer {
 
     patch(route, service, method, options) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.patch(route, service, method, options);
         });
         return this;
@@ -137,7 +137,7 @@ class DamLessServer {
 
     asset(route, filepath) {
         this.commands.push(async () => {
-            const httpServer = await this.resolve("http-server", { mount: false });
+            const httpServer = await this.resolve("http-server");
             await httpServer.asset(route, filepath);
         });
         return this;
