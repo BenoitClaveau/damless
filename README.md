@@ -159,7 +159,7 @@ Run server on http://localhost:3000
 
 ## You want to see some examples
 
-To run our examples, clone the Qwebs repo and install the dependencies.
+To run our examples, clone the Damless repo and install the dependencies.
 
 ```bash
 $ git clone https://github.com/BenoitClaveau/damless --depth 1
@@ -171,7 +171,7 @@ $ node server.js
 
 ## Test
 
-To run our tests, clone the Qwebs repo and install the dependencies.
+To run our tests, clone the Damless repo and install the dependencies.
 
 ```bash
 $ git clone https://github.com/BenoitClaveau/damless --depth 1

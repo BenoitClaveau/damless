@@ -7,29 +7,17 @@
 const path = require("path");
 var fs = require('fs');
 const GiveMeTheService = require("givemetheservice");
-const EventEmitter = require("events");
+const Commands = require("./lib/services/commands");
 
 class DamLessServer {
 
-    constructor(options = {}) {
-        options.config = options.config || "./damless.json";
-        this.commands = [];
-        this.eventEmitter = new EventEmitter();
-        this.giveme = new GiveMeTheService({ dirname: options.dirname }); // Create the container
-        this._config = {};
-        if (typeof options.config == "object")
-            this._config = options.config;
-        if (typeof options.config == "string") {
-            const file = path.resolve(this.giveme.root, options.config);
-            if (fs.existsSync(file)) this._config = require(file);
-        }
-
+    constructor() {
+        //options.config = options.config || "./damless.json";
+        this.commands = new Commands();
+        this.giveme = new GiveMeTheService(); // Create the container
         // inject all core services
-        this.giveme.inject("config", this._config);
-        this.giveme.inject("eventEmitter", this.eventEmitter);
         this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
         this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
-        this.giveme.inject("event", `${__dirname}/lib/services/core/event`);
         this.giveme.inject("json", `${__dirname}/lib/services/core/json`);
         this.giveme.inject("json-stream", `${__dirname}/lib/services/core/json-stream`);
         this.giveme.inject("qjimp", `${__dirname}/lib/services/core/qjimp`);
@@ -38,29 +26,13 @@ class DamLessServer {
         this.giveme.inject("crypto", `${__dirname}/lib/services/core/crypto`);
         this.giveme.inject("password", `${__dirname}/lib/services/core/password`);
         this.giveme.inject("repository-factory", `${__dirname}/lib/services/core/repository-factory`);
-        this.giveme.inject("damless", `${__dirname}/lib/damless`);
-        this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`); // After damless beacause http-router must be created.
-    }
-
-    /**
-     * Apply all configuration commands sequentially
-     */
-    async apply() {
-        let fn;
-        while ((fn = this.commands.shift()) !== undefined) {
-            await fn();
-        }
-    }
-
-    /**
-     * Add a configuration command
-     */
-    async addCommand(fn) {
-        this.commands.push(fn);
+        this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`);
+        this.giveme.inject("http-server", `${__dirname}/lib/http-server`);
+        this.giveme.inject("config", {}); // Inject default config
+        this.giveme.inject("commands", this.commands); // Inject default config
     }
 
     async start() {
-        await this.apply();
         await this.giveme.load();
     }
 
@@ -72,18 +44,30 @@ class DamLessServer {
         return await this.giveme.resolve(name, options);
     }
 
-    config(fn) {
-        fn(this._config);
+    config(data) {
+        if (typeof data == "string") {
+            const file = path.resolve(__dirname, data);
+            if (fs.existsSync(file)) 
+                this.giveme.inject("config", require(file));
+        }
+        if (typeof data == "object") {
+            this.giveme.inject("config", data);
+        }
+        if (typeof data == "function") {
+            this.giveme.inject("config", data());
+        }
         return this;
     }
 
     inject(name, location, options) {
-        this.giveme.inject(name, location, options);
+        this.commands.push(async () => {
+            this.giveme.inject(name, location, options);
+        })
         return this;
     }
 
     get(route, service, method, options) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.get(route, service, method, options);
         });
@@ -91,7 +75,7 @@ class DamLessServer {
     }
 
     post(route, service, method, options) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.post(route, service, method, options);
         });
@@ -99,7 +83,7 @@ class DamLessServer {
     }
 
     put(route, service, method, options) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.put(route, service, method, options);
         });
@@ -107,7 +91,7 @@ class DamLessServer {
     }
 
     delete(route, service, method, options) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.delete(route, service, method, options);
         });
@@ -115,7 +99,7 @@ class DamLessServer {
     }
 
     patch(route, service, method, options) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.patch(route, service, method, options);
         });
@@ -123,7 +107,7 @@ class DamLessServer {
     }
 
     asset(route, filepath) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const damless = await this.resolve("damless", { mount: false });
             await damless.asset(route, filepath);
         });
@@ -131,15 +115,10 @@ class DamLessServer {
     }
 
     use(middleware) {
-        this.addCommand(async () => {
+        this.commands.push(async () => {
             const m = await this.resolve("middleware", { mount: false });
             m.push(middleware);
         });
-        return this;
-    }
-
-    on(type, listener) {
-        this.eventEmitter.on(type, listener);
         return this;
     }
 }
@@ -147,7 +126,6 @@ class DamLessServer {
 const {
     Client,
     Crypto: CryptoService,
-    Event: EventService,
     FS,
     JsonStream,
     Json,
@@ -191,7 +169,6 @@ module.exports = DamLessServer;
 // Export givemetheservice services
 module.exports.Client = Client;
 module.exports.Crypto = CryptoService;
-module.exports.Event = EventService;
 module.exports.FS = FS;
 module.exports.JsonStream = JsonStream;
 module.exports.Json = Json;
