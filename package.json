@@ -1,11 +1,10 @@
 {
     "name": "damless",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "Streamify your web server",
     "main": "index.js",
     "dependencies": {
         "busboy": "latest",
-        "chalk": "latest",
         "file-type": "latest",
         "givemetheservice": "latest",
         "isitforme": "latest",
@@ -14,7 +13,6 @@
         "jwt-simple": "latest",
         "oups": "latest",
         "request": "latest",
-        "uuid": "latest",
         "vinyl": "latest"
     },
     "devDependencies": {

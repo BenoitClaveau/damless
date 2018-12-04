@@ -15,6 +15,7 @@ class DamLessServer {
         //options.config = options.config || "./damless.json";
         this.commands = new Commands();
         this.giveme = new GiveMeTheService(); // Create the container
+        this._config = {};
         // inject all core services
         this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
         this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
@@ -28,7 +29,7 @@ class DamLessServer {
         this.giveme.inject("repository-factory", `${__dirname}/lib/services/core/repository-factory`);
         this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`);
         this.giveme.inject("http-server", `${__dirname}/lib/http-server`);
-        this.giveme.inject("config", {}); // Inject default config
+        this.giveme.inject("config", this._config); // Inject default config
         this.giveme.inject("commands", this.commands); // Inject default config
     }
 
@@ -46,15 +47,19 @@ class DamLessServer {
 
     config(data) {
         if (typeof data == "string") {
-            const file = path.resolve(__dirname, data);
-            if (fs.existsSync(file)) 
-                this.giveme.inject("config", require(file));
+            const file = path.resolve(this.giveme.root, data);
+            if (fs.existsSync(file)) {
+                this._config = require(file);
+                this.giveme.inject("config", this._config);
+            }
         }
         if (typeof data == "object") {
-            this.giveme.inject("config", data);
+            this._config = data;
+            this.giveme.inject("config", this._config);
         }
         if (typeof data == "function") {
-            this.giveme.inject("config", data());
+            data(this._config);
+            this.giveme.inject("config", this._config);
         }
         return this;
     }
@@ -119,6 +124,11 @@ class DamLessServer {
             const m = await this.resolve("middleware", { mount: false });
             m.push(middleware);
         });
+        return this;
+    }
+
+    cwd(value) {
+        this.giveme.root = value;
         return this;
     }
 }
