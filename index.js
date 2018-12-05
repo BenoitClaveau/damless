@@ -31,10 +31,11 @@ class DamLessServer {
         this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`);
         this.giveme.inject("http-server", `${__dirname}/lib/http-server`);
         this.giveme.inject("config", this._config); // Inject default config
-        this.giveme.inject("commands", this.commands); // Inject default config
+        
     }
 
     async start() {
+        await this.commands.run();
         await this.giveme.load();
         return this;
     }
@@ -145,6 +146,11 @@ class DamLessServer {
 }
 
 const {
+    HttpServer,
+    HttpRouter
+} = require('./lib');
+
+const {
     Client,
     Crypto: CryptoService,
     FS,
@@ -187,7 +193,10 @@ const {
 } = require('./lib/core');
 
 module.exports = DamLessServer;
-// Export givemetheservice services
+// Export main service 
+module.exports.HttpServer = HttpServer;
+module.exports.HttpRouter = HttpRouter;
+// Export core services
 module.exports.Client = Client;
 module.exports.Crypto = CryptoService;
 module.exports.FS = FS;
