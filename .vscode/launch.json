@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "read services.json",
+                "Use forward-to-asset middleware",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
