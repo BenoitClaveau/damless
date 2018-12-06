@@ -10,17 +10,26 @@ const { ending } = require("../../index");
 const request = require("request");
 const fs = require("fs");
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await damless.stop());
-
 describe("ask", () => {
 
-    it("post object -> object", async () => {
-        await damless
+    let damless;
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ 
+                http: { 
+                    port: 3000, 
+                }
+            })
             .inject("info", "./info")
             .post("/save", "info", "saveOne")
+            .post("/saves", "info", "saveMany")
+            .post("/upload", "info", "uploadImage")
             .start();
+    })
+    afterEach(async () => await damless.stop());
+
+    it("post object -> object", async () => {
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: {
             name: "ben",
@@ -33,12 +42,8 @@ describe("ask", () => {
     });
 
     it("post object -> array", async () => {
-        await damless
-            .inject("info", "./info")
-            .post("/save", "info", "saveMany")
-            .start();
         const client = await damless.resolve("client");
-        const res = await client.post({ url: "http://localhost:3000/save", json: {
+        const res = await client.post({ url: "http://localhost:3000/saves", json: {
             name: "ben",
             value: 0,
             test: "454566"
@@ -50,10 +55,6 @@ describe("ask", () => {
     });
 
     it("post array -> object", async () => {
-        await damless
-            .inject("info", "./info")
-            .post("/save", "info", "saveOne")
-            .start();
         const client = await damless.resolve("client");
         const res = await client.post({ url: "http://localhost:3000/save", json: [
             {
@@ -73,12 +74,8 @@ describe("ask", () => {
     });
     
     it("post array -> array", async () => {
-        await damless
-            .inject("info", "./info")
-            .post("/save", "info", "saveMany")
-            .start();
         const client = await damless.resolve("client");
-        const res = await client.post({ url: "http://localhost:3000/save", json: [
+        const res = await client.post({ url: "http://localhost:3000/saves", json: [
             {
                 name: "ben",
                 value: 0,
@@ -100,10 +97,6 @@ describe("ask", () => {
     });
 
     it("save json stream", async () => {
-        await damless
-            .inject("info", "./info")
-            .post("/save", "info", "saveMany")
-            .start();
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
@@ -118,7 +111,7 @@ describe("ask", () => {
                 .on("end", () => {
                     console.log("FILE END", new Date())
                 })
-                .pipe(request.post("http://localhost:3000/save"))
+                .pipe(request.post("http://localhost:3000/saves"))
                 .on("response", response => {
                     expect(response.headers["content-type"]).to.be("application/json; charset=utf-8");
                 })
@@ -134,10 +127,6 @@ describe("ask", () => {
     });
 
     it("upload image stream", async () => {
-        await damless
-            .inject("info", "./info")
-            .post("/save", "info", "saveMany")
-            .start();
         const jsonstream = await damless.resolve("json-stream");
 
         let receive = false;
@@ -152,7 +141,7 @@ describe("ask", () => {
                 .on("end", () => {
                     console.log("FILE END", new Date())
                 })
-                .pipe(request.post("http://localhost:3000/save"))
+                .pipe(request.post("http://localhost:3000/saves"))
                 .on("response", response => {
                     expect(response.headers["content-type"]).to.be("application/json; charset=utf-8");
                 })

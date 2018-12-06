@@ -6,28 +6,48 @@ Streamify your web server.
 npm install damless --save
 ```
 
-## Create a server.js
-
 ```server.js
 const DamLess = require("damless");
 const damless = new DamLess();
-damless.start();
+damless
+    .config({ http: { port: 3000 }})
+    .inject("info", "./services/info")
+    .inject("user", "./services/user")
+    .get("/helloworld", "info", "helloworld")
+    .post("/user", "user", "insertOne")
+    .start();
 ```
 
-## Create services.
-
-```.js
-class Service {	
+```./services/info.js
+class Info {	
 };
 
-say_hello(context, stream, headers) {
+helloworld(context, stream, headers) {
   stream.write("Hello");
   stream.end("world");
 };
-
 ```
 
-DamLess has been designed to think the web as a stream. 
+```./services/user.js
+const { Transform } = require("stream");
+class User {	
+};
+
+insertOne(context, stream, headers) {
+  stream
+    .pipe(new Transform({
+        objectMode: true,
+        transform(chunk, enc, callback) {
+            // save the chunk (user) into the database
+            callback(null, chunk);
+        }
+    }))
+    .pipe(stream);
+};
+```
+
+DamLess has been designed to think the web as a stream.
+You can develop your http server like a gulp script. 
 
  [![NPM][npm-image]][npm-url]
  [![Build Status][travis-image]][travis-url]
@@ -41,11 +61,9 @@ DamLess has been designed to think the web as a stream.
   
   [Dependency Injection to override default behavior](#di)
   
-  Compression & minification
-  
-  0 disk access at runtime
-  
   [Configuration manager](#config)
+
+  [Compression & minification](#compression)
 
   [Json serializer](#json)
   
@@ -73,9 +91,36 @@ exports = module.exports = ServiceInfo;
 
 ## Dependency Injection <a href="#di" />
 
-Inject your service and define a new http route.
+DamLess use [givemetheservice](https://www.npmjs.com/package/givemetheservice) to inject all services.
+You can override everythink or inject your new services.
 
-Override core services to custom DamLess.
+## DamLess compression <a href="#compression" />
+
+DamLess has been inspired by the http2 syntax. The request and response are wrap by an unique duplex stream.
+This stream automatically gzip or deflate your response. It is useless to pipe a compressor.
+
+## DamLess configuration manager (damless.json) <a href="#config" />
+
+You can configure damless in javascript or via json file.
+
+```server.js
+damless
+    .config("./damless.json")
+    .config({ http: { port: 3000 }})
+    .config(config => {
+        config.env = "dev"
+    })
+```
+
+```damless.json
+{
+    "services": "./services.json",
+    "http": {
+        "port": 3000
+    }
+}
+```
+You can declare your services in an other json file.
 
 ```services.json
 {
@@ -89,35 +134,24 @@ Override core services to custom DamLess.
         {
             "get": "/",
             "service": "info",
-            "method": "text",
-            "auth": "false"
+            "method": "text"
         }
     ]
-}
-```
-
-## DamLess configuration manager (damless.json) <a href="#config" />
-
-```damless.json
-{
-    "services": "./services.json",
-    "http": {
-        "port": 3000
-    }
 }
 ```
 
 Retrieve the config object in your service.
 
 ```.js
-class ServiceInfo {	
-    constructor(config) {       // config has been injected
+class ServiceInfo {
+    // config will be injected by our DI
+    constructor(config) {
         console.log(config.http.port);
     }
 };
 ```
 
-## Customize the json serializer <a href="#json" />
+## Customize the default json serializer <a href="#json" />
 
 ```json.js
 const { Json } = require("damless");
@@ -130,6 +164,7 @@ class CustomJson extends Json {
         super();
     }
 
+    // override the default onValue
     onValue(key, value) {
         if (/\d{2}-\d{2}-\d{2}/.test(value)) return moment(value, "YYYY-MM-DD").toDate();
         if (ObjectID.isValid(value)) return new ObjectID(value);
@@ -140,19 +175,14 @@ class CustomJson extends Json {
 exports = module.exports = CustomJson;
 ```
 
-Override core json serializer to custom DamLess.
+The default json serializer is declared in the DI as "json". Replace it to load your service.
 
-```services.json
-{
-  "services": [
-    { "name": "json", "location": "./services/json"}
-  ]
-}
+```server.js
+damless
+    .inject("json", "./custom-json.js")
 ```
 
-Run server on http://localhost:3000
-
-## Use other DamLess services to develop as fast as a rocket
+## Use others DamLess services to develop as fast as a rocket
   
   * [mongo](https://www.npmjs.com/package/damless-mongo)
   * [nodemailer](https://www.npmjs.com/package/damless-nodemailer)

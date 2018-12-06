@@ -13,16 +13,18 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname }));
-afterEach(async () => await damless.stop());
-
 describe("Load assets", () => {
 
-    it("assets", async () => {
-        await damless
+    let damless;
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config("./damless.json")
             .start();
+    })
+    afterEach(async () => await damless.stop());
 
+    it("assets", async () => {
         const isitasset = await damless.resolve("isitasset");
         expect(isitasset.nodes.length).to.be(2);
         expect(isitasset.nodes[0].token).to.be("main.html");

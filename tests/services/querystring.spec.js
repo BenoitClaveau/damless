@@ -16,11 +16,13 @@ process.on("unhandledRejection", (reason, p) => {
 describe("querystring", () => {
 
     let damless;
-    before(async () => {
-        damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}})
-        await damless.start();
-    });
-    after(async () => await damless.stop());
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ http: { port: 3000 }})
+            .start();
+    })
+    afterEach(async () => await damless.stop());
 
     it("parse querystring price =", async () => {
         const qs = await damless.resolve("querystring");

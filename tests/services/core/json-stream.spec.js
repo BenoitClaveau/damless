@@ -8,11 +8,16 @@
 const DamLess = require("../../../index");
 const fs = require("fs");
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await damless.stop());
-
 describe("json-stream", () => {
+
+    let damless;
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ http: { port: 3000 }})
+            .start();
+    })
+    afterEach(async () => await damless.stop());
 
     it("parse array", async () => {
         const $json = await damless.resolve("json-stream");

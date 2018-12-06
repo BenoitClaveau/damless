@@ -7,14 +7,17 @@
 const expect = require("expect.js");
 const DamLess = require("../../../index");
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await damless.stop());
-
 describe("ServicesLoader", () => {
+
+    let damless;
+    beforeEach(() => 
+        damless = new DamLess()
+            .cwd(__dirname)
+    )
+    afterEach(async () => await damless.stop());
     
     it("load", async () => {
         let injector = await damless.resolve("injector");
-        expect(Object.entries(injector.container).length).to.be(17);
+        expect(Object.entries(injector.container).length).to.be(16);
     });
 });

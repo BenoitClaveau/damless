@@ -37,10 +37,12 @@ describe("auth-jwt", () => {
     });
 
     it("identify", async () => {
-        const damless = new DamLess({ dirname: __dirname, config: config });
+        const damless = new DamLess();
 
         try {
             await damless
+                .cwd(__dirname)
+                .config(config)
                 .use("auth-jwt") // use auth2 middleware
                 .inject("info", "./info")
                 .get("/info", "info", "httpAuthInfo")

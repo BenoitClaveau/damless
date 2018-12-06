@@ -35,9 +35,13 @@ class DamLessServer {
     }
 
     async start() {
-        await this.commands.run();
+        await this.apply();
         await this.giveme.load();
         return this;
+    }
+
+    async apply() {
+        await this.commands.run();
     }
 
     async stop() {

@@ -30,15 +30,17 @@ const info = new class {
 describe("auth2", () => {
 
     let damless;
-    before(async () => {
-        damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 } } })
-                    .use("oauth2")
-                    .inject("info", info)
-                    .post("/oauth/authorize", "oauth2", "authorize")
-                    .get("/", "info", "index", { auth: true });
-        await damless.start();
-    });
-    after(async () => await damless.stop());
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ http: { port: 3000 }})
+            .use("oauth2")
+            .inject("info", info)
+            .post("/oauth/authorize", "oauth2", "authorize")
+            .get("/", "info", "index", { auth: true })
+            .start();
+    })
+    afterEach(async () => await damless.stop());
 
     it("should authenticate the request", async () => {
         const res = await fetch("http://localhost:3000", {
@@ -50,9 +52,6 @@ describe("auth2", () => {
         expect(res.ok).to.be(true);
 
     }).timeout(30000);
-
-
-
 
     xit("createToken via github", async () => {
         const auth = new ClientOAuth2({

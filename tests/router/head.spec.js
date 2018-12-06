@@ -14,18 +14,20 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { http: { port: 3000 }}}));
-afterEach(async () => await damless.stop());
-
 describe("head", () => {
 
+    let damless;
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ http: { port: 3000 }})
+            .inject("info", "../services/info")
+            .get("/info", "info", "getInfo")
+            .start();
+    })
+    afterEach(async () => await damless.stop());
+
     it("/info", async () => {
-        await damless
-                .inject("info", "../services/info")
-                .get("/info", "info", "getInfo")
-                .start();
-        
         const requestOptions = {
             method : "HEAD",
             url    : "http://localhost:3000/info"

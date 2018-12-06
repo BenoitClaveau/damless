@@ -13,19 +13,23 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-let damless;
-beforeEach(() => damless = new DamLess({ dirname: __dirname, config: { 
-    http: { 
-        port: 3000, 
-    },
-}}));
-afterEach(async () => await damless.stop());
-
 describe("http-router", () => {
+
+    let damless;
+    beforeEach(() => 
+        damless = new DamLess()
+            .cwd(__dirname)
+            .config({ 
+                http: { 
+                    port: 3000, 
+                }
+            })
+            .inject("info", "./services/info")
+    )
+    afterEach(async () => await damless.stop());
 
     it("single route", async () => {
         await damless
-            .inject("info", "./services/info")
             .get("/whoiam", "info", "whoiam")
             .get("/helloworld", "info", "helloworld")
             .start();
@@ -36,7 +40,6 @@ describe("http-router", () => {
 
     it("multiple route", async () => {
         await damless
-            .inject("info", "./services/info")
             .get("/whoiam", "info", "whoiam")
             .get("/helloworld", "info", "helloworld")
             .start();
@@ -49,7 +52,6 @@ describe("http-router", () => {
 
     it("default route", async () => {
         await damless
-            .inject("info", "./services/info")
             .get("/helloworld", "info", "helloworld")
             .get("/*", "info", "whoiam")
             .start();
@@ -64,7 +66,6 @@ describe("http-router", () => {
 
     it("default route inverted", async () => {
         await damless
-            .inject("info", "./services/info")
             .get("/*", "info", "whoiam")
             .get("/helloworld", "info", "helloworld")
             .start();
@@ -79,7 +80,6 @@ describe("http-router", () => {
 
     it("multiple token", async () => {
         await damless
-            .inject("info", "./services/info")
             .get("/*", "info", "whoiam")
             .get("/*/*", "info", "helloworld")
             .start();
@@ -97,7 +97,6 @@ describe("http-router", () => {
     it("multiple end route", async () => {
         try {
             await damless
-                .inject("info", "./services/info")
                 .get("/whoiam", "info", "whoiam")
                 .get("/whoiam", "info", "helloworld")
                 .start();
@@ -111,12 +110,11 @@ describe("http-router", () => {
     it("add multiple end route after start", async () => {
         try {
             await damless
-                .inject("info", "./services/info")
                 .get("/whoiam", "info", "whoiam")
                 .start();
             
             damless.get("/whoiam", "info", "helloworld");
-            await damless.apply(); // need to call apply to apply new config.
+            await damless.apply();
             throw new Error("Failed");
         } 
         catch(error) {
