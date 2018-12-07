@@ -19,11 +19,7 @@ describe("http-router", () => {
     beforeEach(() => 
         damless = new DamLess()
             .cwd(__dirname)
-            .config({ 
-                http: { 
-                    port: 3000, 
-                }
-            })
+            .config({ http: { port: 3000 }})
             .inject("info", "./services/info")
     )
     afterEach(async () => await damless.stop());

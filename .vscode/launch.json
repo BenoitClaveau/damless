@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "Use forward-to-asset middleware",
+                "Throw error in stream",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
