@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "streamify an object",
+                "delete",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

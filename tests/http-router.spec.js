@@ -24,13 +24,48 @@ describe("http-router", () => {
     )
     afterEach(async () => await damless.stop());
 
-    it("single route", async () => {
+    it("get", async () => {
         await damless
             .get("/whoiam", "info", "whoiam")
-            .get("/helloworld", "info", "helloworld")
             .start();
         const client = await damless.resolve("client");
         const res = await client.get("http://localhost:3000/whoiam");
+        expect(res.body).to.be("I'm Info service.");
+    });
+
+    it("post", async () => {
+        await damless
+            .post("/whoiam", "info", "whoiam")
+            .start();
+        const client = await damless.resolve("client");
+        const res = await client.post("http://localhost:3000/whoiam");
+        expect(res.body).to.be("I'm Info service.");
+    });
+
+    it("put", async () => {
+        await damless
+            .put("/whoiam", "info", "whoiam")
+            .start();
+        const client = await damless.resolve("client");
+        const res = await client.put("http://localhost:3000/whoiam");
+        expect(res.body).to.be("I'm Info service.");
+    });
+
+    it("patch", async () => {
+        await damless
+            .patch("/whoiam", "info", "whoiam")
+            .start();
+        const client = await damless.resolve("client");
+        const res = await client.patch("http://localhost:3000/whoiam");
+        expect(res.body).to.be("I'm Info service.");
+    });
+
+    it("delete", async () => {
+        await damless
+            .delete("/whoiam", "info", "whoiam")
+            .start();
+        const client = await damless.resolve("client");
+        const res = await client.delete("http://localhost:3000/whoiam");
         expect(res.body).to.be("I'm Info service.");
     });
 
