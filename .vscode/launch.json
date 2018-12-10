@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "throw an error in a StreamFlow",
+                "streamify an object",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
