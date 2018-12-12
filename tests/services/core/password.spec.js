@@ -14,6 +14,7 @@ require("process").on("unhandledRejection", (reason, p) => {
 });
 
 describe("password", () => {
+
     it("generate", () => {
         const passwordService = new PasswordService(new CryptoService());
         const { password, clear, salt } = passwordService.generate();

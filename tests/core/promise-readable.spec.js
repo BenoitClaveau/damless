@@ -23,10 +23,22 @@ describe("promise-readable", () => {
         expect(first).to.be(1);
     });
 
+    it("getFirst with error", async () => {
+        const stream = new ArrayToStream(null);
+        const res = await getFirst(stream);
+        expect(res).to.be(null);
+    });
+
     it("getAll", async () => {
         const stream = new ArrayToStream([1,2,3]);
         const all = await getAll(stream);
         expect(all).to.eql([1,2,3]);
+    });
+
+    it("getAll with error", async () => {
+        const stream = new ArrayToStream();
+        const all = await getAll(stream);
+        expect(all).to.eql([]);
     });
 
     it("getBuffer", async () => {

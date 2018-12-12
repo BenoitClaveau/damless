@@ -6,18 +6,25 @@
 
 const expect = require("expect.js");
 const DamLess = require("../../../index");
+const path = require("path");
 
 describe("ServicesLoader", () => {
 
     let damless;
     beforeEach(() => 
         damless = new DamLess()
-            .cwd(__dirname)
     )
     afterEach(async () => await damless.stop());
     
-    it("load", async () => {
+    it("load services via config file", async () => {
         let injector = await damless.resolve("injector");
+        expect(Object.entries(injector.container).length).to.be(16);
+
+        await damless
+                .cwd(path.join(__dirname, "../../loaders"))
+                .config("./services.json")
+                .start();
+        
         expect(Object.entries(injector.container).length).to.be(16);
     });
 });

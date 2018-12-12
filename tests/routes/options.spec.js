@@ -4,123 +4,54 @@
  * MIT Licensed
  */
 
+const expect = require("expect.js");
 const DamLess = require("../../index");
-const Options = require('../../lib/routes/options');
+const request = require("request");
+const process = require("process");
+const { inspect } = require("util");
+
+process.on("unhandledRejection", (reason, p) => {
+    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
+});
 
 describe("options", () => {
 
-    // it("*", done => {
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-    //         return giveme.load().then(() => {
-    //             let router = giveme.resolve("router");
-    //             let options = new Options(router);
+    let damless;
+    beforeEach(async () => {
+        damless = await new DamLess()
+            .cwd(__dirname)
+            .config({ http: { port: 3000 }})
+            .inject("info", "../services/info")
+    })
+    afterEach(async () => await damless.stop());
+    
+    it("get options from /info", async () => {
+        await damless
+                .get("/info", "info", "getInfo")
+                .start();
+
+        const client = await damless.resolve("client");
+        const res = await client.request({ 
+            method: "OPTIONS",
+            url: "http://localhost:3000/info"
+        })
+        expect(res.headers.allow).to.be("GET");
+    });
+
+    it("get options from /info with multiple methods", async () => {
+        await damless
+                .get("/info", "info", "getInfo")
+                .post("/info", "info", "getInfo")
+                .put("/info", "info", "getInfo")
+                .patch("/info", "info", "getInfo")
+                .delete("/info", "info", "getInfo")
+                .start();
                 
-    //             let request = new http.IncomingMessage();
-    //             request.url = "*";
-                
-    //             let response = new http.ServerResponse(request);
-                
-    //             return options.invoke(request, response).then(res => {
-    //                 expect(res.header.Allow).toBe("GET,POST,PUT,DELETE,HEAD,OPTIONS");
-    //             });
-    //         });
-    //     }).catch(fail).then(done);
-    // });
-
-    // it("get", done => {
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-            
-    //         giveme.inject("info", "../services/info");
-    //         giveme.get("/get", "info", "getInfo");
-
-    //         return giveme.load().then(() => {
-    //             let router = giveme.resolve("router");
-    //             let options = new Options(router);
-
-    //             let request = new http.IncomingMessage();
-    //             request.url = "/get";
-    //             request.pathname = "/get";
-                
-    //             let response = new http.ServerResponse(request);
-                
-    //             return options.invoke(request, response).then(res => {
-    //                 expect(res.header.Allow).toBe("GET");
-    //             });
-    //         });
-    //     }).catch(fail).then(done);
-    // });
-
-    // it("post", done => {
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-            
-    //         giveme.inject("info", "../services/info");
-    //         giveme.post("/save", "info", "save");
-
-    //         return giveme.load().then(() => {
-    //             let router = giveme.resolve("router");
-    //             let options = new Options(router);
-
-    //             let request = new http.IncomingMessage();
-    //             request.url = "/save";
-    //             request.pathname = "/save";
-                
-    //             let response = new http.ServerResponse(request);
-                
-    //             return options.invoke(request, response).then(res => {
-    //                 expect(res.header.Allow).toBe("POST");
-    //             });
-    //         });
-    //     }).catch(fail).then(done);
-    // });
-
-    // it("put", done => {
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-            
-    //         giveme.inject("info", "../services/info");
-    //         giveme.put("/update", "info", "update");
-
-    //         return giveme.load().then(() => {
-    //             let router = giveme.resolve("router");
-    //             let options = new Options(router);
-
-    //             let request = new http.IncomingMessage();
-    //             request.url = "/update";
-    //             request.pathname = "/update";
-                
-    //             let response = new http.ServerResponse(request);
-                
-    //             return options.invoke(request, response).then(res => {
-    //                 expect(res.header.Allow).toBe("PUT");
-    //             });
-    //         });
-    //     }).catch(fail).then(done);
-    // });
-
-    // it("delete", done => {
-    //     return Promise.resolve().then(() => {
-    //         let giveme = new GiveMeTheService({ dirname: __dirname, config: {}});
-            
-    //         giveme.inject("info", "../services/info");
-    //         giveme.delete("/delete", "info", "delete");
-
-    //         return giveme.load().then(() => {
-    //             let router = giveme.resolve("router");
-    //             let options = new Options(router);
-
-    //             let request = new http.IncomingMessage();
-    //             request.url = "/delete";
-    //             request.pathname = "/delete";
-                
-    //             let response = new http.ServerResponse(request);
-                
-    //             return options.invoke(request, response).then(res => {
-    //                 expect(res.header.Allow).toBe("DELETE");
-    //             });
-    //         });
-    //     }).catch(fail).then(done);
-    // });
+        const client = await damless.resolve("client");
+        const res = await client.request({ 
+            method: "OPTIONS",
+            url: "http://localhost:3000/info"
+        })
+        expect(res.headers.allow).to.be("GET,POST,DELETE,PUT,PATCH");
+    });
 });

@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "delete",
+                "get index options",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

@@ -18,9 +18,7 @@ describe("streamify", () => {
         });
 
         const all = await getAll(stream);
-        expect(all).to.eql({
-            value: 1
-        });
+        expect(all).to.eql([{ value: 1 }]);
     });
 
     it("streamify an array", async () => {
