@@ -169,7 +169,6 @@ const {
 
 const {
     AskReply,
-    CompressedStream,
     ContentType,
     ContextFactory,
     IsItForMe,
@@ -213,7 +212,6 @@ module.exports.String = StringService;
 module.exports.Walk = Walk;
 // Export damless services
 module.exports.AskReply = AskReply;
-module.exports.CompressedStream = CompressedStream;
 module.exports.ContentType = ContentType;
 module.exports.ContextFactory = ContextFactory;
 module.exports.IsItForMe = IsItForMe;

@@ -25,6 +25,6 @@ describe("ServicesLoader", () => {
                 .config("./services.json")
                 .start();
         
-        expect(Object.entries(injector.container).length).to.be(16);
+        expect(Object.entries(injector.container).length).to.be(45);
     });
 });

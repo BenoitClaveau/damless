@@ -4,7 +4,7 @@
  * MIT Licensed
  */
 
-const DamLess = require("../../index");
+const DamLess = require("../../../index");
 const expect = require("expect.js");
 const process = require("process");
 const fetch = require("node-fetch");

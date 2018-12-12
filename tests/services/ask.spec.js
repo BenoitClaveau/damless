@@ -124,7 +124,7 @@ describe("ask", () => {
                     receive = receive || true;
                 })
         );
-    });
+    }).timeout(20000);
 
     it("upload image stream", async () => {
         const jsonstream = await damless.resolve("json-stream");

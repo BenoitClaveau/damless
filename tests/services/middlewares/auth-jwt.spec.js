@@ -4,8 +4,8 @@
  * MIT Licensed
  */
 
-const Auth = require("../../lib/services/middlewares/auth-jwt");
-const DamLess = require("../../index");
+const Auth = require("../../../lib/services/middlewares/auth-jwt");
+const DamLess = require("../../../index");
 const expect = require("expect.js");
 
 const config = {
@@ -44,7 +44,7 @@ describe("auth-jwt", () => {
                 .cwd(__dirname)
                 .config(config)
                 .use("auth-jwt") // use auth2 middleware
-                .inject("info", "./info")
+                .inject("info", "../info")
                 .get("/info", "info", "httpAuthInfo")
                 .post("/connect", "info", "connect", { auth: false })
                 .start();

@@ -20,7 +20,6 @@ describe("duplex stream", () => {
     xit("readable -> writable", async () => {
         const readable = new Readable({ read() {}});
         const writable = new Writable({ write(chunk, encoding, callback) {
-            console.log(chunk.toString())
             callback();
         }});
 
@@ -39,7 +38,6 @@ describe("duplex stream", () => {
             }
         });
         const writable = new Writable({ write(chunk, encoding, callback) {
-            console.log(chunk.toString())
             callback();
         }});
 
@@ -54,7 +52,6 @@ describe("duplex stream", () => {
         const duplex = new Duplex({ 
             read: () => {},
             write(chunk, encoding, callback) {
-                console.log(chunk.toString())
                 callback();
             }
         });
@@ -138,7 +135,6 @@ describe("duplex stream", () => {
         const transform = new Transform({ 
             transform(chunk, encoding, callback) {
                 const data = chunk.toString().toUpperCase();
-                console.log("[transform]", data)
                 this.push("transformation#1:" + data);
                 callback();
             },
@@ -146,7 +142,6 @@ describe("duplex stream", () => {
 
         const response = new Writable({ write(chunk, encoding, callback) {
             const data = chunk.toString();
-            console.log("[REPONSE]", data)
             callback();
         }});
 
@@ -155,7 +150,6 @@ describe("duplex stream", () => {
         const duplex = new Duplex({
             read(n) {
                 const value = data.pop();
-                console.log("[read]");
                 this.push(value ? value : null) //Do not use emit to be able to buffer data
             },            
             write(chunk, encoding, callback) {
@@ -166,7 +160,6 @@ describe("duplex stream", () => {
 
 
         transform.on("data", data => {
-            console.log("[on data]", data.toString());
             response.write(data);
             //duplex.emit("data", data);
             //console.log()
@@ -191,12 +184,10 @@ class MyDuplex extends Duplex {
     }
 
     write(chunk, encoding, callback) {
-        console.log("[write]", chunk.toString())
         super.write(chunk, encoding, callback)
     }
 
     _write(chunk, encoding, callback) {
-        console.log("[_write]", chunk.toString())
         this.transform.write(chunk, encoding, callback)
     }
 }
