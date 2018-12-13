@@ -20,7 +20,9 @@ describe("http-server", () => {
     beforeEach(async () => {
         damless = await new DamLess()
     })
-    afterEach(async () => await damless.stop());
+    afterEach(async () => {
+        await damless.stop();
+    });
 
     it("create a http server", async () => {
         await

@@ -13,13 +13,13 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "create a http2 server with http1 client",
+                "create a http2 server",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
-                "<node_internals>/**/*.js",
-                "${workspaceFolder}/node_modules/core-js/**/*.js"
+                // "<node_internals>/**/*.js",
+                // "${workspaceFolder}/node_modules/core-js/**/*.js"
             ]
           }
     ]
