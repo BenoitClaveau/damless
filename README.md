@@ -38,7 +38,7 @@ insertOne(context, stream, headers) {
     .pipe(new Transform({
         objectMode: true,
         transform(chunk, enc, callback) {
-            // save the chunk (user) into the database
+            // save the chunk (user) in the database
             callback(null, chunk);
         }
     }))
@@ -57,15 +57,13 @@ You can develop your http server like a gulp script.
 
 # Features
 
-  [Structured your project using services](#services)
+  [Services](#services)
   
-  [Dependency Injection to override default behavior](#di)
-  
-  [Configuration manager](#config)
+  [Dependency Injection](#di)
 
-  [Compression & minification](#compression)
+  [(request, response) -> dulplex stream](#ask-reply)
 
-  [Json serializer](#json)
+  [OOP](#oop)
   
   [Security](https://github.com/shieldfy/API-Security-Checklist)
 
@@ -94,7 +92,7 @@ exports = module.exports = ServiceInfo;
 DamLess use [givemetheservice](https://www.npmjs.com/package/givemetheservice) to inject all services.
 You can override everythink or inject your new services.
 
-## DamLess compression <a href="#compression" />
+## (request, response) -> duplex stream <a href="#ask-reply" />
 
 DamLess has been inspired by the http2 syntax. The request and response are wrap by an unique duplex stream.
 This stream automatically gzip or deflate your response. It is useless to pipe a compressor.
@@ -151,7 +149,9 @@ class ServiceInfo {
 };
 ```
 
-## Customize the default json serializer <a href="#json" />
+## Extend core services <a href="#oop" />
+
+Use the power of ES6 to easily extends core services.
 
 ```json.js
 const { Json } = require("damless");
@@ -182,7 +182,7 @@ damless
     .inject("json", "./custom-json.js")
 ```
 
-## Use others DamLess services to develop as fast as a rocket
+## Develop faster
   
   * [mongo](https://www.npmjs.com/package/damless-mongo)
   * [nodemailer](https://www.npmjs.com/package/damless-nodemailer)
