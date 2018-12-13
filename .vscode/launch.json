@@ -13,13 +13,13 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "getFirst with stream.end",
+                "create a StreamFlow",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
-                "<node_internals>/**/*.js",
-                "${workspaceFolder}/node_modules/core-js/**/*.js"
+                // "<node_internals>/**/*.js",
+                // "${workspaceFolder}/node_modules/core-js/**/*.js"
             ]
           }
     ]
