@@ -8,18 +8,30 @@ const expect = require("expect.js");
 const fs = require("fs");
 const { 
     ArrayToStream, 
-    ending,
     getFirst,
     getAll,
     getBuffer
 } = require("../../lib/core");
-const { Transform } = require('stream');
+const { Readable } = require('stream');
 
 describe("promise-readable", () => {
 
     it("getFirst", async () => {
         const stream = new ArrayToStream([1,2,3]);
         const first = await getFirst(stream);
+        expect(first).to.be(1);
+    });
+
+    it("getFirst with stream.end", async () => {
+        const stream = new Readable({
+            objectMode: true,
+            read() {}
+        });
+        setTimeout(() => {
+            stream.emit("end", 1);
+        }, 500);
+        const first = await getFirst(stream);
+
         expect(first).to.be(1);
     });
 

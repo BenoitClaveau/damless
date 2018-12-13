@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "save json stream",
+                "getFirst with stream.end",
                 "${workspaceRoot}/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
