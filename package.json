@@ -17,9 +17,11 @@
     },
     "devDependencies": {
         "JSONStream": "latest",
+        "blue-tape": "^1.0.0",
         "client-oauth2": "latest",
         "coveralls": "latest",
         "expect.js": "latest",
+        "fetch-h2": "^1.0.5",
         "istanbul": "latest",
         "mocha": "latest",
         "node-fetch": "latest",

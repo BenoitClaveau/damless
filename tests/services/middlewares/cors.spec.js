@@ -29,7 +29,7 @@ describe("cors middleware", () => {
         const client = await damless.resolve("client");
         const res = await client.get({ url: "http://localhost:3000/hello", json: true });
         expect(res.body).to.be("Hello world.");
-        expect(res.headers["access-control-allow-headers"]).to.be("Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+        expect(res.headers["access-control-allow-headers"]).to.be("content-type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
         expect(res.headers["access-control-allow-methods"]).to.be("*");
         expect(res.headers["access-control-allow-origin"]).to.be("*");
         expect(res.headers["access-control-max-age"]).to.be("3600");

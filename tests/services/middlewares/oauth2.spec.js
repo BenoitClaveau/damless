@@ -73,7 +73,7 @@ describe("auth2", () => {
                 'accept': '*/*'
             }
         })
-        expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
+        expect(obj.headers.authorization).to.equal('Bearer ' + config.accessToken)
     }).timeout(20000);
 
     xit("createToken via damless", async () => {
@@ -96,7 +96,7 @@ describe("auth2", () => {
                 'accept': '*/*'
             }
         })
-        expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
+        expect(obj.headers.authorization).to.equal('Bearer ' + config.accessToken)
     }).timeout(20000);
 
 });
