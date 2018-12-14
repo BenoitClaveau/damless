@@ -13,8 +13,8 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "create a http2 server",
-                "${workspaceRoot}/**/*.spec.js"
+                "create a StreamFlow",
+                "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
