@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "find a key",
+                "Inject middleware anonymous function",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

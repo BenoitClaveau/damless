@@ -80,4 +80,21 @@ describe("Load middleware", () => {
         }
 
     }).timeout(5000);
+
+    it("Inject middleware anonymous function", async () => {
+
+        await damless
+            .use((context, stream, headers) => {
+                stream.respond({ "x-custom-header": "1234" })
+            })
+            .get("/", (context, stream, header) => {
+                stream.end({ ok: true });
+            })
+            .start();
+        
+        const client = await damless.resolve("client");
+        const res = await client.get({ url: "http://localhost:3000/" });
+        expect(res.statusCode).to.be(200);
+        expect(res.headers["x-custom-header"]).to.be("1234");
+    }).timeout(5000);
 })
