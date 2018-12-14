@@ -23,10 +23,28 @@ describe("Repository", () => {
     })
     afterEach(async () => await damless.stop());
 
-    it("keys", async () => {
+    it("create a repository", async () => {
         const repositoryFactory = await damless.resolve("repository-factory");
-        let repository = repositoryFactory.create(__dirname);
-        var properties = Object.keys(repository);
-        expect(properties.length).to.be(0);
+        const repository = await repositoryFactory.create(__dirname);
+        const properties = Object.keys(repository);
+        expect(properties.length).to.be(11);
+    });
+
+    it("find a key", async () => {
+        const repositoryFactory = await damless.resolve("repository-factory");
+        const repository = await repositoryFactory.create(__dirname);
+        expect(repository.find("walk.spec").js).not.to.be(undefined);
+    });
+
+    it("file not found", async () => {
+        const repositoryFactory = await damless.resolve("repository-factory");
+        const repository = await repositoryFactory.create(__dirname);
+        try {
+            repository.find("walk.js");
+            throw new Error();
+        }
+        catch(error) {
+            expect(error.message).to.be(`Not found walk.js file in ${__dirname}.`);
+        }
     });
 });
