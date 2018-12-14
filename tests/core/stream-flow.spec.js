@@ -57,6 +57,7 @@ describe("stream-flow", () => {
                 .pipe(flow)
                 .on("data", data => {
                     cpt++;
+                    console.log(cpt, data.key);
                     if (cpt == 100) {
                         transform1.pause();
                         setTimeout(() => {
