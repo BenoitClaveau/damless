@@ -25,7 +25,7 @@ describe("stream-flow", () => {
         const transform1 = new Transform({
             objectMode: true,
             transform(chunk, encoding, callback) {
-                console.log("\t", chunk.key);
+                //console.log("\t", chunk.key);
                 callback(null, {
                     ...chunk,
                     key: chunk.key.toUpperCase()
@@ -36,7 +36,7 @@ describe("stream-flow", () => {
         const transform2 = new Transform({
             objectMode: true,
             transform(chunk, encoding, callback) {
-                console.log("\t\t", chunk.key);
+                //console.log("\t\t", chunk.key);
                 callback(null, {
                     ...chunk,
                     key: chunk.key.replace(/ /g, ";")
@@ -59,12 +59,12 @@ describe("stream-flow", () => {
                 .pipe(flow)
                 .on("data", data => {
                     cpt++;
-                    console.log("\t\t\t", data.key);
+                    //console.log("\t\t\t", data.key);
                     if (cpt == 100) {
-                        console.log("** PAUSE **");
+                        //console.log("** PAUSE **");
                         transform1.pause();
                         setTimeout(() => {
-                            console.log("** RESUME **");
+                            //console.log("** RESUME **");
                             transform1.resume();
                         }, 2000);
                     }
