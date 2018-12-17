@@ -110,7 +110,4 @@ describe("stream-flow", () => {
             expect(error.message).to.be("Test");
         }
     });
-
-
-
 })
