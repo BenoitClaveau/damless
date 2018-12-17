@@ -85,7 +85,7 @@ describe("stream-flow", () => {
                 rev: "9-3e7bc6520008b4fcd5ee6eb9e8e5adf5"
             }
         });
-    }).timeout(360000);
+    }).timeout(60000);
 
     it("throw an error in a StreamFlow", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
