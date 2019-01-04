@@ -16,8 +16,10 @@ const {
     JsonStream,
     Json
 } = require("../../lib/services/core");
-
-const { Transform } = require('stream');
+const { 
+    Transform, 
+    pipeline
+} = require('stream');
 
 describe("stream-flow", () => {
 
@@ -44,12 +46,13 @@ describe("stream-flow", () => {
             }
         })
 
-        const flow = new StreamFlow(
-            stream => {
-                return stream
-                    .pipe(transform1)
-                    .pipe(transform2)
-            }
+        const flow = new StreamFlow(function(stream) {
+            return pipeline(
+                stream,
+                transform1,
+                transform2,
+                error => error && this.emit("error", error)
+            )}
         );
 
         let cpt = 0;
@@ -89,17 +92,18 @@ describe("stream-flow", () => {
 
     it("throw an error in a StreamFlow", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow(
-            stream => {
-                return stream
-                    .pipe(new Transform({
-                        objectMode: true,
-                        transform(chunk, encoding, callback) {
-                            if (chunk == "pipes inside") callback(new Error("Test"))
-                            else callback(null, chunk.toUpperCase());
-                        }
-                    }))
-            }
+        const flow = new StreamFlow(function(stream) {
+            return pipeline(
+                stream,
+                new Transform({
+                    objectMode: true,
+                    transform(chunk, encoding, callback) {
+                        if (chunk == "pipes inside") callback(new Error("Test"))
+                        else callback(null, chunk.toUpperCase());
+                    }
+                }),
+                error => error && this.emit("error", error)
+            )}
         );
 
         try {
