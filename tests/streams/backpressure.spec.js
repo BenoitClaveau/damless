@@ -3,15 +3,16 @@ const request = require("request");
 const fs = require("fs");
 const JSONStream = require("JSONStream");
 const process = require("process");
-const { 
-    inspect, 
-    promisify 
+const {
+    inspect,
+    promisify
 } = require('util');
-const { 
-    Readable, 
-    Transform, 
-    Duplex, 
+const {
+    Readable,
+    Transform,
+    Duplex,
     Writable,
+    PassThrough,
     pipeline: pipelineSync
 } = require('stream');
 
@@ -24,56 +25,115 @@ process.on("unhandledRejection", (reason, p) => {
 
 const delay = (action) => {
     setTimeout(() => {
-        if(action())
+        if (action())
             delay(action)
     }, 10)
 }
 
-describe("duplex stream", () => {
+describe("Understand stream back pressure", () => {
 
 
     it("readable -> writable", async () => {
         let cpt = 0;
-        const readable = new Readable({ read: () => {
-            delay(() => {
-                this.push(++cpt);
-                return cpt < 100;
-            })
-        }});
+        const readable = new Readable({
+            objectMode: true,
+            highWaterMark: 3,
+            read() {
+                if (cpt > 10) this.push(null);
+                else {
+                    console.log("push", ++cpt)
+                    this.push(cpt);
+                }
+                const { buffer, length, flowing, awaitDrain } = this._readableState;
 
-        const writable = new Writable({ write(chunk, encoding, callback) {
-            console.log(chunk);
-            callback();
-        }});
+                // console.log("state", { buffer, buffer_length: buffer.length, length, flowing, awaitDrain });
+            }
+        });
+
+        const flow = new Flow();
+        flow.on("data", data => {
+            console.log("flow:", data);
+        })
 
         await pipeline(
             readable,
-            writable
+            flow
         )
-    });
+    }).timeout(60000);
 
-    xit("readable -> transform -> writable", async () => {
-        let cpt = 0;
-        const readable = new Readable({ read: () => {
-            delay(() => {
-                this.push(++cpt);
-            })
-        }});
-
-        const transform = new Transform({ 
-            transform(chunk, encoding, callback) {
-                this.push(chunk.toString().toUpperCase());
-                callback();
-            }
-        });
-        
-        const writable = new Writable({ write(chunk, encoding, callback) {
-            callback();
-        }});
-
-        readable.pipe(transform).pipe(writable); //eror
-        readable.push("command 1");
-        readable.push("command 2");
-        readable.push(null);
-    });
 });
+
+class Flow extends Duplex {
+    constructor() {
+        super({
+            objectMode: true
+        });
+
+        this.inner = new Readable({
+            objectMode: true,
+            highWaterMark: 1,
+            read() { }
+        });
+
+        this.output = new PassThrough({
+            objectMode: true
+        });
+
+        this.inner
+            .pipe(this.output)
+            .on("data", data => {
+                this.push(data);
+            })
+            .on("end", () => {
+                this.push(null);
+            })
+
+        this._transformState = {
+            transforming: false,
+            writecb: null,
+            writechunk: null,
+            writeencoding: null,
+        };
+    }
+
+    _write(chunk, encoding, callback) {
+        var ts = this._transformState;
+        ts.writecb = callback;
+        ts.writechunk = chunk;
+        ts.writeencoding = encoding;
+
+        if (!ts.transforming) {
+            var rs = this._readableState;
+            if (ts.needTransform || rs.needReadable || rs.length < rs.highWaterMark) this._read(rs.highWaterMark);
+        }
+    }
+
+    _read(n) {
+        var ts = this._transformState;
+        if (ts.writechunk !== null && !ts.transforming) {
+            ts.transforming = true;
+            const ret = this.inner.push(ts.writechunk);
+            if (ret)
+                this.afterTransform();
+            else {
+                this.output.once("drain", () => {
+                    this.afterTransform();
+                })
+            }
+        }
+    }
+
+    afterTransform() {
+        var ts = this._transformState;
+        var cb = ts.writecb;
+        ts.transforming = false;
+        ts.writechunk = null;
+        ts.writecb = null;
+        cb();
+        var rs = this._readableState;
+        rs.reading = false;
+        if (rs.needReadable || rs.length < rs.highWaterMark) {
+            this._read(rs.highWaterMark);
+        }
+    }
+}

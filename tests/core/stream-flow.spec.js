@@ -35,22 +35,21 @@ describe("stream-flow", () => {
             }
         })
 
-        const transform2 = new Transform({
-            objectMode: true,
-            transform(chunk, encoding, callback) {
-                //console.log("\t\t", chunk.key);
-                callback(null, {
-                    ...chunk,
-                    key: chunk.key.replace(/ /g, ";")
-                });
-            }
-        })
+        // const transform2 = new Transform({
+        //     objectMode: true,
+        //     transform(chunk, encoding, callback) {
+        //         //console.log("\t\t", chunk.key);
+        //         callback(null, {
+        //             ...chunk,
+        //             key: chunk.key.replace(/ /g, ";")
+        //         });
+        //     }
+        // })
 
         const flow = new StreamFlow(function(stream) {
             return pipeline(
                 stream,
                 transform1,
-                transform2,
                 error => error && this.emit("error", error)
             )}
         );
@@ -60,17 +59,29 @@ describe("stream-flow", () => {
             fs.createReadStream(`${__dirname}/../data/npm.array.json`)
                 .pipe(new JsonStream(new Json()).parse())
                 .pipe(flow)
+                // .pipe(new Transform({
+                //     objectMode: true,
+                //     transform(chunk, enc, cb) {
+                //         cb(null, chunk);
+                //     }
+                // }))
                 .on("data", data => {
                     cpt++;
-                    //console.log("\t\t\t", data.key);
-                    if (cpt == 100) {
-                        //console.log("** PAUSE **");
-                        transform1.pause();
-                        setTimeout(() => {
-                            //console.log("** RESUME **");
-                            transform1.resume();
-                        }, 2000);
-                    }
+                    console.log(data.key);
+                    // if (cpt == 100) {
+                    //     //console.log("** PAUSE **");
+                    //     transform1.pause();
+                    //     setTimeout(() => {
+                    //         //console.log("** RESUME **");
+                    //         transform1.resume();
+                    //     }, 2000);
+                    // }
+                })
+                .on("end", () => {
+                    console.log("ENd")
+                })
+                .on("error", error => {
+                    console.log(error)
                 })
         )
         expect(all.length).to.be(4028);
@@ -88,7 +99,7 @@ describe("stream-flow", () => {
                 rev: "9-3e7bc6520008b4fcd5ee6eb9e8e5adf5"
             }
         });
-    }).timeout(15000);
+    }).timeout(30000);
 
     it("throw an error in a StreamFlow", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
