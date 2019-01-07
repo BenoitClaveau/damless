@@ -35,21 +35,22 @@ describe("stream-flow", () => {
             }
         })
 
-        // const transform2 = new Transform({
-        //     objectMode: true,
-        //     transform(chunk, encoding, callback) {
-        //         //console.log("\t\t", chunk.key);
-        //         callback(null, {
-        //             ...chunk,
-        //             key: chunk.key.replace(/ /g, ";")
-        //         });
-        //     }
-        // })
+        const transform2 = new Transform({
+            objectMode: true,
+            transform(chunk, encoding, callback) {
+                //console.log("\t\t", chunk.key);
+                callback(null, {
+                    ...chunk,
+                    key: chunk.key.replace(/ /g, ";")
+                });
+            }
+        })
 
         const flow = new StreamFlow(function(stream) {
             return pipeline(
                 stream,
                 transform1,
+                transform2,
                 error => error && this.emit("error", error)
             )}
         );
@@ -67,15 +68,15 @@ describe("stream-flow", () => {
                 // }))
                 .on("data", data => {
                     cpt++;
-                    console.log(data.key);
-                    // if (cpt == 100) {
-                    //     //console.log("** PAUSE **");
-                    //     transform1.pause();
-                    //     setTimeout(() => {
-                    //         //console.log("** RESUME **");
-                    //         transform1.resume();
-                    //     }, 2000);
-                    // }
+                    //console.log(data.key);
+                    if (cpt == 100) {
+                        //console.log("** PAUSE **");
+                        transform1.pause();
+                        setTimeout(() => {
+                            //console.log("** RESUME **");
+                            transform1.resume();
+                        }, 2000);
+                    }
                 })
                 .on("end", () => {
                     console.log("ENd")
