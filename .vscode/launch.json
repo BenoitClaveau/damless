@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "Override writeError",
+                "upload image stream",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
