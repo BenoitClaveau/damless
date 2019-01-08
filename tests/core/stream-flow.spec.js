@@ -46,14 +46,17 @@ describe("stream-flow", () => {
             }
         })
 
-        const flow = new StreamFlow(function(stream) {
-            return pipeline(
-                stream,
-                transform1,
-                transform2,
-                error => error && this.emit("error", error)
-            )}
-        );
+        const flow = new StreamFlow({
+            objectMode: true,
+            init(stream) {
+                return pipeline(
+                    stream,
+                    transform1,
+                    transform2,
+                    error => error && this.emit("error", error)
+                )
+            }
+        });
 
         let cpt = 0;
         const all = await getAll(
@@ -78,12 +81,6 @@ describe("stream-flow", () => {
                         }, 2000);
                     }
                 })
-                .on("end", () => {
-                    console.log("ENd")
-                })
-                .on("error", error => {
-                    console.log(error)
-                })
         )
         expect(all.length).to.be(4028);
         expect(all[1]).to.eql({
@@ -104,19 +101,22 @@ describe("stream-flow", () => {
 
     it("throw an error in a StreamFlow", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow(function(stream) {
-            return pipeline(
-                stream,
-                new Transform({
-                    objectMode: true,
-                    transform(chunk, encoding, callback) {
-                        if (chunk == "pipes inside") callback(new Error("Test"))
-                        else callback(null, chunk.toUpperCase());
-                    }
-                }),
-                error => error && this.emit("error", error)
-            )}
-        );
+        const flow = new StreamFlow({
+            objectMode: true,
+            init(stream) {
+                return pipeline(
+                    stream,
+                    new Transform({
+                        objectMode: true,
+                        transform(chunk, encoding, callback) {
+                            if (chunk == "pipes inside") callback(new Error("Test"))
+                            else callback(null, chunk.toUpperCase());
+                        }
+                    }),
+                    error => error && this.emit("error", error)
+                );
+            }
+        });
 
         try {
             await ending(stream.pipe(flow));

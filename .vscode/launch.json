@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "throw an error in a StreamFlow",
+                "Override writeError",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

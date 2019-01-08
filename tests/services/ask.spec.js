@@ -102,15 +102,16 @@ describe("ask", () => {
         let receive = false;
         let sending = false;
 
+        let cpt = 0;
         await ending(
             fs.createReadStream(`${__dirname}/../data/npm.array.json`)
-                .on("data", data => {
-                    if (!sending) console.log("FIRST SENDING", new Date())
-                    sending = sending || true;
-                })
-                .on("end", () => {
-                    console.log("FILE END", new Date())
-                })
+                // .on("data", data => {
+                //     if (!sending) console.log("FIRST SENDING", new Date())
+                //     sending = sending || true;
+                // })
+                // .on("end", () => {
+                //     console.log("FILE END", new Date())
+                // })
                 .pipe(request.post("http://localhost:3000/saves"))
                 .on("response", response => {
                     expect(response.headers["content-type"]).to.be("application/json; charset=utf-8");
@@ -122,9 +123,10 @@ describe("ask", () => {
                 .on("data", data => {
                     if (!receive) console.log("FIRST RECEIVE", new Date())
                     receive = receive || true;
+                    //console.log(++cpt, data.key)
                 })
         );
-    }).timeout(20000);
+    }).timeout(10000);
 
     it("upload image stream", async () => {
         const jsonstream = await damless.resolve("json-stream");
