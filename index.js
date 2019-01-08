@@ -192,6 +192,7 @@ const {
     getBuffer,
     ending,
     ArrayToStream,
+    StreamToArray,
     StreamFlow
 } = require('./lib/core');
 
@@ -231,4 +232,5 @@ module.exports.getBuffer = getBuffer;
 module.exports.ending = ending;
 module.exports.noop = noop;
 module.exports.ArrayToStream = ArrayToStream;
+module.exports.StreamToArray = StreamToArray;
 module.exports.StreamFlow = StreamFlow;
