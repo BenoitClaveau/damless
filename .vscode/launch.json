@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "transform",
+                "Throw error in transform pipeline async",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

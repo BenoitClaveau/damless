@@ -7,10 +7,11 @@
 const expect = require("expect.js");
 const { Error } = require("oups");
 const DamLess = require("../index");
-const { streamify, HttpServer } = require("../index");
-const { Transform } = require("stream");
+const { streamify, HttpServer, transform } = require("../index");
+const { Transform, pipeline } = require("stream");
 const process = require("process");
-const { inspect } = require("util");
+const { inspect, promisify } = require("util");
+const pipelineAsync = promisify(pipeline);
 
 process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
@@ -19,10 +20,10 @@ process.on("unhandledRejection", (reason, p) => {
 describe("errors", () => {
 
     let damless;
-    beforeEach(() => 
+    beforeEach(() =>
         damless = new DamLess()
             .cwd(__dirname)
-            .config({ http: { port: 3000 }})
+            .config({ http: { port: 3000 } })
     )
     afterEach(async () => await damless.stop());
 
@@ -47,8 +48,8 @@ describe("errors", () => {
         await damless
             .post("/", (context, stream, headers) => {
                 stream
-                    .pipe(new Transform({ 
-                        objectMode: true, 
+                    .pipe(new Transform({
+                        objectMode: true,
                         transform(chunk, encoding, callback) {
                             callback(new Error("In stream"));
                         }
@@ -57,9 +58,11 @@ describe("errors", () => {
             .start();
         const client = await damless.resolve("client");
         try {
-            await client.post({ url: "http://localhost:3000/", json: {
-                value: "1"
-            }});
+            await client.post({
+                url: "http://localhost:3000/", json: {
+                    value: "1"
+                }
+            });
             throw new Error();
         }
         catch (error) {
@@ -74,7 +77,7 @@ describe("errors", () => {
                 streamify(() => {
                     throw new Error("In streamify");
                 })
-                .pipe(stream);
+                    .pipe(stream);
             })
             .start();
         const client = await damless.resolve("client");
@@ -87,6 +90,86 @@ describe("errors", () => {
             expect(error.data.body.message).to.be("In streamify");
         }
     }).timeout(20000);
+
+    it("Throw error in pipeline async", async () => {
+        await damless
+            .get("/", async (context, stream, headers) => {
+                await pipelineAsync(
+                    streamify(() => {
+                        throw new Error("In pipeline");
+                    }),
+                    stream
+                )
+            })
+            .start();
+        const client = await damless.resolve("client");
+        try {
+            await client.get("http://localhost:3000/");
+            throw new Error();
+        }
+        catch (error) {
+            expect(error.statusCode).to.be(500);
+            expect(error.data.message).to.be("In pipeline");
+        }
+    }).timeout(20000);
+
+    it("Throw error in transform pipeline async", async () => {
+        await damless
+            .get("/", async (context, stream, headers) => {
+                try {
+                    await pipelineAsync(
+                        streamify([1, 2, 3]),
+                        transform((chunk, encoding) => {
+                            if (chunk == 1) throw new Error("In chunk 2.")
+                            return chunk.toString();
+                        }),
+                        stream.respond({
+                            contentType: "text/html"
+                        })
+                    )
+                }
+                catch (error) {
+                    throw error;
+                }
+            })
+            .start();
+        const client = await damless.resolve("client");
+        try {
+            const res = await client.get("http://localhost:3000/");
+            throw new Error(res.body);
+        }
+        catch (error) {
+            expect(error.statusCode).to.be(500);
+            expect(error.data.message).to.be("In pipeline");
+        }
+    }).timeout(20000);
+
+    // it("Throw error in pipeline", async () => {
+    //     await damless
+    //         .get("/", (context, stream, headers) => {
+    //             try {
+    //                 pipeline(
+    //                     streamify(() => {
+    //                         throw new Error("In pipeline");
+    //                     }),
+    //                     stream
+    //                 )
+    //             }
+    //             catch (error) {
+    //                 throw error;
+    //             }
+    //         })
+    //         .start();
+    //     const client = await damless.resolve("client");
+    //     try {
+    //         await client.get("http://localhost:3000/");
+    //         throw new Error();
+    //     }
+    //     catch (error) {
+    //         expect(error.statusCode).to.be(500);
+    //         expect(error.data.message).to.be("In pipeline");
+    //     }
+    // }).timeout(20000);
 
     it("Override writeError", async () => {
         class MyHttpServer extends HttpServer {
@@ -106,7 +189,7 @@ describe("errors", () => {
                 streamify(() => {
                     throw new Error("In streamify");
                 })
-                .pipe(stream);
+                    .pipe(stream);
             })
             .start();
         const client = await damless.resolve("client");
@@ -129,8 +212,8 @@ describe("errors", () => {
                 streamify(() => {
                     return { value: "ok" };
                 }).pipe(stream
-                        .mode("object")
-                        .respond({ statusCode: 500 }));
+                    .mode("object")
+                    .respond({ statusCode: 500 }));
             }
         }
         await damless
@@ -139,7 +222,7 @@ describe("errors", () => {
                 streamify(() => {
                     throw new Error("In streamify");
                 })
-                .pipe(stream);
+                    .pipe(stream);
             })
             .start();
         const client = await damless.resolve("client");
@@ -161,8 +244,8 @@ describe("errors", () => {
                 streamify(() => {
                     throw new Error("in writeError")
                 }).pipe(stream
-                        .mode("object")
-                        .respond({ statusCode: 500 }));
+                    .mode("object")
+                    .respond({ statusCode: 500 }));
             }
         }
         await damless
@@ -171,7 +254,7 @@ describe("errors", () => {
                 streamify(() => {
                     throw new Error("In streamify");
                 })
-                .pipe(stream);
+                    .pipe(stream);
             })
             .start();
         const client = await damless.resolve("client");

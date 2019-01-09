@@ -44,7 +44,7 @@ describe("streamify", () => {
         const output = new StreamToArray();
         await pipelineAsync(
             stream,
-            transform((chunk, encoding, callback) => {
+            transform((chunk, encoding) => {
                 return chunk - 1;
             }),
             output
