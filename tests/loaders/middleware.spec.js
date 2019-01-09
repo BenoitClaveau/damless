@@ -40,7 +40,7 @@ describe("Load middleware", () => {
         }
         catch(error) {
             expect(error.statusCode).to.be(401);
-            expect(error.data.body.message).to.be("Authentication has failed for GET:/.");
+            expect(error.data.message).to.be("Authentication has failed for GET:/.");
         }
 
     }).timeout(5000);
@@ -76,7 +76,7 @@ describe("Load middleware", () => {
         }
         catch(error) {
             expect(error.statusCode).to.be(404);
-            expect(error.data.body.message).to.be("Page / not found.");
+            expect(error.data.message).to.be("Page / not found.");
         }
 
     }).timeout(5000);

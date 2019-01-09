@@ -40,7 +40,7 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.body.message).to.be("In method");
+            expect(error.data.message).to.be("In method");
         }
     }).timeout(20000);
 
@@ -87,7 +87,7 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.body.message).to.be("In streamify");
+            expect(error.data.message).to.be("In streamify");
         }
     }).timeout(20000);
 
@@ -113,14 +113,14 @@ describe("errors", () => {
         }
     }).timeout(20000);
 
-    it("Throw error in transform pipeline async", async () => {
+    xit("Throw error in transform pipeline async", async () => {
         await damless
             .get("/", async (context, stream, headers) => {
                 try {
                     await pipelineAsync(
                         streamify([1, 2, 3]),
                         transform((chunk, encoding) => {
-                            if (chunk == 1) throw new Error("In chunk 2.")
+                            if (chunk == 2) throw new Error("In chunk 2.")
                             return chunk.toString();
                         }),
                         stream.respond({
@@ -136,11 +136,11 @@ describe("errors", () => {
         const client = await damless.resolve("client");
         try {
             const res = await client.get("http://localhost:3000/");
-            throw new Error(res.body);
+            throw new Error(res.statusCode);
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In pipeline");
+            expect(error.data.message).to.be("In chunk 2.");
         }
     }).timeout(20000);
 
