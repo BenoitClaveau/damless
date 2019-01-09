@@ -59,7 +59,7 @@ describe("streamify", () => {
             const output = new StreamToArray();
             await pipelineAsync(
                 stream,
-                transform((chunk, encoding, callback) => {
+                transform((chunk, encoding) => {
                     if (chunk == 2) throw new Error("Boom");
                     return chunk;
                 }),
