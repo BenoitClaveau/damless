@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "upload image stream",
+                "transform",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
