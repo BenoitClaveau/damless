@@ -27,7 +27,7 @@ describe("Repository", () => {
         const repositoryFactory = await damless.resolve("repository-factory");
         const repository = await repositoryFactory.create(__dirname);
         const properties = Object.keys(repository);
-        expect(properties.length).to.be(11);
+        expect(properties.length).to.be(12);
     });
 
     it("find a key", async () => {

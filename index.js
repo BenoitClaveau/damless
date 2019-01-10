@@ -22,6 +22,7 @@ class DamLessServer {
         this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
         this.giveme.inject("json", `${__dirname}/lib/services/core/json`);
         this.giveme.inject("json-stream", `${__dirname}/lib/services/core/json-stream`);
+        this.giveme.inject("text-stream", `${__dirname}/lib/services/core/text-stream`);
         this.giveme.inject("qjimp", `${__dirname}/lib/services/core/qjimp`);
         this.giveme.inject("client", `${__dirname}/lib/services/core/client`);
         this.giveme.inject("walk", `${__dirname}/lib/services/core/walk`);

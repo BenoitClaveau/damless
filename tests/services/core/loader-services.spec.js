@@ -18,13 +18,13 @@ describe("ServicesLoader", () => {
     
     it("load services via config file", async () => {
         let injector = await damless.resolve("injector");
-        expect(Object.entries(injector.container).length).to.be(16);
+        expect(Object.entries(injector.container).length).to.be(17);
 
         await damless
                 .cwd(path.join(__dirname, "../../loaders"))
                 .config("./services.json")
                 .start();
         
-        expect(Object.entries(injector.container).length).to.be(45);
+        expect(Object.entries(injector.container).length).to.be(46);
     });
 });

@@ -15,7 +15,7 @@ require("process").on('unhandledRejection', (reason, p) => {
 describe("walk", () => {
     it("get", () => {
         let files = new Walk().get(__dirname);
-        expect(files.length).to.be(9);
+        expect(files.length).to.be(10);
         expect(files[0].slice(__dirname.length)).to.be("/crypto.spec.js");
     });
 });
