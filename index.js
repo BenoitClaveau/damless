@@ -36,9 +36,12 @@ class DamLessServer {
     }
 
     async start() {
-        await this.giveme.resolve("services-loader", { mount: false }); // We call services-loader contructor to inject services in json.
+        await this.giveme.importAll(); // require all modules
+        await this.giveme.resolve("services-loader", { mount: false }); // services-loader contructor will inject services in json.
         await this.commands.run(); // We inject or override services
-        await this.giveme.load();
+        await this.giveme.importAll(); // require all new injected modules (old will ot be imported)
+        await this.giveme.createAll();
+        await this.giveme.mountAll();
         return this;
     }
 
