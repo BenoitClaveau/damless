@@ -137,19 +137,4 @@ describe("http-router", () => {
             expect(error.message).to.be("Failed the register helloworld of info for GET:/whoiam");
         }
     }).timeout(20000);
-
-    it("add multiple end route after start", async () => {
-        try {
-            await damless
-                .get("/whoiam", "info", "whoiam")
-                .start();
-            
-            damless.get("/whoiam", "info", "helloworld");
-            await damless.apply();
-            throw new Error("Failed");
-        } 
-        catch(error) {
-            expect(error.message).to.be("Failed the register helloworld of info for GET:/whoiam");
-        }
-    }).timeout(20000);
 });

@@ -36,13 +36,10 @@ class DamLessServer {
     }
 
     async start() {
-        await this.apply();
+        await this.giveme.resolve("services-loader", { mount: false }); // We call services-loader contructor to inject services in json.
+        await this.commands.run(); // We inject or override services
         await this.giveme.load();
         return this;
-    }
-
-    async apply() {
-        await this.commands.run();
     }
 
     async stop() {
