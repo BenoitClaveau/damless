@@ -36,7 +36,7 @@ class DamLessServer {
     }
 
     async start() {
-        await this.giveme.importAll(); // require all modules
+        await this.giveme.importAll(); // import all modules (damless)
         await this.giveme.resolve("services-loader", { mount: false }); // services-loader contructor will inject services in json.
         await this.commands.run(); // We inject or override services
         await this.giveme.importAll(); // require all new injected modules (old will ot be imported)
@@ -59,7 +59,8 @@ class DamLessServer {
         if (typeof data == "string") {
             const file = path.resolve(this.giveme.root, data);
             if (fs.existsSync(file)) {
-                this._config = require(file);
+                const content = fs.readFileSync(file); // Do not use require (data must be duplicated).
+                this._config = JSON.parse(content);
                 this.giveme.inject("config", this._config);
             }
         }

@@ -66,4 +66,38 @@ describe("auth-jwt", () => {
             damless.stop();
         }
     }).timeout(5000);
+
+    it("override auth-jwt", async () => {
+        const damless = new DamLess();
+
+        try {
+            await damless
+                .cwd(__dirname)
+                .config(config)
+                .inject("info", "../info")
+                .inject("auth-jwt", class extends Auth {
+                    decode(payload, secret) {
+                        return "HI";
+                    }
+                })
+                .use("auth-jwt") // use auth2 middleware
+                .get("/info", (context, stream, headers) => {
+                    expect(context.auth.payload).to.be("HI");
+                    stream
+                        .mode("object")
+                        .end({ ok: 1 });
+                })
+                .post("/connect", "info", "connect", { auth: false })
+                .start();
+
+            const client = await damless.resolve("client");
+            const res2 = await client.post({ url: "http://localhost:3000/connect", json: { id: 1024 }});
+            expect(res2.body.token).not.to.be(null);
+            const res3 = await client.get({ url: "http://localhost:3000/info", auth: { "bearer": res2.body.token }, json: true });
+            expect(res3.body).to.eql({ ok: 1 });
+        }
+        finally {
+            damless.stop();
+        }
+    }).timeout(5000);
 });
