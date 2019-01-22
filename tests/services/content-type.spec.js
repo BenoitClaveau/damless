@@ -19,6 +19,7 @@ describe("ContentType", () => {
 
     it("get", () => {
         expect(contentType.get(".json")).to.be("application/json");
+        expect(contentType.get(".geojson")).to.be("application/json");
         expect(contentType.get(".png")).to.be("image/png");
         expect(contentType.get(".jpeg")).to.be("image/jpeg");
         expect(contentType.get(".jpg")).to.be("image/jpeg");
