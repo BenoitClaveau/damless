@@ -153,7 +153,7 @@ describe("http-server", () => {
                 .cwd(__dirname)
                 .config({
                     "http2-unsecure": {
-                        port: 8443
+                        port: 8003
                     }
                 })
                 .inject("info", "./services/info")
@@ -164,7 +164,7 @@ describe("http-server", () => {
             session: { rejectUnauthorized: false },
         });
 
-        const response = await fetch("http://localhost:8443/save", {
+        const response = await fetch("http://localhost:8003/save", {
             method: "POST",
             json: {
                 name: "ben",

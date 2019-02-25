@@ -13,13 +13,15 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "createToken via damless",
+                "create a http2 unsecure server",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
                 "<node_internals>/**/*.js",
-                "${workspaceFolder}/node_modules/core-js/**/*.js"
+                "${workspaceFolder}/node_modules/core-js/**/*.js",
+                "${workspaceFolder}/node_modules/object.assign/**/*.js",
+                "${workspaceFolder}/node_modules/isexe/**/*.js"
             ]
           }
     ]
