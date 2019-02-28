@@ -87,6 +87,7 @@ describe("oauth2", () => {
     xit("createToken", async () => {
         // https://www.oauth.com/playground/authorization-code.html
         // https://aaronparecki.com/oauth-2-simplified/#web-server-apps
+        // https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2
         const auth = new ClientOAuth2({
             clientId: 'abc',
             clientSecret: '123',
