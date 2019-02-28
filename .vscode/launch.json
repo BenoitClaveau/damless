@@ -13,7 +13,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "create a http2 unsecure server",
+                "authorize",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

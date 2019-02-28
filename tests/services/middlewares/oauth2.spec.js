@@ -43,6 +43,7 @@ describe("oauth2", () => {
             .inject("service", service)
             .post("/oauth/authorize", "oauth2", "authorize")
             .post("/oauth/access_token", "oauth2", "access_token")
+            .post("/oauth/token_info", "oauth2", "token_info")
             .get("/sign", "service", "sign", { auth: true })
             .get("/callback", "service", "callback", { auth: false })
             .start();
@@ -83,7 +84,9 @@ describe("oauth2", () => {
         expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
     }).timeout(20000);
 
-    xit("createToken via damless", async () => {
+    xit("createToken", async () => {
+        // https://www.oauth.com/playground/authorization-code.html
+        // https://aaronparecki.com/oauth-2-simplified/#web-server-apps
         const auth = new ClientOAuth2({
             clientId: 'abc',
             clientSecret: '123',
@@ -118,4 +121,18 @@ describe("oauth2", () => {
         expect(res).to.be(undefined);
     }).timeout(20000);
 
+
+    it("authorize", async () => {
+        const client = await damless.resolve("client");
+        const res = await client.get(`
+https://localhost:3001/oauth/authorize?
+response_type=code
+&client_id=0oajkyofj2DnFwMLR0h7
+&redirect_uri=https://www.oauth.com/playground/authorization-code.html
+&scope=photo+offline_access
+&state=T4y0SndTUtwPNo7P`);
+
+        expect(res).to.be(undefined);
+
+    }).timeout(20000);
 });
