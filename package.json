@@ -20,12 +20,16 @@
         "JSONStream": "latest",
         "client-oauth2": "latest",
         "coveralls": "latest",
+        "encoding": "latest",
         "expect.js": "latest",
+        "express-oauth-server": "^2.0.0",
         "fetch-h2": "latest",
+        "iconv": "^2.3.2",
         "istanbul": "latest",
         "mocha": "latest",
         "node-fetch": "latest",
-        "nyc": "latest"
+        "nyc": "latest",
+        "oauth2-server": "^3.0.1"
     },
     "scripts": {
         "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",

@@ -3,6 +3,9 @@
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  * cf express-oauth-server
+ * https://www.sohamkamani.com/blog/javascript/2018-06-24-oauth-with-node-js/
+ * https://developer.github.com/apps/building-oauth-apps/authorizing-oauth-apps/#2-users-are-redirected-back-to-your-site-by-github
+ * https://www.oauth.com/playground/authorization-code.html
  */
 
 const DamLess = require("../../../index");
@@ -23,13 +26,17 @@ const config = {
 }
 
 const service = new class {
-    sign (context, stream, headers) {
-		stream.end({ token: "12345" });
+    sign(context, stream, headers) {
+        stream.end({ token: "12345" });
     };
-    
-    callback (context, stream, headers) {
-		stream.end();
+
+    callback(context, stream, headers) {
+        stream.end();
     };
+
+    register(context, stream, headers) {
+
+    }
 }
 
 describe("oauth2", () => {
@@ -38,7 +45,7 @@ describe("oauth2", () => {
     beforeEach(async () => {
         damless = await new DamLess()
             .cwd(__dirname)
-            .config({ http: { port: 3000 }})
+            .config({ http: { port: 3000 } })
             .use("oauth2")
             .inject("service", service)
             .post("/oauth/authorize", "oauth2", "authorize")
@@ -123,17 +130,98 @@ describe("oauth2", () => {
     }).timeout(20000);
 
 
-    it("authorize", async () => {
-        const client = await damless.resolve("client");
-        const res = await client.get(`
-https://localhost:3001/oauth/authorize?
-response_type=code
-&client_id=0oajkyofj2DnFwMLR0h7
-&redirect_uri=https://www.oauth.com/playground/authorization-code.html
-&scope=photo+offline_access
-&state=T4y0SndTUtwPNo7P`);
+    /*
+    Flow sur https://www.oauth.com/playground/client-registration.html
 
-        expect(res).to.be(undefined);
+    login: angry-lapwing@example.com
+    password: Vivacious-Coyote-Clever-Swiftlet-2
+    client_id: 0oajpdnxb3P8371KU0h7
+    client_secret: 	Rz_BWfY5xYU2VNlY4P8Ll5x0go8pMsT1CAhiK9E0
+    Registered Redirect URIs: https://www.oauth.com/playground/authorization-code.html
+                               https://www.oauth.com/playground/authorization-code-with-pkce.html
+    Supported Grant Types: authorization_code
+                           refresh_token
+                           implicit
+    
+    1. open url
+    
+    https://dev-396343.oktapreview.com/oauth2/default/v1/authorize?
+    response_type=code
+    &client_id=0oajpaoqak67Bm7Dh0h7
+    &redirect_uri=https://www.oauth.com/playground/authorization-code.html
+    &scope=photo+offline_access
+    &state=5GsJXQWm6WXKgKJa
 
-    }).timeout(20000);
+    2. J'ai été redirigé vers https://dev-396343.oktapreview.com/login/login.htm?fromURI=/oauth2/v1/authorize/redirect?okta_key=JRSyhE1J4Lnoipqwm03bxlYpiMGjUdtTeDsDjgUf_SQ
+       qui est un formulaire de connexion
+
+    entrer login + mot de passe
+    
+    3. J'ai été rediriger vers https://www.oauth.com/playground/authorization-code.html?code=PwqlAMHzXfToOXPg-ZYb&state=5GsJXQWm6WXKgKJa
+    avec un nouveau paramêtre ?state=5GsJXQWm6WXKgKJa&code=PwqlAMHzXfToOXPg-ZYb
+
+    4. Echange du code d'autorisation pour obtenir un access_token (code)
+
+    POST https://dev-396343.oktapreview.com/oauth2/default/v1/token
+    grant_type=authorization_code
+    &client_id=0oajpaoqak67Bm7Dh0h7
+    &client_secret=I3Uz307W2g-UxepmkiZJvFKAczGd2UmcaAzUc4F7
+    &redirect_uri=https://www.oauth.com/playground/authorization-code.html
+    &code=PwqlAMHzXfToOXPg-ZYb
+
+    response ->
+    {
+        "access_token": "eyJraWQiOiJvLWlnUFVkX2prN2pKNDM1Rl9IdW9pWWluamxhb0lKV0FkMWk0ZU9NQ2FNIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULkYwQ1VIbmVfbUc4VGI2QjRDN2o2dEdUOElsZm5wX1V4N0FFZWtaZFFKMDAuS2pQb0o5VDNOQU5ZRjI3d0ZCWXE3a1pzNEJKdkQ0NHVKOW1DNnVkZGJ6MD0iLCJpc3MiOiJodHRwczovL2Rldi0zOTYzNDMub2t0YXByZXZpZXcuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU1MjM4NTY1NiwiZXhwIjoxNTUyMzg5MjU2LCJjaWQiOiIwb2FqcGFvcWFrNjdCbTdEaDBoNyIsInVpZCI6IjAwdWpwYmNjY2p1blhjeW83MGg3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGhvdG8iXSwic3ViIjoiZW5jb3VyYWdpbmctYWxwYWNhQGV4YW1wbGUuY29tIn0.ALsBowDY_m1jq00MiQNLbqm5UyWcR_mxZFyXBhOn6mpi8LO4hWQqjuzy2NTbrsEwa4Alo84qF2mfUZ3ClNWQM5yDHW9C8Iuma8S3n2bxK_Tcoekngk0R_c38Dx8U06IiXn4vSaiPDw1On6ctIcF3apqDVukTawzeIknypOBwptICAGlu3TIdLb1FfMhxKppoRSI3LfRh0J81zX4HJ-nWUeXjkHnUWhfdfR8lx7a6Z1cKPxXkUhhFYQKlMQrIR4z-UWh_GwJKIY-pQGWFRGHUCaeNg9YSXIaSbSl1CseJi990Ek45XGMy6GWSS_oNB2jrn7-6YDftO2TzMN5DyPuOpQ",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "scope": "offline_access photo",
+        "refresh_token": "uaiVCQJapHfrgChhaZJHdj6WQ83D9HNhDUFC_JEPMwM"
+    }
+    */
+
+    /* Flow sur localhost
+
+    login: encouraging-alpaca@example.com
+    password: Selfish-Curlew-Famous-Gerbil-9
+    client_id: 0oajpaoqak67Bm7Dh0h7
+    client_secret: I3Uz307W2g-UxepmkiZJvFKAczGd2UmcaAzUc4F7
+    Registered Redirect URIs: http://localhost:3001/authorization
+    Supported Grant Types: authorization_code
+                           refresh_token
+                           implicit
+
+    http://localhost:2999/authorize?
+    response_type=code
+    &client_id=0oajpaoqak67Bm7Dh0h7
+    &redirect_uri=http://localhost:2999/callback
+    &scope=photo+offline_access
+    &state=5GsJXQWm6WXKgKJa
+
+    2. J'ai été redirigé vers https://dev-396343.oktapreview.com/login/login.htm?fromURI=/oauth2/v1/authorize/redirect?okta_key=JRSyhE1J4Lnoipqwm03bxlYpiMGjUdtTeDsDjgUf_SQ
+       qui est un formulaire de connexion
+
+    entrer login + mot de passe
+    
+    3. J'ai été rediriger vers https://www.oauth.com/playground/authorization-code.html?code=PwqlAMHzXfToOXPg-ZYb&state=5GsJXQWm6WXKgKJa
+    avec un nouveau paramêtre ?state=5GsJXQWm6WXKgKJa&code=PwqlAMHzXfToOXPg-ZYb
+
+    4. Echange du code d'autorisation pour obtenir un access_token (code)
+
+    POST https://dev-396343.oktapreview.com/oauth2/default/v1/token
+    grant_type=authorization_code
+    &client_id=0oajpaoqak67Bm7Dh0h7
+    &client_secret=I3Uz307W2g-UxepmkiZJvFKAczGd2UmcaAzUc4F7
+    &redirect_uri=https://www.oauth.com/playground/authorization-code.html
+    &code=PwqlAMHzXfToOXPg-ZYb
+
+    response ->
+    {
+        "access_token": "eyJraWQiOiJvLWlnUFVkX2prN2pKNDM1Rl9IdW9pWWluamxhb0lKV0FkMWk0ZU9NQ2FNIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOjEsImp0aSI6IkFULkYwQ1VIbmVfbUc4VGI2QjRDN2o2dEdUOElsZm5wX1V4N0FFZWtaZFFKMDAuS2pQb0o5VDNOQU5ZRjI3d0ZCWXE3a1pzNEJKdkQ0NHVKOW1DNnVkZGJ6MD0iLCJpc3MiOiJodHRwczovL2Rldi0zOTYzNDMub2t0YXByZXZpZXcuY29tL29hdXRoMi9kZWZhdWx0IiwiYXVkIjoiYXBpOi8vZGVmYXVsdCIsImlhdCI6MTU1MjM4NTY1NiwiZXhwIjoxNTUyMzg5MjU2LCJjaWQiOiIwb2FqcGFvcWFrNjdCbTdEaDBoNyIsInVpZCI6IjAwdWpwYmNjY2p1blhjeW83MGg3Iiwic2NwIjpbIm9mZmxpbmVfYWNjZXNzIiwicGhvdG8iXSwic3ViIjoiZW5jb3VyYWdpbmctYWxwYWNhQGV4YW1wbGUuY29tIn0.ALsBowDY_m1jq00MiQNLbqm5UyWcR_mxZFyXBhOn6mpi8LO4hWQqjuzy2NTbrsEwa4Alo84qF2mfUZ3ClNWQM5yDHW9C8Iuma8S3n2bxK_Tcoekngk0R_c38Dx8U06IiXn4vSaiPDw1On6ctIcF3apqDVukTawzeIknypOBwptICAGlu3TIdLb1FfMhxKppoRSI3LfRh0J81zX4HJ-nWUeXjkHnUWhfdfR8lx7a6Z1cKPxXkUhhFYQKlMQrIR4z-UWh_GwJKIY-pQGWFRGHUCaeNg9YSXIaSbSl1CseJi990Ek45XGMy6GWSS_oNB2jrn7-6YDftO2TzMN5DyPuOpQ",
+        "token_type": "Bearer",
+        "expires_in": 3600,
+        "scope": "offline_access photo",
+        "refresh_token": "uaiVCQJapHfrgChhaZJHdj6WQ83D9HNhDUFC_JEPMwM"
+    }
+    */
+
 });
