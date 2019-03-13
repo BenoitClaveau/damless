@@ -1,11 +1,10 @@
 {
     "name": "damless",
-    "version": "0.2.13",
+    "version": "0.3.0",
     "description": "Streamify your web server",
     "main": "index.js",
     "dependencies": {
         "busboy": "latest",
-        "end-of-stream": "latest",
         "file-type": "latest",
         "givemetheservice": "latest",
         "isitforme": "latest",
@@ -14,6 +13,7 @@
         "jwt-simple": "latest",
         "oups": "latest",
         "request": "latest",
+        "stream-workflow": "latest",
         "vinyl": "latest"
     },
     "devDependencies": {
@@ -22,14 +22,12 @@
         "coveralls": "latest",
         "encoding": "latest",
         "expect.js": "latest",
-        "express-oauth-server": "^2.0.0",
         "fetch-h2": "latest",
-        "iconv": "^2.3.2",
         "istanbul": "latest",
         "mocha": "latest",
         "node-fetch": "latest",
         "nyc": "latest",
-        "oauth2-server": "^3.0.1"
+        "oauth2-server": "latest"
     },
     "scripts": {
         "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",

@@ -5,7 +5,7 @@
  */
 
 const expect = require("expect.js");
-const { ArrayToStream, ending } = require("../../lib/core");
+const { ArrayToStream, ending } = require("../../lib/streams");
 const { Transform } = require('stream');
 
 describe("array-to-stream", () => {

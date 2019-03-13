@@ -9,10 +9,9 @@ const fs = require("fs");
 const { promisify } = require("util");
 const {
     ArrayToStream,
-    StreamFlow,
-    getAll,
-    ending
-} = require("../../lib/core");
+    StreamWorkflow,
+    getAll
+} = require("../../lib/streams");
 const {
     JsonStream,
     Json
@@ -23,9 +22,9 @@ const {
 } = require('stream');
 const pipelineAsync = promisify(pipeline);
 
-describe("stream-flow", () => {
+describe("stream-workflow", () => {
 
-    it("create a StreamFlow", async () => {
+    it("create a StreamWorkflow", async () => {
         const transform1 = new Transform({
             objectMode: true,
             transform(chunk, encoding, callback) {
@@ -48,7 +47,7 @@ describe("stream-flow", () => {
             }
         })
 
-        const flow = new StreamFlow({
+        const flow = new StreamWorkflow({
             objectMode: true,
             init(stream) {
                 return pipeline(
@@ -101,9 +100,9 @@ describe("stream-flow", () => {
         });
     }).timeout(30000);
 
-    it("throw an error in a StreamFlow pipe()", async () => {
+    it("throw an error in a StreamWorkflow pipe()", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow({
+        const flow = new StreamWorkflow({
             objectMode: true,
             init(stream) {
                 return stream
@@ -133,9 +132,9 @@ describe("stream-flow", () => {
         }
     }).timeout(20000);
 
-    it("throw an error in a StreamFlow pipeline mid", async () => {
+    it("throw an error in a StreamWorkflow pipeline mid", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow({
+        const flow = new StreamWorkflow({
             objectMode: true,
             init(stream) {
                 return pipeline(
@@ -176,9 +175,9 @@ describe("stream-flow", () => {
         }
     });
 
-    it("throw an error in a StreamFlow pipeline first", async () => {
+    it("throw an error in a StreamWorkflow pipeline first", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow({
+        const flow = new StreamWorkflow({
             objectMode: true,
             init(stream) {
                 return pipeline(
@@ -207,9 +206,9 @@ describe("stream-flow", () => {
         }
     });
 
-    it("throw an error in a StreamFlow pipeline last", async () => {
+    it("throw an error in a StreamWorkflow pipeline last", async () => {
         const stream = new ArrayToStream(["Execute multiples", "pipes inside", "a stream"]);
-        const flow = new StreamFlow({
+        const flow = new StreamWorkflow({
             objectMode: true,
             init(stream) {
                 return pipeline(

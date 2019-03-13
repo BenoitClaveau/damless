@@ -11,7 +11,7 @@ const {
     transform,
     getAll,
     StreamToArray
-} = require("../../lib/core");
+} = require("../../lib/streams");
 const { pipeline } = require("stream");
 const { promisify } = require("util");
 const pipelineAsync = promisify(pipeline);

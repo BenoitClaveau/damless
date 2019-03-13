@@ -5,7 +5,7 @@
  */
 
 const expect = require("expect.js");
-const { StreamToArray, ending } = require("../../lib/core");
+const { StreamToArray } = require("../../lib/streams");
 const { Transform, Readable, pipeline } = require("stream");
 const { promisify } = require("util");
 const pipelineAsync = promisify(pipeline);

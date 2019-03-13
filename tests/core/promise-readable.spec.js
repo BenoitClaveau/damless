@@ -11,7 +11,7 @@ const {
     getFirst,
     getAll,
     getBuffer
-} = require("../../lib/core");
+} = require("../../lib/streams");
 const { Readable } = require('stream');
 
 describe("promise-readable", () => {

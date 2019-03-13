@@ -194,9 +194,8 @@ const {
     getBuffer,
     ending,
     ArrayToStream,
-    StreamToArray,
-    StreamFlow
-} = require('./lib/core');
+    StreamToArray
+} = require('./lib/streams');
 
 module.exports = DamLessServer;
 // Export main service 
@@ -235,4 +234,3 @@ module.exports.ending = ending;
 module.exports.noop = noop;
 module.exports.ArrayToStream = ArrayToStream;
 module.exports.StreamToArray = StreamToArray;
-module.exports.StreamFlow = StreamFlow;

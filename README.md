@@ -97,9 +97,9 @@ You can override everythink or inject your new services.
 DamLess has been inspired by the http2 syntax. The request and response are wrap by an unique duplex stream.
 This stream automatically gzip or deflate your response. It is useless to pipe a compressor.
 
-## Extend core services <a href="#oop" />
+## Extend services <a href="#oop" />
 
-Use the power of ES6 to easily extends core services.
+Use the power of ES6 to easily extends services.
 
 ```json.js
 const { Json } = require("damless");
