@@ -8,7 +8,8 @@
             "type": "node",
             "request": "launch",
             "name": "OAuth2",
-            "program": "${workspaceFolder}/tests/services/middlewares/oauth2.server.js"
+            "program": "${workspaceFolder}/tests/services/middlewares/oauth2.server.js",
+            "args": []
         },
         {
             "type": "node",
