@@ -64,7 +64,7 @@ const oauth = new class {
     }
 
     postLogin(context, stream, headers) {
-        const access_token = "123456789";
+        const access_token = "Bearer 123456789";
         stream.redirect(`${context.query.redirect_uri}?access_token=${access_token}`, {
             statusCode: 303 // pattern PRG
         });
@@ -80,6 +80,26 @@ const oauth = new class {
         } = context.query;
 
         stream.redirect(`/login?redirect_uri=${redirect_uri}`);
+    }
+
+    hello(context, stream, headers) {
+
+        stream
+            .respond({
+                statusCode: 200,
+                contentType: "text/html"
+            })
+            .end(`
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Hello ${context.auth.user.name}</h2>
+    </body>
+</html>
+`)        
     }
 }
 
@@ -127,6 +147,11 @@ const resource = new class {
         <ul>
             <li>${context.query.access_token}</li>
         </ul>
+        <div>
+            <a
+                href="http://localhost:2998/api/hello?access_token=${context.query.access_token}"
+            >Accès</a>
+        </div>
     </body>
 </html>
 `)
@@ -145,6 +170,8 @@ new DamLess()
     .get("/authorize", "service", "authorize", { auth: false })
 
     .post("/token", "oauth2", "access_token")
+
+    .get("/api/hello", "service", "hello")
     
     .start();
 
