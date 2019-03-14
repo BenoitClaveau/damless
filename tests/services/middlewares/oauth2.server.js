@@ -15,7 +15,12 @@ process.on("unhandledRejection", (reason, p) => {
     console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
 });
 
-const oauth = new class {
+class OAuth {
+
+    constructor(oauth2) {
+        this.oauth2 = oauth2;
+    }
+
     getLogin(context, stream, headers) {
         stream
             .respond({
@@ -64,13 +69,33 @@ const oauth = new class {
     }
 
     postLogin(context, stream, headers) {
+        
         const access_token = "Bearer 123456789";
-        stream.redirect(`${context.query.redirect_uri}?access_token=${access_token}`, {
-            statusCode: 303 // pattern PRG
-        });
+
+        // TODO chercher l'acces_token en base
+
+        // stream.redirect(`${context.query.redirect_uri}?access_token=${access_token}`, {
+        //     statusCode: 303 // pattern PRG
+        // });
+
+        // TODO real login
+
+
+        // redirect = req.body.redirect
+        const redirect = "/authorize";
+
+        const {
+            redirect_uri,
+            client_id
+        } = context.query
+
+        // Je ne sais pas comment passer l'acces_token
+        // Il faut peut-être faire un request
+
+        stream.redirect(`${redirect}?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`);
     }
 
-    authorize(context, stream, headers) {
+    async getAuthorize(context, stream, headers) {
         const {
             respond_type,
             client_id,
@@ -79,7 +104,44 @@ const oauth = new class {
             state
         } = context.query;
 
-        stream.redirect(`/login?redirect_uri=${redirect_uri}`);
+        if (!context.auth)
+            return stream.redirect(`/login?client_id=${client_id}&redirect_uri=${redirect_uri}`);
+
+        stream
+            .respond({
+                statusCode: 200,
+                contentType: "text/html"
+            })
+            .end(`
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Autorisation</h2>
+        <ul>
+            <li>${context.query.client_id}</li>
+            <li>${context.query.redirect_uri}</li>
+        </ul>
+    </body>
+</html>
+`)
+    }
+
+    async postAuthorize(context, stream, headers) {
+        const {
+            respond_type,
+            client_id,
+            redirect_uri,
+            scope,
+            state
+        } = context.query;
+
+        // if (!context.auth)
+        //     return stream.redirect(`/login?client_id=${client_id}&redirect_uri=${redirect_uri}`);
+
+        await this.oauth2.authorize(context, stream, headers);
     }
 
     hello(context, stream, headers) {
@@ -96,14 +158,14 @@ const oauth = new class {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <h2>Hello ${context.auth.user.name}</h2>
+        <h2>Hello ${context.auth ? context.auth.user.name : ''}</h2>
     </body>
 </html>
-`)        
+`)
     }
 }
 
-const resource = new class {
+class Resource {
 
     index(context, stream, headers) {
         stream
@@ -124,6 +186,27 @@ const resource = new class {
             <a
                 href="http://localhost:2998/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read"
             >Authorization Code Flow</a>
+        </div>
+
+        <div>
+        <a
+            href="http://localhost:2998/private?access_token=${context.query.access_token}"
+        >Accès privé serveur OAuth</a>
+        </div>
+        <div>
+            <a
+                href="http://localhost:2998/public?access_token=${context.query.access_token}"
+            >Accès public serveur OAuth</a>
+        </div>
+        <div>
+            <a
+                href="http://localhost:2999/private?access_token=${context.query.access_token}"
+            >Accès privé serveur de ressource</a>
+        </div>
+        <div>
+            <a
+                href="http://localhost:2999/public?access_token=${context.query.access_token}"
+            >Accès public serveur de ressource</a>
         </div>
     </body>
 </html>
@@ -147,11 +230,26 @@ const resource = new class {
         <ul>
             <li>${context.query.access_token}</li>
         </ul>
-        <div>
-            <a
-                href="http://localhost:2998/api/hello?access_token=${context.query.access_token}"
-            >Accès</a>
-        </div>
+    </body>
+</html>
+`)
+    }
+
+    hello(context, stream, headers) {
+
+        stream
+            .respond({
+                statusCode: 200,
+                contentType: "text/html"
+            })
+            .end(`
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h2>Hello ${context.auth ? context.auth.user.name : ''}</h2>
     </body>
 </html>
 `)
@@ -163,16 +261,19 @@ new DamLess()
     .cwd(__dirname)
     .config({ http: { port: 2998 } })
     .use("oauth2")
-    .inject("service", oauth)
+    .inject("service", OAuth)
     .get("/login", "service", "getLogin", { auth: false })
     .post("/login", "service", "postLogin", { auth: false })
 
-    .get("/authorize", "service", "authorize", { auth: false })
+    .get("/authorize", "service", "getAuthorize", { auth: false })
+    .post("/authorize", "service", "postAuthorize", { auth: false })
 
-    .post("/token", "oauth2", "access_token")
+    .post("/token", "oauth2", "token")
 
-    .get("/api/hello", "service", "hello")
-    
+    //pour simuler une api
+    .get("/private", "service", "hello")
+    .get("/public", "service", "hello", { auth: false })
+
     .start();
 
 
@@ -180,23 +281,27 @@ console.log("serveur de ressource port: 2999");
 new DamLess()
     .cwd(__dirname)
     .config({ http: { port: 2999 } })
-    .inject("service", resource)
+    .inject("service", Resource)
     .get("/", "service", "index", { auth: false })
     .get("/callback", "service", "callback", { auth: false })
+    //pour simuler une api
+    .get("/private", "service", "hello")
+    .get("/public", "service", "hello", { auth: false })
+
     .start();
 
 
-    /*
-    http://jlabusch.github.io/oauth2-server/
+/*
+http://jlabusch.github.io/oauth2-server/
 
-    CLIENT_ID: 1234
+CLIENT_ID: 1234
 
 
-    1. Registration
-        Application name, Callback URL -> Client ID, Client Secret
+1. Registration
+    Application name, Callback URL -> Client ID, Client Secret
 
-    2. Authorization Code Flow (for server-side application)
+2. Authorization Code Flow (for server-side application)
 
-        http://localhost:2998/oauth2/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read
+    http://localhost:2998/oauth2/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read
 
-    */
+*/
