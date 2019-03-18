@@ -8,6 +8,7 @@
 const DamLess = require("../../../index");
 const expect = require("expect.js");
 const process = require("process");
+const request = require("request");
 const fetch = require("node-fetch");
 const { inspect } = require("util");
 
@@ -69,9 +70,8 @@ class OAuth {
     }
 
     postLogin(context, stream, headers) {
-        
-        const access_token = "Bearer 123456789";
 
+        
         // TODO chercher l'acces_token en base
 
         // stream.redirect(`${context.query.redirect_uri}?access_token=${access_token}`, {
@@ -80,9 +80,10 @@ class OAuth {
 
         // TODO real login
 
+        const token = Buffer.from(`coco:secret`).toString("base64");
 
         // redirect = req.body.redirect
-        const redirect = "/authorize";
+        const redirect = "/oauth/authorize";
 
         const {
             redirect_uri,
@@ -92,7 +93,16 @@ class OAuth {
         // Je ne sais pas comment passer l'acces_token
         // Il faut peut-être faire un request
 
-        stream.redirect(`${redirect}?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`);
+
+        request({
+            method: "POST",
+            url: `${headers.origin}/oauth/authorize`,
+            headers: { 'Authorization': `Basic ${token}` }
+        }).on('response', (response) => response.pipe(stream))
+
+        // stream.redirect(`${redirect}?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`? {
+            
+        // });
     }
 
     async getAuthorize(context, stream, headers) {
@@ -141,7 +151,7 @@ class OAuth {
         // if (!context.auth)
         //     return stream.redirect(`/login?client_id=${client_id}&redirect_uri=${redirect_uri}`);
 
-        await this.oauth2.authorize(context, stream, headers);
+        await this.oauth2.token(context, stream, headers);
     }
 
     hello(context, stream, headers) {
@@ -184,7 +194,7 @@ class Resource {
         <div>client_id: 1234</div>
         <div>
             <a
-                href="http://localhost:2998/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read"
+                href="http://localhost:2998/oauth/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read"
             >Authorization Code Flow</a>
         </div>
 
@@ -265,10 +275,10 @@ new DamLess()
     .get("/login", "service", "getLogin", { auth: false })
     .post("/login", "service", "postLogin", { auth: false })
 
-    .get("/authorize", "service", "getAuthorize", { auth: false })
-    .post("/authorize", "service", "postAuthorize", { auth: false })
+    .get("/oauth/authorize", "service", "getAuthorize")
+    .post("/oauth/authorize", "service", "postAuthorize")
 
-    .post("/token", "oauth2", "token")
+    .post("/oauth/token", "oauth2", "token")
 
     //pour simuler une api
     .get("/private", "service", "hello")
@@ -305,3 +315,118 @@ CLIENT_ID: 1234
     http://localhost:2998/oauth2/authorize?response_type=code&client_id=1234&redirect_uri=http://localhost:2999/callback&scope=read
 
 */
+
+process.nextTick(async () => {
+
+    // Set the configuration settings
+    const credentials = {
+        client: {
+            id: 'client-id',
+            secret: 'client-secret'
+        },
+        auth: {
+            tokenHost: 'http://localhost:2998'
+        }
+    };
+
+    // Initialize the OAuth2 Library
+    const oauth2 = require('simple-oauth2').create(credentials);
+
+    // Authorization oauth2 URI
+    const authorizationUri = oauth2.authorizationCode.authorizeURL({
+        redirect_uri: 'http://localhost:2999/callback',
+        scope: 'scope', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
+        state: 'state'
+    });
+
+    const res = await fetch(authorizationUri, {
+        method: "GET"
+    });
+
+    // Redirect example using Express (see http://expressjs.com/api.html#res.redirect)
+    //res.redirect(authorizationUri);
+    console.log("authorizationUri", authorizationUri)
+
+
+
+    // Get the access token object (the authorization code is given from the previous step).
+    const tokenConfig = {
+        code: 'code',
+        redirect_uri: 'http://localhost:3000/callback',
+        scope: 'scope', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
+    };
+
+    // Save the access token
+    try {
+        const result = await oauth2.authorizationCode.getToken(tokenConfig);
+        const accessToken = oauth2.accessToken.create(result);
+        console.log(accessToken);
+    } catch (error) {
+        console.log('Access Token Error', error.message);
+    }
+});
+
+/*----------------------------*/
+
+var bodyParser = require('body-parser');
+var express = require('express');
+var OAuthServer = require('express-oauth-server');
+
+var app = express();
+
+const tokens = [];
+const clients = [{ clientId: 'thom', clientSecret: 'nightworld', redirectUris: [''] }];
+const users = [{ id: '123', username: 'thomseddon', password: 'nightworld' }];
+
+app.oauth = new OAuthServer({
+    model: {
+        getAccessToken(bearerToken) {
+            var tokens = tokens.filter(token => {
+                return token.accessToken === bearerToken;
+            });
+            return tokens.length ? tokens[0] : false;
+        },
+        getRefreshToken(bearerToken) {
+            var tokens = tokens.filter(token => {
+                return token.refreshToken === bearerToken;
+            });
+
+            return tokens.length ? tokens[0] : false;
+        },
+        getClient(clientId, clientSecret) {
+            var clients = clients.filter(function (client) {
+                return client.clientId === clientId && client.clientSecret === clientSecret;
+            });
+
+            return clients.length ? clients[0] : false;
+        },
+        saveToken(token, client, user) {
+            tokens.push({
+                accessToken: token.accessToken,
+                accessTokenExpiresAt: token.accessTokenExpiresAt,
+                clientId: client.clientId,
+                refreshToken: token.refreshToken,
+                refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+                userId: user.id
+            });
+        },
+        getUser(username, password) {
+            var users = this.users.filter(user => {
+                return user.username === username && user.password === password;
+            });
+
+            return users.length ? users[0] : false;
+        }
+
+    },
+});
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(app.oauth.authorize());
+
+app.use(function (req, res) {
+    res.send('Secret area');
+});
+
+app.listen(3009);

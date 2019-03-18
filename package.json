@@ -18,16 +18,20 @@
     },
     "devDependencies": {
         "JSONStream": "latest",
+        "body-parser": "^1.18.3",
         "client-oauth2": "latest",
         "coveralls": "latest",
         "encoding": "latest",
         "expect.js": "latest",
+        "express": "^4.16.4",
+        "express-oauth-server": "^2.0.0",
         "fetch-h2": "latest",
         "istanbul": "latest",
         "mocha": "latest",
         "node-fetch": "latest",
         "nyc": "latest",
-        "oauth2-server": "latest"
+        "oauth2-server": "latest",
+        "simple-oauth2": "^2.2.1"
     },
     "scripts": {
         "test": "nyc --reporter=text --reporter=html mocha --recursive tests/**/*.spec.js",
