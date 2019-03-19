@@ -71,7 +71,7 @@ class OAuth {
 
     postLogin(context, stream, headers) {
 
-        
+
         // TODO chercher l'acces_token en base
 
         // stream.redirect(`${context.query.redirect_uri}?access_token=${access_token}`, {
@@ -81,9 +81,6 @@ class OAuth {
         // TODO real login
 
         const token = Buffer.from(`coco:secret`).toString("base64");
-
-        // redirect = req.body.redirect
-        const redirect = "/oauth/authorize";
 
         const {
             redirect_uri,
@@ -101,57 +98,8 @@ class OAuth {
         }).on('response', (response) => response.pipe(stream))
 
         // stream.redirect(`${redirect}?response_type=code&client_id=${client_id}&redirect_uri=${redirect_uri}`? {
-            
+
         // });
-    }
-
-    async getAuthorize(context, stream, headers) {
-        const {
-            respond_type,
-            client_id,
-            redirect_uri,
-            scope,
-            state
-        } = context.query;
-
-        if (!context.auth)
-            return stream.redirect(`/login?client_id=${client_id}&redirect_uri=${redirect_uri}`);
-
-        stream
-            .respond({
-                statusCode: 200,
-                contentType: "text/html"
-            })
-            .end(`
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <h2>Autorisation</h2>
-        <ul>
-            <li>${context.query.client_id}</li>
-            <li>${context.query.redirect_uri}</li>
-        </ul>
-    </body>
-</html>
-`)
-    }
-
-    async postAuthorize(context, stream, headers) {
-        const {
-            respond_type,
-            client_id,
-            redirect_uri,
-            scope,
-            state
-        } = context.query;
-
-        // if (!context.auth)
-        //     return stream.redirect(`/login?client_id=${client_id}&redirect_uri=${redirect_uri}`);
-
-        await this.oauth2.token(context, stream, headers);
     }
 
     hello(context, stream, headers) {
@@ -223,27 +171,27 @@ class Resource {
 `)
     }
 
-    callback(context, stream, headers) {
-        stream
-            .respond({
-                statusCode: 200,
-                contentType: "text/html"
-            })
-            .end(`
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <h2>Je suis la callback</h2>
-        <ul>
-            <li>${context.query.access_token}</li>
-        </ul>
-    </body>
-</html>
-`)
-    }
+    //     callback(context, stream, headers) {
+    //         stream
+    //             .respond({
+    //                 statusCode: 200,
+    //                 contentType: "text/html"
+    //             })
+    //             .end(`
+    // <html>
+    //     <head>
+    //         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    //         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //     </head>
+    //     <body>
+    //         <h2>Je suis la callback</h2>
+    //         <ul>
+    //             <li>${context.query.access_token}</li>
+    //         </ul>
+    //     </body>
+    // </html>
+    // `)
+    //     }
 
     hello(context, stream, headers) {
 
@@ -275,11 +223,10 @@ new DamLess()
     .get("/login", "service", "getLogin", { auth: false })
     .post("/login", "service", "postLogin", { auth: false })
 
-    .get("/oauth/authorize", "service", "getAuthorize")
-    .post("/oauth/authorize", "service", "postAuthorize")
+    .get("/oauth/authorize", "oauth2", "authorize", { auth: false })
+    .post("/oauth/authorize", "oauth2", "authorize", { auth: false })
 
-    .post("/oauth/token", "oauth2", "token")
-
+    .post("/oauth/token", "oauth2", "access_token")
     //pour simuler une api
     .get("/private", "service", "hello")
     .get("/public", "service", "hello", { auth: false })
@@ -287,13 +234,59 @@ new DamLess()
     .start();
 
 
+const credentials = {
+    client: {
+        id: 'client-id',
+        secret: 'client-secret'
+    },
+    auth: {
+        tokenHost: 'http://localhost:2998'
+    }
+};
+
+// Initialize the OAuth2 Library
+const oauth2 = require('simple-oauth2').create(credentials);
+
 console.log("serveur de ressource port: 2999");
 new DamLess()
     .cwd(__dirname)
     .config({ http: { port: 2999 } })
     .inject("service", Resource)
     .get("/", "service", "index", { auth: false })
-    .get("/callback", "service", "callback", { auth: false })
+    .get("/login", async (context, stream, headers) => {
+
+        const authorizationUri = oauth2.authorizationCode.authorizeURL({
+            redirect_uri: 'http://localhost:2999/callback',
+            scope: 'scope', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
+            state: 'state'
+        });
+    
+        const res = await fetch(authorizationUri, {
+            method: "GET"
+        });
+
+        stream.end();
+
+    }, null, { auth: false })
+    
+    .get("/callback", async (context, stream, headers) => {
+        console.log("CALLBACK code", context.query.code);
+        // je domande un access token
+        const tokenConfig = {
+            code: context.query.code,
+            redirect_uri: 'http://localhost:2999/callback',
+            scope: '<scope>', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
+        };
+
+        try {
+            const result = await oauth2.authorizationCode.getToken(tokenConfig)
+            const accessToken = oauth2.accessToken.create(result);
+        } catch (error) {
+            console.log('Access Token Error', error.message);
+        }
+
+
+    }, null, { auth: false })
     //pour simuler une api
     .get("/private", "service", "hello")
     .get("/public", "service", "hello", { auth: false })
@@ -316,55 +309,6 @@ CLIENT_ID: 1234
 
 */
 
-process.nextTick(async () => {
-
-    // Set the configuration settings
-    const credentials = {
-        client: {
-            id: 'client-id',
-            secret: 'client-secret'
-        },
-        auth: {
-            tokenHost: 'http://localhost:2998'
-        }
-    };
-
-    // Initialize the OAuth2 Library
-    const oauth2 = require('simple-oauth2').create(credentials);
-
-    // Authorization oauth2 URI
-    const authorizationUri = oauth2.authorizationCode.authorizeURL({
-        redirect_uri: 'http://localhost:2999/callback',
-        scope: 'scope', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
-        state: 'state'
-    });
-
-    const res = await fetch(authorizationUri, {
-        method: "GET"
-    });
-
-    // Redirect example using Express (see http://expressjs.com/api.html#res.redirect)
-    //res.redirect(authorizationUri);
-    console.log("authorizationUri", authorizationUri)
-
-
-
-    // Get the access token object (the authorization code is given from the previous step).
-    const tokenConfig = {
-        code: 'code',
-        redirect_uri: 'http://localhost:3000/callback',
-        scope: 'scope', // also can be an array of multiple scopes, ex. ['<scope1>, '<scope2>', '...']
-    };
-
-    // Save the access token
-    try {
-        const result = await oauth2.authorizationCode.getToken(tokenConfig);
-        const accessToken = oauth2.accessToken.create(result);
-        console.log(accessToken);
-    } catch (error) {
-        console.log('Access Token Error', error.message);
-    }
-});
 
 /*----------------------------*/
 
