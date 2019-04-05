@@ -11,10 +11,9 @@ const Commands = require("./lib/services/commands");
 
 class DamLessServer {
 
-    constructor() {
-        //options.config = options.config || "./damless.json";
+    constructor(options) {
         this.commands = new Commands();
-        this.giveme = new GiveMeTheService(); // Create the container
+        this.giveme = new GiveMeTheService(options); // Create the container
         this._config = {};
         // inject all core services
         this.giveme.inject("damless", this);
