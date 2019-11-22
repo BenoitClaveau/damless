@@ -39,7 +39,7 @@ const service = new class {
     }
 }
 
-describe("oauth2", () => {
+xdescribe("oauth2", () => {
 
     let damless;
     beforeEach(async () => {
