@@ -20,7 +20,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "errorsgit",
+                "Throw error in get",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

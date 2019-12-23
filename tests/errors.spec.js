@@ -27,7 +27,7 @@ describe("errors", () => {
     )
     afterEach(async () => await damless.stop());
 
-    it("Throw error", async () => {
+    it("Throw error in get", async () => {
         await damless
             .get("/", (context, stream, headers) => {
                 throw new Error("In method");
