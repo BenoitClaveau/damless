@@ -7,15 +7,11 @@
 const expect = require("expect.js");
 const { Error } = require("oups");
 const DamLess = require("../index");
-const { streamify, HttpServer, transform } = require("../index");
+const { streamify, AskReply, transform } = require("../index");
 const { Transform, pipeline } = require("stream");
 const process = require("process");
 const { inspect, promisify } = require("util");
 const pipelineAsync = promisify(pipeline);
-
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
 
 describe("errors", () => {
 
@@ -25,7 +21,10 @@ describe("errors", () => {
             .cwd(__dirname)
             .config({ http: { port: 3000 } })
     )
-    afterEach(async () => await damless.stop());
+    afterEach(async function () {
+        this.timeout(5000);
+        await damless.stop()
+    });
 
     it("Throw error in get", async () => {
         await damless
@@ -42,9 +41,9 @@ describe("errors", () => {
             expect(error.statusCode).to.be(500);
             expect(error.data.message).to.be("In method");
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
-    it("Throw error in stream (not the better pattern)", async () => {
+    it("Throw error in stream not the better pattern", async () => {
         await damless
             .post("/", (context, stream, headers) => {
                 stream
@@ -53,25 +52,30 @@ describe("errors", () => {
                         transform(chunk, encoding, callback) {
                             callback(new Error("In stream"));
                         }
-                    })).pipe(stream);
+                    }))
+                    .on("error", error => {
+                        stream.emit("error", error); // Must forward error manually
+                    })
+                    .pipe(stream)
             })
             .start();
         const client = await damless.resolve("client");
         try {
-            await client.post({
+            const res = await client.post({
                 url: "http://localhost:3000/", json: {
                     value: "1"
                 }
             });
-            throw new Error("Mustn't be called.");
+            expect(res.statusCode).not.to.be(200);
+            expect(res.statusCode).not.to.be(500);
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be(undefined); // because send by errorHandler not writeError (see http-server)
+            expect(error.data.message).to.be("In stream"); // because send by errorHandler not writeError (see http-server)
         }
-    });
+    }).timeout(5000);
 
-    it("Throw error in stream via async pipeline (better implementation)", async () => {
+    it("Throw error in stream via async pipeline", async () => {
         await damless
             .post("/", async (context, stream, headers) => {
                 await pipelineAsync(
@@ -99,7 +103,7 @@ describe("errors", () => {
             expect(error.statusCode).to.be(500);
             expect(error.data.message).to.be("In stream"); // message is avaliable because error was sent by writeError (see http-server)
         }
-    });
+    }).timeout(5000);
 
     it("Throw error in streamify", async () => {
         await damless
@@ -126,7 +130,7 @@ describe("errors", () => {
             expect(error.statusCode).to.be(500);
             expect(error.data.message).to.be("after pipeline");
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
     it("Throw error after the header was sent async", async () => {
         await damless
@@ -145,6 +149,7 @@ describe("errors", () => {
                     )
                 }
                 catch (error) {
+                    expect(error.message).to.be("In chunk 2.");
                     throw error;
                 }
             })
@@ -155,26 +160,26 @@ describe("errors", () => {
             throw new Error("Mustn't be called. statusCode: ${statusCode}, trailer status: ${trailers.status}.", { statusCode: res.statusCode, trailers: res.trailers });
         }
         catch (error) {
-            //expect(error.statusCode).to.be(500);
+            //expect(error.code).to.be("ECONNRESET");
             expect(error.message).to.be("Mustn't be called. statusCode: 200, trailer status: 500.");
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
 
     it("Override writeError", async () => {
-        class MyHttpServer extends HttpServer {
-            constructor(injector, config) {
-                super(injector, config);
+        class MyAskReply extends AskReply {
+            constructor(giveme, request, response, headers) {
+                super(giveme, request, response, headers);
             }
 
-            writeError(error, context, stream, headers) {
-                stream.respond({
+            sendError(error) {
+                this.respond({
                     statusCode: 500
                 }).end("ok");
             }
         }
         await damless
-            .inject("http-server", MyHttpServer)
+            .inject("ask-reply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -193,22 +198,23 @@ describe("errors", () => {
             expect(error.statusCode).to.be(500);
             expect(error.data.body).to.be("ok");
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
     it("Override writeError with streamify", async () => {
-        class MyHttpServer extends HttpServer {
-            constructor(injector, config) {
-                super(injector, config);
+        class MyAskReply extends AskReply {
+            constructor(giveme, request, response, headers) {
+                super(giveme, request, response, headers);
             }
-            writeError(error, context, stream, headers) {
-                stream
+
+            sendError(error) {
+                this
                     .mode("object")
                     .respond({ statusCode: 500 })
                     .end({ value: "ok" });
             }
         }
         await damless
-            .inject("http-server", MyHttpServer)
+            .inject("ask-reply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -226,21 +232,20 @@ describe("errors", () => {
         catch (error) {
             expect(error.data.body.value).to.be("ok");
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
     it("Throw error in writeError", async () => {
-        class MyHttpServer extends HttpServer {
-
-            constructor(injector, config) {
-                super(injector, config);
+        class MyAskReply extends AskReply {
+            constructor(giveme, request, response, headers) {
+                super(giveme, request, response, headers);
             }
 
-            writeError(error, context, stream, headers) {
+            sendError(error) {
                 throw new Error("in writeError");
             }
         }
         await damless
-            .inject("http-server", MyHttpServer)
+            .inject("ask-reply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -258,34 +263,34 @@ describe("errors", () => {
         catch (error) {
             expect(error.statusCode).to.be(500); // request must be closed
         }
-    }).timeout(20000);
+    }).timeout(5000);
 
     it("Throw error in writeError pipeline", async () => {
-        class MyHttpServer extends HttpServer {
-
-            constructor(injector, config) {
-                super(injector, config);
+        class MyAskReply extends AskReply {
+            constructor(giveme, request, response, headers) {
+                super(giveme, request, response, headers);
             }
 
-            async writeError(error, context, stream, headers) {
+            sendError(error) {
                 try {
                     await pipelineAsync(
                         streamify([1,2,3]),
                         transform((chunk, encoding) => {
                             throw new Error("Boom");
                         }),
-                        stream
+                        this
                             .mode("object")
                             .respond({ statusCode: 500 })
                     );
                 }
                 catch (error) {
-                    throw error;
+                    
                 }
             }
         }
+
         await damless
-            .inject("http-server", MyHttpServer)
+            .inject("ask-reply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -303,5 +308,5 @@ describe("errors", () => {
         catch (error) {
             expect(error.statusCode).to.be(500); // request must be closed
         }
-    }).timeout(20000);
+    }).timeout(5000);
 });

@@ -8,10 +8,6 @@
 const expect = require("expect.js");
 const Walk = require('../../../lib/services/core/walk');
 
-require("process").on('unhandledRejection', (reason, p) => {
-    console.error('Unhandled Rejection at:', p, 'reason:', reason);
-});
-
 describe("walk", () => {
     it("get", () => {
         let files = new Walk().get(__dirname);

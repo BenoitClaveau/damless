@@ -58,5 +58,5 @@ describe("promise-readable", () => {
         const buffer = await getBuffer(stream);
         expect(buffer).to.be.an(Buffer);
         fs.writeFileSync(`${__dirname}/../data/output/world.buffer.png`, buffer);
-    });
+    }).timeout(5000);
 })

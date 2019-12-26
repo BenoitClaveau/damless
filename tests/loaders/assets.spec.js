@@ -6,12 +6,6 @@
 
 const expect = require("expect.js");
 const DamLess = require("../../index");
-const process = require("process");
-const { inspect } = require("util");
-
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
 
 describe("Load assets", () => {
 

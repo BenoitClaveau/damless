@@ -11,10 +11,6 @@ const {
     Writable 
 } = require('stream');
 
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
-
 describe("duplex stream", () => {
 
     xit("readable -> writable", async () => {

@@ -9,10 +9,6 @@ const expect = require("expect.js");
 const JSON = new require('../../../lib/services/core/json');
 const json = new JSON();
 
-require("process").on('unhandledRejection', (reason, p) => {
-    console.error('Unhandled Rejection at:', p, 'reason:', reason);
-});
-
 describe("JSON", () => {
 
     it("parse empty", () => {

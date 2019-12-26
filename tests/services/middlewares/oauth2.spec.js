@@ -15,10 +15,6 @@ const fetch = require("node-fetch");
 const { inspect } = require("util");
 const ClientOAuth2 = require('client-oauth2')
 
-process.on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", inspect(reason));
-});
-
 const config = {
     accessToken: '4430eb16f4f6577c0f3a15fb6127cbf828a8e403',
     refreshToken: '4430eb16f4f6577c0f3a15fb6127cbf828a8e403'.split('').reverse().join(''),

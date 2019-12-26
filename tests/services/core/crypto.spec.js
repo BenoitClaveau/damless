@@ -8,10 +8,6 @@
 const expect = require("expect.js");
 const Crypto = require("../../../lib/services/core/crypto");
 
-require("process").on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", reason);
-});
-
 describe("crypto", () => {
     it("encrypted", () => {
         const crypto = new Crypto();

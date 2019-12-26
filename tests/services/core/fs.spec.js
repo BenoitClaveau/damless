@@ -9,10 +9,6 @@ const expect = require("expect.js");
 const FileSystem = require('../../../lib/services/core/fs');
 const $fs = new FileSystem({ root: __dirname });
 
-require("process").on('unhandledRejection', (reason, p) => {
-    console.error('Unhandled Rejection at:', p, 'reason:', reason);
-});
-
 describe("FileSystem", () => {
 
     it("readFile", async () => {

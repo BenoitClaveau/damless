@@ -9,10 +9,6 @@ const expect = require("expect.js");
 const CryptoService = require("../../../lib/services/core/crypto");
 const PasswordService = require("../../../lib/services/core/password");
 
-require("process").on("unhandledRejection", (reason, p) => {
-    console.error("Unhandled Rejection at:", p, "reason:", reason);
-});
-
 describe("password", () => {
 
     it("generate", () => {

@@ -8,10 +8,6 @@
 const expect = require("expect.js");
 const DamLess = require("../../../index");
 
-require("process").on('unhandledRejection', (reason, p) => {
-    console.error('Unhandled Rejection at:', p, 'reason:', reason);
-});
-
 describe("Repository", () => {
    
     let damless;

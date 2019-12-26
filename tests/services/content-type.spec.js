@@ -9,10 +9,6 @@ const ContentType = new require('../../lib/services/content-type.js');
 const process = require("process");
 const { inspect } = require("util");
 
-process.on('unhandledRejection', (reason, p) => {
-    console.error('Unhandled Rejection at:', p, 'reason:', inspect(reason));
-});
-
 describe("ContentType", () => {
 
     const contentType = new ContentType();
