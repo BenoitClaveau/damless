@@ -20,7 +20,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "Override writeError",
+                "Override sendError",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

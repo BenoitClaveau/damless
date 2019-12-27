@@ -71,7 +71,7 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In stream"); // because send by errorHandler not writeError (see http-server)
+            expect(error.data.message).to.be("In stream");
         }
     }).timeout(5000);
 
@@ -101,7 +101,7 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In stream"); // message is avaliable because error was sent by writeError (see http-server)
+            expect(error.data.message).to.be("In stream");
         }
     }).timeout(5000);
 
@@ -166,7 +166,7 @@ describe("errors", () => {
     }).timeout(5000);
 
 
-    it("Override writeError", async () => {
+    it("Override sendError", async () => {
         class MyAskReply extends AskReply {
             constructor(giveme, request, response, headers) {
                 super(giveme, request, response, headers);
@@ -179,7 +179,7 @@ describe("errors", () => {
             }
         }
         await damless
-            .inject("ask-reply", MyAskReply)
+            .inject("AskReply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -200,7 +200,7 @@ describe("errors", () => {
         }
     }).timeout(5000);
 
-    it("Override writeError with streamify", async () => {
+    it("Override sendError with streamify", async () => {
         class MyAskReply extends AskReply {
             constructor(giveme, request, response, headers) {
                 super(giveme, request, response, headers);
@@ -214,7 +214,7 @@ describe("errors", () => {
             }
         }
         await damless
-            .inject("ask-reply", MyAskReply)
+            .inject("AskReply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -234,18 +234,18 @@ describe("errors", () => {
         }
     }).timeout(5000);
 
-    it("Throw error in writeError", async () => {
+    it("Throw error in sendError", async () => {
         class MyAskReply extends AskReply {
             constructor(giveme, request, response, headers) {
                 super(giveme, request, response, headers);
             }
 
             sendError(error) {
-                throw new Error("in writeError");
+                throw new Error("in sendError");
             }
         }
         await damless
-            .inject("ask-reply", MyAskReply)
+            .inject("AskReply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -265,13 +265,13 @@ describe("errors", () => {
         }
     }).timeout(5000);
 
-    it("Throw error in writeError pipeline", async () => {
+    it("Throw error in sendError pipeline", async () => {
         class MyAskReply extends AskReply {
             constructor(giveme, request, response, headers) {
                 super(giveme, request, response, headers);
             }
 
-            sendError(error) {
+            async sendError(error) {
                 try {
                     await pipelineAsync(
                         streamify([1,2,3]),
@@ -290,7 +290,7 @@ describe("errors", () => {
         }
 
         await damless
-            .inject("ask-reply", MyAskReply)
+            .inject("AskReply", MyAskReply)
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
