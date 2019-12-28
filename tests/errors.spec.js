@@ -179,7 +179,7 @@ describe("errors", () => {
             }
         }
         await damless
-            .inject("AskReply", MyAskReply)
+            .inject("AskReply", MyAskReply, { instanciate: false })
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -214,7 +214,7 @@ describe("errors", () => {
             }
         }
         await damless
-            .inject("AskReply", MyAskReply)
+            .inject("AskReply", MyAskReply, { instanciate: false })
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -245,7 +245,7 @@ describe("errors", () => {
             }
         }
         await damless
-            .inject("AskReply", MyAskReply)
+            .inject("AskReply", MyAskReply, { instanciate: false })
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {
@@ -284,13 +284,16 @@ describe("errors", () => {
                     );
                 }
                 catch (error) {
-                    
+                    expect(error.message).to.be("Boom");
+                    this
+                        .respond({ statusCode: 500 })
+                        .end({});
                 }
             }
         }
 
         await damless
-            .inject("AskReply", MyAskReply)
+            .inject("AskReply", MyAskReply, { instanciate: false})
             .get("/", async (context, stream, headers) => {
                 await pipelineAsync(
                     streamify(() => {

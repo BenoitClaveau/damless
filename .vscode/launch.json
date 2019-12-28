@@ -20,7 +20,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "Override sendError",
+                "Use forward-to-asset without loading assets",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

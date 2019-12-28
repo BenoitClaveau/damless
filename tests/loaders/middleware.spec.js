@@ -70,7 +70,7 @@ describe("Load middleware", () => {
         }
         catch(error) {
             expect(error.statusCode).to.be(404);
-            expect(error.data.message).to.be("Page / not found.");
+            expect(error.data.message).to.be("Failed to forward / to /main.html");
         }
 
     }).timeout(5000);

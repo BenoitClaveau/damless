@@ -11,34 +11,34 @@ const Commands = require("./lib/services/commands");
 
 class DamLessServer {
 
+    static *services() {
+        yield { name: "services-loader", location: `${__dirname}/lib/services/core/services-loader`};
+        yield { name: "fs", location: `${__dirname}/lib/services/core/fs`};
+        yield { name: "json", location: `${__dirname}/lib/services/core/json`};
+        yield { name: "json-stream", location: `${__dirname}/lib/services/core/json-stream`};
+        yield { name: "text-stream", location: `${__dirname}/lib/services/core/text-stream`};
+        yield { name: "qjimp", location: `${__dirname}/lib/services/core/qjimp`};
+        yield { name: "client", location: `${__dirname}/lib/services/core/client`};
+        yield { name: "walk", location: `${__dirname}/lib/services/core/walk`};
+        yield { name: "crypto", location: `${__dirname}/lib/services/core/crypto`};
+        yield { name: "password", location: `${__dirname}/lib/services/core/password`};
+        yield { name: "repository-factory", location: `${__dirname}/lib/services/core/repository-factory`};
+        yield { name: "middleware", location: `${__dirname}/lib/services/middleware`};
+        yield { name: "http-server", location: `${__dirname}/lib/http-server`};
+    }
+
     constructor(options) {
         this.commands = new Commands();
         this.giveme = new GiveMeTheService(options); // Create the container
         this._config = {};
         // inject all core services
         this.giveme.inject("damless", this);
-        this.giveme.inject("services-loader", `${__dirname}/lib/services/core/services-loader`); // Need to be on top of injected services. services-loader constructor will inject others services. But services-loader constructor is calling after load. So default service will be overrideed.
-        this.giveme.inject("fs", `${__dirname}/lib/services/core/fs`);
-        this.giveme.inject("json", `${__dirname}/lib/services/core/json`);
-        this.giveme.inject("json-stream", `${__dirname}/lib/services/core/json-stream`);
-        this.giveme.inject("text-stream", `${__dirname}/lib/services/core/text-stream`);
-        this.giveme.inject("qjimp", `${__dirname}/lib/services/core/qjimp`);
-        this.giveme.inject("client", `${__dirname}/lib/services/core/client`);
-        this.giveme.inject("walk", `${__dirname}/lib/services/core/walk`);
-        this.giveme.inject("crypto", `${__dirname}/lib/services/core/crypto`);
-        this.giveme.inject("password", `${__dirname}/lib/services/core/password`);
-        this.giveme.inject("repository-factory", `${__dirname}/lib/services/core/repository-factory`);
-        this.giveme.inject("middleware", `${__dirname}/lib/services/middleware`);
-        this.giveme.inject("http-server", `${__dirname}/lib/http-server`);
-        this.giveme.inject("config", this._config); // Inject default config
-        
+        this.giveme.inject("config", this._config);
     }
 
     async start() {
-        await this.giveme.importAll(); // import all modules (damless)
         await this.giveme.resolve("services-loader", { mount: false }); // services-loader contructor will inject services in json.
         await this.commands.run(); // We inject or override services
-        await this.giveme.importAll(); // require all new injected modules (old will ot be imported)
         await this.giveme.createAll();
         await this.giveme.mountAll();
         return this;
@@ -50,7 +50,7 @@ class DamLessServer {
     }
 
     cwd(value) {
-        this.giveme.root = value;
+        this.giveme.injector.root = value;
         return this;
     }
 

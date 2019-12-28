@@ -18,7 +18,7 @@ describe("ServicesLoader", () => {
     
     it("load services via config file", async () => {
         let injector = await damless.resolve("injector");
-        expect(Object.entries(injector.container).length).to.be(17);
+        expect(Object.entries(injector.container).length).to.be(38);
 
         await damless
                 .cwd(path.join(__dirname, "../../loaders"))
