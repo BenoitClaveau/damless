@@ -12,11 +12,12 @@ describe("http-server", () => {
 
     let damless;
     beforeEach(async () => {
+        if (damless) damless.stop();
         damless = await new DamLess()
     })
-    afterEach(async () => {
-        await damless.stop();
-    });
+    // afterEach(async () => {
+    //     await damless.stop();
+    // });
 
     it("create a http server", async () => {
         await
@@ -76,7 +77,7 @@ describe("http-server", () => {
         expect(res.body.test).to.be(454566);
     }).timeout(60000);
 
-    it("create a http2 server", async () => {
+    it("create a http2 server with http2 client", async () => {
         await
             damless
                 .cwd(__dirname)

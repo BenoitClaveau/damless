@@ -157,11 +157,10 @@ describe("errors", () => {
         const client = await damless.resolve("client");
         try {
             const res = await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called. statusCode: ${statusCode}, trailer status: ${trailers.status}.", { statusCode: res.statusCode, trailers: res.trailers });
+            throw new Error("Error after headerSent. statusCode: ${statusCode}, trailer status: ${trailers.status}.", { statusCode: res.statusCode, trailers: res.trailers });
         }
         catch (error) {
-            //expect(error.code).to.be("ECONNRESET");
-            expect(error.message).to.be("Mustn't be called. statusCode: 200, trailer status: 500.");
+            expect(error.message).to.be("Error after headerSent. statusCode: 200, trailer status: 500.");
         }
     }).timeout(5000);
 

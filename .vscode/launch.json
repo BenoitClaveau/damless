@@ -20,15 +20,15 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "Use forward-to-asset without loading assets",
+                "create a http2 server with http2 client",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
-                "<node_internals>/**/*.js",
-                "${workspaceFolder}/node_modules/core-js/**/*.js",
-                "${workspaceFolder}/node_modules/object.assign/**/*.js",
-                "${workspaceFolder}/node_modules/isexe/**/*.js"
+                // "<node_internals>/**/*.js",
+                // "${workspaceFolder}/node_modules/core-js/**/*.js",
+                // "${workspaceFolder}/node_modules/object.assign/**/*.js",
+                // "${workspaceFolder}/node_modules/isexe/**/*.js"
             ]
           }
     ]
