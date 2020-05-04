@@ -17,7 +17,7 @@ class DamLessServer {
         yield { name: "json", location: `${__dirname}/lib/services/core/json`};
         yield { name: "json-stream", location: `${__dirname}/lib/services/core/json-stream`};
         yield { name: "text-stream", location: `${__dirname}/lib/services/core/text-stream`};
-        yield { name: "qjimp", location: `${__dirname}/lib/services/core/qjimp`};
+        yield { name: "qjimp", location: `${__dirname}/lib/services/core/qjimp`, instanciate: false };
         yield { name: "client", location: `${__dirname}/lib/services/core/client`};
         yield { name: "walk", location: `${__dirname}/lib/services/core/walk`};
         yield { name: "crypto", location: `${__dirname}/lib/services/core/crypto`};
