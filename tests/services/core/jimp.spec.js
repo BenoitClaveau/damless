@@ -3,40 +3,34 @@
  * Copyright(c) 2018 Benoît Claveau <benoit.claveau@gmail.com>
  * MIT Licensed
  */
-const QJimp = require("../../../lib/services/core/qjimp");
+const Jimp = require("../../../lib/services/core/jimp");
 const fs = require("fs");
-const path = require("path");
 const expect = require("expect.js");
 
-describe("qjimp", () => {
+describe("jimp", () => {
 
     it("read & write", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.png`;
         if(fs.existsSync(output)) fs.unlinkSync(output);
         fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const buffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
         expect(fs.existsSync(output)).to.be(true);
     });
     
     it("size", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
-        let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        let input = `${__dirname}/../../data/world.png`;
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
     });
     
     it("clone", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
-        let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        let input = `${__dirname}/../../data/world.png`;
+        const image = await Jimp.read(input);
         const size = image.size(image);
         const clone = image.clone();
         const cloneSize = image.size(clone);
@@ -45,10 +39,8 @@ describe("qjimp", () => {
     });
     
     it("crop", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
-        let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        let input = `${__dirname}/../../data/world.png`;
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -59,10 +51,8 @@ describe("qjimp", () => {
     });
     
     it("resize", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
-        let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        let input = `${__dirname}/../../data/world.png`;
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -73,10 +63,10 @@ describe("qjimp", () => {
     });
     
     it("cropAndResize same ratio", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -87,10 +77,10 @@ describe("qjimp", () => {
     });
     
     it("cropAndResize great ratio", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -101,10 +91,10 @@ describe("qjimp", () => {
     });
     
     it("cropAndResize less ratio", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -115,10 +105,10 @@ describe("qjimp", () => {
     });
     
     it("scale", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const size = image.size(image);
         expect(size.width).to.be(800);
         expect(size.height).to.be(550);
@@ -129,30 +119,30 @@ describe("qjimp", () => {
     });
 
     it("lightness", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const lightness = await image.lightness();
         expect(lightness).to.be(1);
     });
     
     it("lightness", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.dark.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.dark.png`;
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const lightness = await image.lightness();
         expect(lightness).to.be(0.75);
     });
     
     it("greyscale", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        const jimp = new Jimp();
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.greyscale.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.greyscale();
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
@@ -160,12 +150,11 @@ describe("qjimp", () => {
     });
     
     it("contrast", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.contrast.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.contrast(0.75);
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
@@ -173,12 +162,11 @@ describe("qjimp", () => {
     });
     
     it("blur", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.blur.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.blur(25);
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
@@ -186,12 +174,11 @@ describe("qjimp", () => {
     });
     
     it("opacity", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.opacity.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.opacity(0.5);
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
@@ -199,12 +186,11 @@ describe("qjimp", () => {
     });
     
     it("smartResize crop", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.smartresize.crop.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.smartResize(400, 200);
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);
@@ -212,12 +198,11 @@ describe("qjimp", () => {
     });
     
     it("smartResize extend", async () => {
-        const qjimp = new QJimp();
-        let input = `${__dirname}/../../data/world.png`
+        let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.smartresize.extend.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
         let buffer = fs.readFileSync(input);
-        const image = await qjimp.read(input);
+        const image = await Jimp.read(input);
         const greyImage = await image.smartResize(1600, 800);
         const greyBuffer = await image.getBufferAsync("image/png");
         fs.writeFileSync(output, buffer);

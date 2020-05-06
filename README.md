@@ -1,9 +1,8 @@
 # DamLess
 
-Streamify your web server.
+DamLess help you to create a NodeJS stream api (with http chunk).
 
-DamLess has been designed to think the web as a stream.
-You can develop your http server like a gulp script. 
+Develop your http server like a gulp script. 
 
  [![NPM][npm-image]][npm-url]
  [![Build Status][travis-image]][travis-url]
@@ -11,9 +10,6 @@ You can develop your http server like a gulp script.
  [![NPM Download][npm-image-download]][npm-url]
  [![Dependencies Status][david-dm-image]][david-dm-url]
 
-```shell
-npm install damless --save
-```
 
 ```server.js
 const DamLess = require("damless");
@@ -29,43 +25,42 @@ damless
 
 ```./services/info.js
 class Info {	
-};
-
-helloworld(context, stream, headers) {
-  stream.write("Hello");
-  stream.end("world");
-};
+    // helloworld is declare as GET:/helloworld
+    helloworld(context, stream, headers) {
+        stream.write("Hello");
+        stream.end("world");
+    }
+}
 ```
 
 ```./services/user.js
 const { Transform } = require("stream");
 class User {	
-};
-
-insertOne(context, stream, headers) {
-  stream
-    .pipe(new Transform({
-        objectMode: true,
-        transform(chunk, enc, callback) {
-            // save the chunk (user) in the database
-            callback(null, chunk);
-        }
-    }))
-    .pipe(stream);
-};
+    insertOne(context, stream, headers) {
+        // Read a JSON stream request and write a response as a JSON stream.
+        stream
+            .pipe(new Transform({
+                objectMode: true,
+                transform(chunk, enc, callback) {
+                    // save the chunk (user) in the database
+                    callback(null, chunk);
+                }
+            }))
+            .pipe(stream);
+    }
+}
 ```
 
-# Features
+```shell
+npm install damless --save
+```
 
-  [Services](#services)
+
+# Features
   
   [Dependency Injection](#di)
 
-  [(request, response) -> dulplex stream](#ask-reply)
-
-  [OOP](#oop)
-  
-  [Security](https://github.com/shieldfy/API-Security-Checklist)
+  [(context, stream, headers) like http2 interface](#ask-reply)
 
 
 ## Services/info.js <a href="#services" />
@@ -90,12 +85,15 @@ exports = module.exports = ServiceInfo;
 ## Dependency Injection <a href="#di" />
 
 DamLess use [givemetheservice](https://www.npmjs.com/package/givemetheservice) to inject all services.
-You can override everythink or inject your new services.
 
-## (request, response) -> duplex stream <a href="#ask-reply" />
+You can override all damless functions or inject your new services.
+
+It's is easier to test your api.
+
+## (context, stream, headers) -> http2 interface <a href="#ask-reply" />
 
 DamLess has been inspired by the http2 syntax. The request and response are wrap by an unique duplex stream.
-This stream automatically gzip or deflate your response. It is useless to pipe a compressor.
+This stream automatically stringify, gzip or deflate your response. It is useless to pipe a compressor.
 
 ## Extend services <a href="#oop" />
 
@@ -112,7 +110,7 @@ class CustomJson extends Json {
         super();
     }
 
-    // override the default onValue
+    // override the default onValue to deserialize mongo ObjectID
     onValue(key, value) {
         if (/\d{2}-\d{2}-\d{2}/.test(value)) return moment(value, "YYYY-MM-DD").toDate();
         if (ObjectID.isValid(value)) return new ObjectID(value);
