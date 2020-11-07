@@ -63,7 +63,6 @@ describe("jimp", () => {
     });
     
     it("cropAndResize same ratio", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -77,7 +76,6 @@ describe("jimp", () => {
     });
     
     it("cropAndResize great ratio", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -91,7 +89,6 @@ describe("jimp", () => {
     });
     
     it("cropAndResize less ratio", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -105,7 +102,6 @@ describe("jimp", () => {
     });
     
     it("scale", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -119,7 +115,6 @@ describe("jimp", () => {
     });
 
     it("lightness", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -128,7 +123,6 @@ describe("jimp", () => {
     });
     
     it("lightness", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.dark.png`;
         let buffer = fs.readFileSync(input);
         const image = await Jimp.read(input);
@@ -137,7 +131,6 @@ describe("jimp", () => {
     });
     
     it("greyscale", async () => {
-        const jimp = new Jimp();
         let input = `${__dirname}/../../data/world.png`;
         let output = `${__dirname}/../../data/output/world.greyscale.png`;
         if(fs.existsSync(output)) return fs.unlinkSync(output);
