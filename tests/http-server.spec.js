@@ -54,8 +54,8 @@ describe("http-server", () => {
                 .config({
                     https: {
                         port: 8443,
-                        cert: `${__dirname}/certificates/server.crt`,
-                        key: `${__dirname}/certificates/server.key`,
+                        cert: `${__dirname}/certificates/cert.pem`,
+                        key: `${__dirname}/certificates/privkey.pem`,
                     }
                 })
                 .inject("info", "./services/info")
@@ -84,8 +84,8 @@ describe("http-server", () => {
                 .config({
                     http2: {
                         port: 8443,
-                        cert: `${__dirname}/certificates/server.crt`,
-                        key: `${__dirname}/certificates/server.key`,
+                        cert: `${__dirname}/certificates/cert.pem`,
+                        key: `${__dirname}/certificates/privkey.pem`,
                     }
                 })
                 .inject("info", "./services/info")
@@ -118,8 +118,8 @@ describe("http-server", () => {
                 .config({
                     http2: {
                         port: 8443,
-                        cert: `${__dirname}/certificates/server.crt`,
-                        key: `${__dirname}/certificates/server.key`,
+                        cert: `${__dirname}/certificates/cert.pem`,
+                        key: `${__dirname}/certificates/privkey.pem`,
                     }
                 })
                 .inject("info", "./services/info")

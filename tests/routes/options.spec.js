@@ -27,7 +27,7 @@ describe("options", () => {
         const res = await client.request({ 
             method: "OPTIONS",
             url: "http://localhost:3000/info"
-        })
+        });
         expect(res.headers.allow).to.be("GET");
     });
 

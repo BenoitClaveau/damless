@@ -21,19 +21,17 @@ describe("options-leaf", () => {
     })
     afterEach(async () => await damless.stop());
 
-    xit("/info", async () => {
+    it("/info", async () => {
 
-        const requestOptions = {
-            method : "OPTIONS",
-            url    : "http://localhost:3000/info"
-        };
-
-        request(requestOptions, (error, response, body) => {
-            expect(response.headers.allow).to.be("POST");
-            expect(response.headers).not.property("content-type");
-            expect(response.headers).property("date");
-            expect(response.headers).property("expires");
-            expect(response.headers).property("content-length");
+        const client = await damless.resolve("client");
+        const response = await client.request({ 
+            method: "OPTIONS",
+            url: "http://localhost:3000/info"
         });
-    });
+        expect(response.headers.allow).to.be("GET");
+        expect(response.headers).not.property("content-type");
+        expect(response.headers).property("date");
+        expect(response.headers).property("expires");
+        
+    }).timeout(100000);
 });

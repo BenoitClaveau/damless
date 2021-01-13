@@ -11,6 +11,7 @@ const { streamify, AskReply, transform } = require("../index");
 const { Transform, pipeline } = require("stream");
 const process = require("process");
 const { inspect, promisify } = require("util");
+const { stream } = require("file-type");
 const pipelineAsync = promisify(pipeline);
 
 describe("errors", () => {
@@ -40,6 +41,25 @@ describe("errors", () => {
         catch (error) {
             expect(error.statusCode).to.be(500);
             expect(error.data.message).to.be("In method");
+        }
+    }).timeout(5000);
+
+    it("Throw error in get after setTimeout", async () => {
+        await damless
+            .get("/", (context, stream, headers) => {
+                setTimeout(() => {
+                    throw new Error("In timeout");
+                })
+            })
+            .start();
+        const client = await damless.resolve("client");
+        try {
+            await client.get("http://localhost:3000/");
+            throw new Error("Mustn't be called.");
+        }
+        catch (error) {
+            expect(error.statusCode).to.be(500);
+            expect(error.data.message).to.be("In timeout");
         }
     }).timeout(5000);
 
@@ -132,7 +152,7 @@ describe("errors", () => {
         }
     }).timeout(5000);
 
-    it("Throw error after the header was sent async", async () => {
+    it("Throw error after the header was sent", async () => {
         await damless
             .get("/", async (context, stream, headers) => {
                 try {
@@ -164,30 +184,21 @@ describe("errors", () => {
         }
     }).timeout(5000);
 
-
-    it("Override sendError", async () => {
-        class MyAskReply extends AskReply {
-            constructor(giveme, request, response, headers) {
-                super(giveme, request, response, headers);
-            }
-
-            sendError(error) {
-                this.respond({
-                    statusCode: 500
-                }).end("ok");
-            }
-        }
+    it("Customize error page", async () => {
         await damless
-            .inject("AskReply", MyAskReply, { instanciate: false })
-            .get("/", async (context, stream, headers) => {
-                await pipelineAsync(
-                    streamify(() => {
-                        throw new Error("In streamify");
-                    }),
-                    stream
-                );
+            .get("/", (context, stream, headers) => {
+                throw new Error("Oops");
+            })
+            .error((error, context, stream, headers) => {
+                expect(error.message).to.be("Oops");
+
+                stream.respond({ 
+                    statusCode: 500,
+                    contentType: "text/plain"
+                }).end("BEURK");
             })
             .start();
+
         const client = await damless.resolve("client");
         try {
             await client.get("http://localhost:3000/");
@@ -195,120 +206,7 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.body).to.be("ok");
-        }
-    }).timeout(5000);
-
-    it("Override sendError with streamify", async () => {
-        class MyAskReply extends AskReply {
-            constructor(giveme, request, response, headers) {
-                super(giveme, request, response, headers);
-            }
-
-            sendError(error) {
-                this
-                    .mode("object")
-                    .respond({ statusCode: 500 })
-                    .end({ value: "ok" });
-            }
-        }
-        await damless
-            .inject("AskReply", MyAskReply, { instanciate: false })
-            .get("/", async (context, stream, headers) => {
-                await pipelineAsync(
-                    streamify(() => {
-                        throw new Error("In streamify");
-                    }),
-                    stream
-                );
-            })
-            .start();
-        const client = await damless.resolve("client");
-        try {
-            await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called.");
-        }
-        catch (error) {
-            expect(error.data.body.value).to.be("ok");
-        }
-    }).timeout(5000);
-
-    it("Throw error in sendError", async () => {
-        class MyAskReply extends AskReply {
-            constructor(giveme, request, response, headers) {
-                super(giveme, request, response, headers);
-            }
-
-            sendError(error) {
-                throw new Error("in sendError");
-            }
-        }
-        await damless
-            .inject("AskReply", MyAskReply, { instanciate: false })
-            .get("/", async (context, stream, headers) => {
-                await pipelineAsync(
-                    streamify(() => {
-                        throw new Error("In streamify");
-                    }),
-                    stream
-                );
-            })
-            .start();
-        const client = await damless.resolve("client");
-        try {
-            await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called.");
-        }
-        catch (error) {
-            expect(error.statusCode).to.be(500); // request must be closed
-        }
-    }).timeout(5000);
-
-    it("Throw error in sendError pipeline", async () => {
-        class MyAskReply extends AskReply {
-            constructor(giveme, request, response, headers) {
-                super(giveme, request, response, headers);
-            }
-
-            async sendError(error) {
-                try {
-                    await pipelineAsync(
-                        streamify([1,2,3]),
-                        transform((chunk, encoding) => {
-                            throw new Error("Boom");
-                        }),
-                        this
-                            .mode("object")
-                            .respond({ statusCode: 500 })
-                    );
-                }
-                catch (error) {
-                    expect(error.message).to.be("Boom");
-                    this
-                        .respond({ statusCode: 500 })
-                        .end({});
-                }
-            }
-        }
-
-        await damless
-            .inject("AskReply", MyAskReply, { instanciate: false})
-            .get("/", async (context, stream, headers) => {
-                await pipelineAsync(
-                    streamify(() => {
-                        throw new Error("In streamify");
-                    }),
-                    stream
-                );
-            })
-            .start();
-        const client = await damless.resolve("client");
-        try {
-            await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called.");
-        }
-        catch (error) {
-            expect(error.statusCode).to.be(500); // request must be closed
+            expect(error.data.body).to.be("BEURK");
         }
     }).timeout(5000);
 });

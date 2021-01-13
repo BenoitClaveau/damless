@@ -13,7 +13,7 @@ const {
 
 describe("duplex stream", () => {
 
-    xit("readable -> writable", async () => {
+    it("readable -> writable", async () => {
         const readable = new Readable({ read() {}});
         const writable = new Writable({ write(chunk, encoding, callback) {
             callback();
@@ -25,7 +25,7 @@ describe("duplex stream", () => {
         readable.push(null);
     });
 
-    xit("readable -> transform -> writable", async () => {  
+    it("readable -> transform -> writable", async () => {  
         const readable = new Readable({ read: () => {}});
         const transform = new Transform({ 
             transform(chunk, encoding, callback) {
@@ -44,7 +44,7 @@ describe("duplex stream", () => {
     });
 
 
-    xit("duplex -> transform -> duplex", async () => { 
+    it("duplex -> transform -> duplex", async () => { 
         const duplex = new Duplex({ 
             read: () => {},
             write(chunk, encoding, callback) {
@@ -64,7 +64,7 @@ describe("duplex stream", () => {
         duplex.end();
     });
 
-    xit("duplex -> duplex", async () => {
+    it("duplex -> duplex", async () => {
 
         const data = ["command 1", "command 2"];
         const duplex = new Duplex({
@@ -88,7 +88,7 @@ describe("duplex stream", () => {
         duplex.pipe(duplex);
     }).timeout(30000);
 
-    xit("(duplex -> transform) as readable -> duplex", async () => {
+    it("(duplex -> transform) as readable -> duplex", async () => {
         const transform = new Transform({ 
             transform(chunk, encoding, callback) {
                 const data = chunk.toString().toUpperCase();
@@ -172,18 +172,3 @@ describe("duplex stream", () => {
 
     }).timeout(30000);
 });
-
-class MyDuplex extends Duplex {
-    constructor(options, transform) {
-        super(options);
-        this.transform = transform;
-    }
-
-    write(chunk, encoding, callback) {
-        super.write(chunk, encoding, callback)
-    }
-
-    _write(chunk, encoding, callback) {
-        this.transform.write(chunk, encoding, callback)
-    }
-}

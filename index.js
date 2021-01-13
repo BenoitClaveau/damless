@@ -90,6 +90,10 @@ class DamLessServer {
         return this;
     }
 
+    error(listener) {
+        return this.on("http-server", "error", listener);
+    }
+
     async resolve(name, options) {
         return await this.giveme.resolve(name, options);
     }
@@ -187,6 +191,7 @@ const {
 const {
     transform,
     streamify,
+    aggregate,
     noop,
     getFirst,
     getAll,
@@ -226,6 +231,7 @@ module.exports.OAuth2 = OAuth2;
 // Export damless core
 module.exports.transform = transform;
 module.exports.streamify = streamify;
+module.exports.aggregate = aggregate;
 module.exports.getFirst = getFirst;
 module.exports.getAll = getAll;
 module.exports.getBuffer = getBuffer;
