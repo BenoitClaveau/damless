@@ -20,7 +20,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "error",
+                "timeout",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
