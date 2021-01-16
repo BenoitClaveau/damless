@@ -20,15 +20,16 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "timeout",
+                "50 clients",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
             "skipFiles": [
-                // "<node_internals>/**/*.js",
+                "<node_internals>/**/*.js",
                 // "${workspaceFolder}/node_modules/core-js/**/*.js",
-                // "${workspaceFolder}/node_modules/object.assign/**/*.js",
-                // "${workspaceFolder}/node_modules/isexe/**/*.js"
+                "${workspaceFolder}/node_modules/object.assign/**/*.js",
+                "${workspaceFolder}/node_modules/isexe/**/*.js",
+                "${workspaceFolder}/node_modules/chokidar/*/*.js"
             ]
           }
     ]
