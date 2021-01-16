@@ -12,12 +12,11 @@ describe("http-server", () => {
 
     let damless;
     beforeEach(async () => {
-        if (damless) damless.stop();
         damless = await new DamLess()
     })
-    // afterEach(async () => {
-    //     await damless.stop();
-    // });
+    afterEach(async () => {
+        await damless.stop();
+    });
 
     it("create a http server", async () => {
         await
