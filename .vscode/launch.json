@@ -20,7 +20,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "create a http server",
+                "create a http2 server with http2 client",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
