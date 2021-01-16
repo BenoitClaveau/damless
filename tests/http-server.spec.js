@@ -55,7 +55,8 @@ describe("http-server", () => {
                         port: 8443,
                         cert: `${__dirname}/certificates/cert.pem`,
                         key: `${__dirname}/certificates/privkey.pem`,
-                    }
+                    },
+                    log: true
                 })
                 .inject("info", "./services/info")
                 .post("/save", "info", "saveOne")
