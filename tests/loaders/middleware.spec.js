@@ -79,7 +79,7 @@ describe("Load middleware", () => {
 
         await damless
             .use((context, stream, headers) => {
-                stream.respond({ "x-custom-header": "1234" })
+                stream.headers({ "x-custom-header": "1234" })
             })
             .get("/", (context, stream, header) => {
                 stream.end({ ok: true });
@@ -90,5 +90,28 @@ describe("Load middleware", () => {
         const res = await client.get({ url: "http://localhost:3000/" });
         expect(res.statusCode).to.be(200);
         expect(res.headers["x-custom-header"]).to.be("1234");
+    }).timeout(5000);
+
+    it("Inject middleware for 404", async () => {
+
+        await damless
+            .use((context, stream, headers) => {
+                if ("404" in context.route) {
+                    stream.end({ ok: false });
+                }
+            })
+            .get("/", (context, stream, header) => {
+                stream.end({ ok: true });
+            })
+            .start();
+        
+        const client = await damless.resolve("client");
+        const res = await client.get({ url: "http://localhost:3000/" });
+        expect(res.statusCode).to.be(200);
+        expect(res.body).to.be('[\n{"ok":true}\n]\n');
+
+        const res2 = await client.get({ url: "http://localhost:3000/info" });
+        expect(res2.statusCode).to.be(200);
+        expect(res2.body).to.be('[\n{"ok":false}\n]\n');
     }).timeout(5000);
 })
