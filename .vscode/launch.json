@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "askreply",
+                "read and stream json",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

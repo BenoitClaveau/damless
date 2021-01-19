@@ -14,7 +14,7 @@ new DamLess()
     })
     .get("/", async (context, stream, headers) => {
         stream
-            .respond({ 
+            .respond({
                 statusCode: 200,
                 contentType: "text/plain"
             })
@@ -22,7 +22,7 @@ new DamLess()
             .end("World");
     })
     .post("/", async (context, stream, headers) => {
-        stream.respond({ contentType: "application/json" })
+        stream.respond({ contentType: "application/json" }).mode("object")
         await pipeline(
             stream,
             new Transform({
@@ -32,8 +32,50 @@ new DamLess()
                 }
             }),
             stream
-        ) 
-    }, { readableObjectMode: true })
+        )
+    })
+    .post("/error", async (context, s, headers) => {
+        s.respond({ contentType: "application/json" }).mode("object")
+        stream.pipeline(
+            s,
+            new Transform({
+                objectMode: true,
+                transform(chunk, encoding, callback) {
+                    callback(new Error("reading error"));
+                }
+            }),
+            s,
+            err => {
+                // await new Promise(res => setTimeout(res, 1000))
+                s.respond({ statusCode: 403 }).end();
+            }
+        )
+    })
+    .post("/error2", async (context, s, headers) => {
+        s.respond({ contentType: "application/json" }).mode("object")
+        // s.on("close", () => {
+        //     // console.log("close", s.response.headersSent, s.response)
+        //     if (!s.response.headersSent)
+        //         process.exit(-1)
+        // })
+        try {
+            await pipeline(
+                s,
+                new Transform({
+                    objectMode: true,
+                    transform(chunk, encoding, callback) {
+                        callback(new Error("reading error"));
+                    }
+                }).once("error", error => {
+                    s.respond({ statusCode: 403 }).end();
+                }),
+                s
+            )
+        }
+        catch (error) {
+            // s.respond({ statusCode: 403 }).end();
+        }
+    })
     .use((context, stream, headers) => {
         if ("404" in context.route) {
             stream.end("404")

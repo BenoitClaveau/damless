@@ -92,7 +92,7 @@ describe("Load middleware", () => {
         expect(res.headers["x-custom-header"]).to.be("1234");
     }).timeout(5000);
 
-    it("Inject middleware for 404", async () => {
+    xit("Inject middleware for 404", async () => {
 
         await damless
             .use((context, stream, headers) => {

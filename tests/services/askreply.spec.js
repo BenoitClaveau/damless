@@ -25,7 +25,7 @@ describe("askreply", () => {
     })
     afterEach(async () => await damless.stop());
 
-    xit("post json array", async () => {
+    it("post json array", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async(context, stream, headers) => {
@@ -34,7 +34,6 @@ describe("askreply", () => {
                     new Writable({
                         objectMode: true,
                         write(chunk, encoding, callback) {
-                            console.log(chunk);
                             callback();
                         }
                     })
@@ -49,16 +48,16 @@ describe("askreply", () => {
         );
     }).timeout(20000);
 
-    xit("read and stream json", async () => {
+    it("read and stream json", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
+                stream.respond({ contentType: "application/json" })
                 await pipeline(
                     stream,
                     new Transform({
                         objectMode: true,
                         transform(chunk, encoding, callback) {
-                            console.log(chunk);
                             chunk.key = chunk.key?.toUpperCase();
                             callback(null, chunk);
                         }
@@ -74,30 +73,88 @@ describe("askreply", () => {
 
         const output = fs.createWriteStream(filename);
 
-        await pipeline(
-            fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
-            request.post('http://localhost:3000/'),
-            output
-        );
+        await new Promise(async(resolve, reject) => {
+            await pipeline(
+                fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
+                request.post('http://localhost:3000/', (err, res, body) =>{
+                    if (err) 
+                        reject(err);
+                    else if (res.statusCode !== 200 ) 
+                        reject("statusCode !== 200");
+                }),
+                output
+            );
+            resolve();
+        })
 
     }).timeout(20000);
 
+    it("read and stream json without content-type", async () => {
+        await damless
+            .config({ http: { port: 3000 } })
+            .post("/", async (context, stream, headers) => {
+                await pipeline(
+                    stream,
+                    new Transform({
+                        objectMode: true,
+                        transform(chunk, encoding, callback) {
+                            chunk.key = chunk.key?.toUpperCase();
+                            callback(null, chunk);
+                        }
+                    }),
+                    stream
+                )
+            })
+            .start();
 
-    xit("basic error", async () => {
+        const filename = `${__dirname}/../data/output/12.json`
+        if (fs.existsSync(filename))
+            fs.unlinkSync(filename);
+
+        const output = fs.createWriteStream(filename);
+
+        await new Promise(async(resolve, reject) => {
+            await pipeline(
+                fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
+                request.post('http://localhost:3000/', (err, res, body) =>{
+                    if (err) 
+                        reject(err);
+                    else if (res.statusCode !== 200 ) 
+                        reject("statusCode !== 200");
+                }),
+                output
+            );
+            resolve();
+        })
+
+    }).timeout(20000);
+
+    it("error not catch by user", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, stream, headers) => {
-                throw new Error("basic error");
+                throw new Error("error not catch by user");
             })
+            .start();
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+        })
+        expect(response.status).to.be(500);
+    }).timeout(20000);
+
+    it("404", async () => {
+        await damless
+            .config({ http: { port: 3000 } })
             .start();
 
         const response = await fetch(`http://localhost:3000/`, {
             method: "GET",
         })
-        expect(response.status).to.be(500);
+        expect(response.status).to.be(404);
     }).timeout(20000);
 
-    xit("reading error in async pipeline", async () => {
+    it("reading error in async pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -115,7 +172,34 @@ describe("askreply", () => {
             .start();
 
         const response = await fetch(`http://localhost:3000/`, {
-            method: "GET",
+            method: "POST",
+            // default header = text/plain => askreply has no pipeline 
+            body: "text plain"
+        })
+        expect(response.status).to.be(500);
+    }).timeout(20000);
+
+    it("reading error in async json pipeline", async () => {
+        await damless
+            .config({ http: { port: 3000 } })
+            .post("/", async (context, stream, headers) => {
+                await pipeline(
+                    stream,
+                    new Transform({
+                        objectMode: true,
+                        transform(chunk, encoding, callback) {
+                            callback(new Error("reading error"));
+                        }
+                    }),
+                    stream
+                )
+            })
+            .start();
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([1,2,3,4])
         })
         expect(response.status).to.be(500);
     }).timeout(20000);
@@ -131,28 +215,53 @@ describe("askreply", () => {
                         transform(chunk, encoding, callback) {
                             callback(new Error("reading error"));
                         }
+                    }).once("error", error => {
+                        s.respond({ statusCode: 403 }).end();
                     }),
                     s,
                     err => {
-                        // Je répond une erreur http 403
-                        s.respond({ statusCode: 403 }).end();
+                        // Je réponds une erreur http 403
+                        // expect(err.message).to.eql("reading error");
+                        // s.respond({ statusCode: 403 }).end();
                     }
                 )
             })
             .start();
 
-        const response = await fetch(`http://localhost:3000/`, {
-            method: "POST",
-            body: JSON.stringify({
-                name: "ben",
-                value: 0,
-                test: 454566
-            })
-        })
-        expect(response.status).to.be(403);
+        
+        // const response = await fetch(`http://localhost:3000/`, {
+        //     method: "POST",
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //         name: "ben",
+        //         value: 0,
+        //         test: 454566
+        //     })
+        // })
+        // expect(response.status).to.be(403);
+        
+
+       await new Promise(async(resolve, reject) => {
+        await pipeline(
+            fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
+            request({
+                url: 'http://localhost:3000/',
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+            }, (err, res, body) =>{
+                if (err) 
+                    reject(err);
+                else if (res.statusCode !== 200 ) 
+                    reject("statusCode !== 200");
+            }),
+            output
+        );
+        resolve();
+    })
+
     }).timeout(20000);
 
-    xit("forget to send an http error in pipeline", async () => {
+    it("forget to send an http error in pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, s, headers) => {
@@ -175,6 +284,7 @@ describe("askreply", () => {
 
         const response = await fetch(`http://localhost:3000/`, {
             method: "POST",
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: "ben",
                 value: 0,
@@ -210,6 +320,7 @@ describe("askreply", () => {
 
         const response = await fetch(`http://localhost:3000/`, {
             method: "POST",
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: "ben",
                 value: 0,
@@ -230,7 +341,7 @@ describe("askreply", () => {
 
 
 
-    xit("multiple respond with error in pipeline", async () => {
+    it("multiple respond with error in pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
