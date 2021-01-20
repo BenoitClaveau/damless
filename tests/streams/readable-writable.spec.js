@@ -111,7 +111,6 @@ describe("readable-writable", () => {
             new Transform({
                 objectMode: true,
                 transform(chunk, encoding, callback) {
-                    console.log(chunk);
                     callback(null, chunk);
                 }
             }),

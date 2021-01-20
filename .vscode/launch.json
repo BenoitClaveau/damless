@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "transform-wrapper",
+                "askreply",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
