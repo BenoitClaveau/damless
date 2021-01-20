@@ -12,7 +12,8 @@ const stream = require("stream");
 const { Writable, Transform } = require("stream");
 const request = require("request");
 const fetch = require("node-fetch");
-const { resolve } = require("path");
+const FormData = require('form-data');
+const FileType = require("file-type")
 const pipeline = promisify(stream.pipeline);
 const finished = promisify(stream.finished);
 
@@ -303,7 +304,6 @@ describe("askreply", () => {
                     await pipeline(
                         stream,
                         new Transform({
-                            objectMode: true,
                             transform(chunk, encoding, callback) {
                                 callback(new Error("reading error"));
                             }
@@ -380,4 +380,87 @@ describe("askreply", () => {
         expect(response.headers.get("content-disposition")).to.be("inline;filename=file.json");
     }).timeout(20000);
 
+
+    xit("post file wit form-data", async () => {
+        await damless
+            .config({ http: { port: 3000 } })
+            .post("/", (context, s, headers) => {
+                stream.pipeline(
+                    s,
+                    new Transform({
+                        async transform(chunk, encoding, callback) {
+                            const type = await FileType.fromBuffer(chunk);
+                            callback(new Error("reading error"));
+                        }
+                    }),
+                    s,
+                    err => {
+                        // Je réponds une erreur http 403
+                        // expect(err.message).to.eql("reading error");
+                        s.respond({ statusCode: 403 }).end();
+                    }
+                )
+            }, { readableObjectMode: false })
+            .start();
+
+            const form = new FormData();
+            form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
+            const response = await fetch('http://localhost:3000/', {method: 'POST', body: form});
+            expect(response.statusCode).to.eql(200);
+            // const json = await response.json();
+            
+
+    }).timeout(20000);
+
+    it("detect content-type", async () => {
+        await damless
+            .config({ http: { port: 3000 } })
+            .put("/", (context, s, headers) => {
+                stream.pipeline(
+                    s,
+                    new Transform({
+                        async transform(chunk, encoding, callback) {
+                            const type = await FileType.fromBuffer(chunk);
+                            callback(new Error("reading error"));
+                        }
+                    }),
+                    s.response,
+                    err => {
+                        // Je réponds une erreur http 403
+                        // expect(err.message).to.eql("reading error");
+                        s.respond({ statusCode: 403 }).end();
+                    }
+                )
+            }, { readableObjectMode: false })
+            .start();
+
+            await new Promise(async(resolve, reject) => {
+                //fs.createReadStream(`${__dirname}/../data/npm.light.array.json`)
+                fs.createReadStream(`${__dirname}/../data/world.png`)
+                    .pipe(request.put('http://localhost:3000/', (err, http, body) =>{
+                        err && console.log(err);
+                        http && console.log(http);
+                        resolve()
+                    }))
+            });
+
+        await new Promise(async(resolve, reject) => {
+            await pipeline(
+                fs.createReadStream(`${__dirname}/../data/world.png`),
+                request({
+                    url: 'http://localhost:3000/',
+                    method: "POST",
+                    headers: { 'Content-Type': 'image/png', "Content-Length": 14565 },
+                }, (err, res, body) =>{
+                    if (err) 
+                        reject(err);
+                    else if (res.statusCode !== 200 ) 
+                        reject("statusCode !== 200");
+                }),
+                output
+            );
+            resolve();
+        })
+
+    }).timeout(20000);
 });

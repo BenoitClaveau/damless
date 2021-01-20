@@ -9,13 +9,12 @@ const DamLess = require("../../index");
 const fs = require("fs");
 const { promisify } = require("util");
 const stream = require("stream");
-const { Writable, Readable, Transform, finished } = require("stream");
+const { Writable, Readable, Transform, finished, PassThrough } = require("stream");
 const WritableWrapper = require("../../lib/streams/writable-wrapper");
-const ReadableWrapper = require("../../lib/streams/readable-wrapper");
 const JSONStream = require("JSONStream");
 const pipeline = promisify(stream.pipeline);
 
-describe("writeable-wrapper", () => {
+describe("writable-wrapper", () => {
 
     it("write text", async () => {
         const filename = `${__dirname}/../data/output/2.json`
@@ -94,6 +93,72 @@ describe("writeable-wrapper", () => {
             JSONStream.parse("*"),
             output // write JS Object            
         );
+    }).timeout(20000);
+
+    it("throw error in pipeline", async () => {
+        try {
+            await pipeline(
+                Readable.from(async function* () {
+                    yield { line: 1 };
+                    yield { line: 2 };
+                    yield { line: 3 };
+                }()),
+                new WritableWrapper(function* () {
+                    yield new PassThrough({ objectMode: true });
+                    yield new Transform({
+                        objectMode: true,
+                        transform(chunk, encoding, callback) {
+                            if (chunk.line == 2) callback(new Error("line == 2"))
+                            else callback(null, chunk);
+                        }
+                    });
+                    yield new Writable({
+                        objectMode: true,
+                        write(chunk, encoding, callback) {
+                            callback();
+                        }
+                    });
+                }, { objectMode: true })
+            );
+            throw new Error("Unexpected behavior.")
+        } 
+        catch(error) {
+            expect(error.message).to.eql("line == 2")
+        }
+    }).timeout(20000);
+
+    it("neasted writable wrapper", async () => {
+        try {
+            await pipeline(
+                Readable.from(async function* () {
+                    yield { line: 1 };
+                    yield { line: 2 };
+                    yield { line: 3 };
+                }()),
+                new WritableWrapper(function* () {
+                    yield new PassThrough({ objectMode: true });
+                    yield new WritableWrapper(function* () {
+                        yield new Transform({
+                            objectMode: true,
+                            transform(chunk, encoding, callback) {
+                                if (chunk.line == 2) callback(new Error("line == 2"))
+                                else callback(null, chunk);
+                            }
+                        });
+                        yield new Writable({
+                            objectMode: true,
+                            write(chunk, encoding, callback) {
+                                expect(chunk.line).to.eql(1) // car erreur au 2ème chunk
+                                callback();
+                            }
+                        })}, { objectMode: true })
+                }, { objectMode: true })
+            );
+            throw new Error("Unexpected behavior.")
+        } 
+        catch(error) {
+            expect(error.message).to.eql("line == 2")
+        }
     }).timeout(20000);
 
 });

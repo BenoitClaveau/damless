@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "read and stream json",
+                "transform-wrapper",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

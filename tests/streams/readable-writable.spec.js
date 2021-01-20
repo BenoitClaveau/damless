@@ -9,16 +9,14 @@ const DamLess = require("../../index");
 const fs = require("fs");
 const { promisify } = require("util");
 const stream = require("stream");
-const { Writable, Readable, Transform } = require("stream");
+const { Transform } = require("stream");
 const ReadableWritable = require("../../lib/streams/readable-writable");
-const ReadableWrapper = require("../../lib/streams/readable-wrapper");
-const WritableWrapper = require("../../lib/streams/writable-wrapper");
 const JSONStream = require("JSONStream");
 const pipeline = promisify(stream.pipeline);
 
 describe("readable-writable", () => {
 
-    xit("wrap standard readable stream and read with standard writable", async () => {
+    it("simple readable-writable", async () => {
         const filename = `${__dirname}/../data/output/5.json`
         if (fs.existsSync(filename))
             fs.unlinkSync(filename);
@@ -31,9 +29,11 @@ describe("readable-writable", () => {
             stream,
             stream
         );
+
+        expect(fs.existsSync(filename)).to.eql(true);
     });
 
-    xit("wrap standard readable stream and read with JSONStream (though)", async () => {
+    it("readable-writable with JSONStream pipeline (thought)", async () => {
         const filename = `${__dirname}/../data/output/5.json`
         if (fs.existsSync(filename))
             fs.unlinkSync(filename);
@@ -49,7 +49,6 @@ describe("readable-writable", () => {
             new Transform({
                 objectMode: true,
                 transform(chunk, encoding, callback) {
-                    console.log(chunk);
                     callback(null, chunk);
                 }
             }),
@@ -57,9 +56,11 @@ describe("readable-writable", () => {
             stream                
         );
 
+        expect(fs.existsSync(filename)).to.eql(true);
+
     }).timeout(20000);
 
-    xit("wrap readable JSONStream (though)", async () => {
+    it("nested readable", async () => {
         const filename = `${__dirname}/../data/output/7.json`
         if (fs.existsSync(filename))
             fs.unlinkSync(filename);
@@ -67,19 +68,16 @@ describe("readable-writable", () => {
         const readable = fs.createReadStream(`${__dirname}/../data/npm.light.array.json`);
         const writable = fs.createWriteStream(filename);
 
-        const input = new ReadableWrapper(
-            readable.pipe(JSONStream.parse("*")),
-            { objectMode: true }
-        )
-
-        const stream = new ReadableWritable(input, writable);
+        const stream = new ReadableWritable(function* () {
+            yield readable;
+            yield JSONStream.parse("*");
+        }, writable);
 
         await pipeline(
             stream,
             new Transform({
                 objectMode: true,
                 transform(chunk, encoding, callback) {
-                    console.log(chunk);
                     callback(null, chunk);
                 }
             }),
@@ -87,27 +85,26 @@ describe("readable-writable", () => {
             stream
         );
 
+        expect(fs.existsSync(filename)).to.eql(true);
+
     }).timeout(20000);
 
-    it("wrap readable and writable JSONStream (though)", async () => {
-        const filename = `${__dirname}/../data/output/8.json`
+
+    it("nested readable & writable", async () => {
+        const filename = `${__dirname}/../data/output/7.json`
         if (fs.existsSync(filename))
             fs.unlinkSync(filename);
 
         const readable = fs.createReadStream(`${__dirname}/../data/npm.light.array.json`);
         const writable = fs.createWriteStream(filename);
 
-        const input = new ReadableWrapper(
-            readable.pipe(JSONStream.parse("*")),
-            { objectMode: true }
-        )
-
-        const stringify = JSONStream.stringify();
-        stringify.pipe(writable);
-
-        const output = new WritableWrapper(stringify);
-
-        const stream = new ReadableWritable(input, output);
+        const stream = new ReadableWritable(function* () {
+            yield readable;
+            yield JSONStream.parse("*");
+        }, function* () {
+            yield JSONStream.stringify();
+            yield writable
+        }, { objectMode: true});
 
         await pipeline(
             stream,
@@ -119,9 +116,10 @@ describe("readable-writable", () => {
                 }
             }),
             stream
-        );
+        )
+
+        expect(fs.existsSync(filename)).to.eql(true);
 
     }).timeout(20000);
-
 
 });
