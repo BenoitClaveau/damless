@@ -16,41 +16,85 @@ const pipeline = promisify(stream.pipeline);
 
 describe("workflow", () => {
 
-    it("workflow", async () => {
+    it("workflow with standard stream", async () => {
 
-        let contentType;
+        let buffer = Buffer.from("");
         await pipeline(
             Readable.from(async function* () {
                 yield `[{ "line": 1 },`;
                 yield `{ "line": 2 },`;
                 yield `{ "line": 3 }]`;
             }()),
-            new Transform({
-                objectMode: true,
-                transform(chunk, encoding, callback) {
-                    contentType = contentType ?? "gif"
-                    callback(null, chunk);
-                }
-            }),
             new Workflow(function* () {
-                if (contentType == "json")
-                    yield JSONStream.parse("*")
+                yield new Transform({
+                    objectMode: true,
+                    transform(chunk, encoding, callback) {
+                        chunk = chunk.toUpperCase();
+                        callback(null, chunk);
+                    }
+                });
             }, { writableObjectMode: true }),
-            new Transform({
-                objectMode: true,
-                transform(chunk, encoding, callback) {
-                    callback(null, chunk);
-                }
-            }),
-            JSONStream.stringify(), // thought: non standard
             new Writable({
                 objectMode: true,
                 write(chunk, encoding, callback) {
+                    buffer = Buffer.concat([buffer, chunk]);
                     callback();
                 }
             })
         );
+        expect(buffer.toString()).to.eql('[{ "LINE": 1 },{ "LINE": 2 },{ "LINE": 3 }]');
 
+    }).timeout(20000);
+
+    it("workflow parse json", async () => {
+        let buffer = Buffer.from("");
+        await pipeline(
+            Readable.from(async function* () {
+                yield `[{ "line": 1 },`;
+                yield `{ "line": 2 },`;
+                yield `{ "line": 3 }]`;
+            }()),
+            new Workflow(function* () {
+                yield JSONStream.parse("*")     // utilise through.js non standard stream
+            }, { readableObjectMode: true }),   // important quand workflow sera lu il émettra des objets.
+            new Writable({
+                objectMode: true,
+                write(chunk, encoding, callback) {
+                    buffer = Buffer.concat([buffer, Buffer.from(`buf:${chunk.line}, `)]);
+                    callback();
+                }
+            })
+        );
+        expect(buffer.toString()).to.eql('buf:1, buf:2, buf:3, ');
+    }).timeout(20000);
+
+    it("workflow parse and transform json ", async () => {
+        let buffer = Buffer.from("");
+        await pipeline(
+            Readable.from(async function* () {
+                yield `[{ "line": 1 },`;
+                yield `{ "line": 2 },`;
+                yield `{ "line": 3 }]`;
+            }()),
+            new Workflow(function* () {
+                yield JSONStream.parse("*")     // utilise through.js non standard stream
+                yield new Transform({
+                    objectMode: true,
+                    transform(chunk, encoding, callback) {
+                        chunk.line += 10;
+                        callback(null, chunk);
+                    }
+                });
+            }, { readableObjectMode: true }),   // important quand workflow sera lu il émettra des objets.
+            JSONStream.stringify(),
+            new Writable({
+                write(chunk, encoding, callback) {
+                    buffer = Buffer.concat([buffer, chunk]);
+                    callback();
+                }
+            })
+        );
+        expect(buffer.toString()).to.eql('[\n{"line":11}\n,\n{"line":12}\n,\n{"line":13}\n]\n');
     }).timeout(20000);
 
     it("neasted wrapper with error", async () => {

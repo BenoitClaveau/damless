@@ -23,10 +23,11 @@ const ReadableWrapper = require("../../lib/streams/readable-wrapper");
 const ReadableWritable = require("../../lib/streams/readable-writable");
 const Workflow = require("../../lib/streams/workflow");
 const AskReply = require("../../lib/services/askreply");
-const { 
-    createDeflate, 
-    createGzip, 
-    createBrotliCompress 
+const Busboy = require("busboy");
+const {
+    createDeflate,
+    createGzip,
+    createBrotliCompress
 } = require("zlib");
 
 describe("askreply", () => {
@@ -180,6 +181,7 @@ describe("askreply", () => {
                     new Transform({
                         objectMode: true,
                         transform(chunk, encoding, callback) {
+                            expect(chunk.toString()).to.eql("text plain");
                             callback(new Error("reading error"));
                         }
                     }),
@@ -205,6 +207,7 @@ describe("askreply", () => {
                     new Transform({
                         objectMode: true,
                         transform(chunk, encoding, callback) {
+                            expect(chunk).to.eql(1);
                             callback(new Error("reading error"));
                         }
                     }),
@@ -238,97 +241,19 @@ describe("askreply", () => {
                     s,
                     err => {
                         console.log(err)
-                        // Je réponds une erreur http 403
-                        // expect(err.message).to.eql("reading error");
-                        // s.respond({ statusCode: 403 }).end();
                     }
                 )
             })
             .start();
 
-        await pipeline(
-            fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
-            request({
-                url: 'http://localhost:3000/',
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-            }, (err, res, body) => {
-                if (res.statusCode !== 403) resolve();
-                else reject()
-            })
-        );
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify([1, 2, 3, 4])
+        })
+        expect(response.status).to.be(403);
 
     }).timeout(20000);
-
-    // xit("forget to send an http error in pipeline", async () => {
-    //     await damless
-    //         .config({ http: { port: 3000 } })
-    //         .post("/", (context, s, headers) => {
-    //             stream.pipeline(
-    //                 s,
-    //                 new Transform({
-    //                     objectMode: true,
-    //                     transform(chunk, encoding, callback) {
-    //                         callback(new Error("reading error"));
-    //                     }
-    //                 }),
-    //                 s,
-    //                 err => {
-    //                     // Bad idea. Error not throw.
-    //                     // Http request must be closed by the http-server (cf invoke).
-    //                 }
-    //             )
-    //         })
-    //         .start();
-
-    //     const response = await fetch(`http://localhost:3000/`, {
-    //         method: "POST",
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //             name: "ben",
-    //             value: 0,
-    //             test: 454566
-    //         })
-    //     })
-    //     // request error must be sent
-    //     expect(response.status).to.be(500);
-    // }).timeout(20000);
-
-    // it("forget to send an http error in async pipeline", async () => {
-    //     await damless
-    //         .config({ http: { port: 3000 } })
-    //         .post("/", async (context, stream, headers) => {
-    //             try {
-    //                 await pipeline(
-    //                     stream,
-    //                     new Transform({
-    //                         transform(chunk, encoding, callback) {
-    //                             callback(new Error("reading error"));
-    //                         }
-    //                     }),
-    //                     stream
-    //                 )
-    //             }
-    //             catch (err) {
-    //                 // Bad idea. Error not throw.
-    //                 // Http request must be closed by the http-server (cf invoke).
-    //             }
-    //         })
-    //         .start();
-
-    //     const response = await fetch(`http://localhost:3000/`, {
-    //         method: "POST",
-    //         headers: { 'Content-Type': 'application/json' },
-    //         body: JSON.stringify({
-    //             name: "ben",
-    //             value: 0,
-    //             test: 454566
-    //         })
-    //     })
-    //     // request error must be sent
-    //     expect(response.status).to.be(500);
-    // }).timeout(20000);
-
 
     xit("multiple respond with error in pipeline", async () => {
         await damless
@@ -400,117 +325,8 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("detect content-type", async () => {
-        await damless
-            .config({ http: { port: 3000 } })
-            .put("/", (context, s, headers) => {
-                stream.pipeline(
-                    s,
-                    new Transform({
-                        async transform(chunk, encoding, callback) {
-                            const type = await FileType.fromBuffer(chunk);
-                            callback(new Error("reading error"));
-                        }
-                    }),
-                    s.response,
-                    err => {
-                        // Je réponds une erreur http 403
-                        // expect(err.message).to.eql("reading error");
-                        s.respond({ statusCode: 403 }).end();
-                    }
-                )
-            }, { readableObjectMode: false })
-            .start();
-
-        await new Promise(async (resolve, reject) => {
-            //fs.createReadStream(`${__dirname}/../data/npm.light.array.json`)
-            fs.createReadStream(`${__dirname}/../data/world.png`)
-                .pipe(request.put('http://localhost:3000/', (err, http, body) => {
-                    err && console.log(err);
-                    http && console.log(http);
-                    resolve()
-                }))
-        });
-
-        await new Promise(async (resolve, reject) => {
-            await pipeline(
-                fs.createReadStream(`${__dirname}/../data/world.png`),
-                request({
-                    url: 'http://localhost:3000/',
-                    method: "POST",
-                    headers: { 'Content-Type': 'image/png', "Content-Length": 14565 },
-                }, (err, res, body) => {
-                    if (err)
-                        reject(err);
-                    else if (res.statusCode !== 200)
-                        reject("statusCode !== 200");
-                }),
-                output
-            );
-            resolve();
-        })
-
-    }).timeout(20000);
-
-    it("read and write http request", async () => {
+    xit("read and write http request deflate response", async () => {
         server = http.createServer().on("request", async (request, response) => {
-            
-            // request.pipe(
-            //     new Writable({
-            //         objectMode: true,
-            //         write(chunk, encoding, callback) {
-            //             response.end()
-            //             callback();
-            //         }
-            //     })
-            // )
-            
-
-            // await pipeline(
-            //     request,
-            //     new Writable({
-            //         objectMode: true,
-            //         write(chunk, encoding, callback) {
-            //             response.end()
-            //             callback();
-            //         }
-            //     })
-            // )
-
-
-            /*
-            request.once("finish", () => {
-                console.log("FINISH")
-            })
-            request.once("close", () => {
-                console.log("CLOSE")
-            })
-            request.once("end", () => {
-                console.log("END")
-            })
-            
-
-            
-            const stream = new WritableWrapper(function* () {
-                yield response;
-            }, { objectMode: true });
-            */
-            // new ReadableWrapper(function* () {
-            //     yield request;
-            // }, { objectMode: true })
-            //     .on("end", () => {
-            //         stream.end();
-            //     })
-            //     .resume();
-
-            // const input = new ReadableWrapper(function* () {
-            //     yield request;
-            // }, { objectMode: true });
-
-            // const output = new WritableWrapper(function* () {
-            //     yield response;
-            // }, { objectMode: true });
-
             const duplex = new ReadableWritable(function* () {
                 yield request;
             }, function* () {
@@ -520,31 +336,103 @@ describe("askreply", () => {
                 yield response;
             }, { objectMode: true })
 
-            // const duplex = new AskReply(null, request, response,  request.headers, { objectMode: true })
-
             duplex.on("read", () => {
-                response.writeHead(403, {"content-encoding": "deflate"});
+                response.writeHead(403, { "content-encoding": "deflate" });
                 duplex.end();
             }).resume();
-            /*
-            await pipeline(
-                duplex,
-                new Writable({
-                    objectMode: true,
-                    write(chunk, encoding, callback) {
-                        duplex.end();
-                        callback();
-                    }
-                })
-            )
-            */
-            
+
         }).listen(3000);
 
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+            body: JSON.stringify({
+                name: "ben",
+                value: 0,
+                test: 454566
+            })
+        })
+        expect(response.status).to.eql(403);
 
-        // const form = new FormData();
-        // form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
-        // const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
+    }).timeout(20000);
+
+    xit("wrap request in ReadableWrapper", async () => {
+        server = http.createServer().on("request", async (request, response) => {
+
+            const input = new ReadableWrapper(function* () {
+                yield request;
+            }, { objectMode: true });
+
+            input.on("end", () => {
+                response.writeHead(403);
+                response.end();
+            }).resume();
+
+        }).listen(3000);
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+            body: JSON.stringify({
+                name: "ben",
+                value: 0,
+                test: 454566
+            })
+        })
+        expect(response.status).to.eql(403);
+
+    }).timeout(20000);
+
+    it("wrap request in ReadableWrapper with busboy", async () => {
+        server = http.createServer().on("request", async (request, response) => {
+
+            const input = new ReadableWrapper(function* () {
+                yield request;
+                const busboy = new Busboy({ headers: request });
+                busboy.on("file", (...args) => {
+                    console.log("file")
+                });
+                yield busboy;
+            }, { objectMode: true });
+
+            input.on("end", () => {
+                response.writeHead(403);
+                response.end();
+            }).resume();
+
+        }).listen(3000);
+
+        const form = new FormData();
+        form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
+        const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
+        expect(response.status).to.eql(403);
+
+    }).timeout(20000);
+
+    xit("wrap response in ReadableWrapper", async () => {
+        server = http.createServer().on("request", async (request, response) => {
+
+            const output = new WritableWrapper(function* () {
+                yield response;
+            }, { objectMode: true });
+
+            response.writeHead(403)
+            output.end();
+
+        }).listen(3000);
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "GET"
+        })
+        expect(response.status).to.eql(403);
+
+    }).timeout(20000);
+
+    xit("AskReply", async () => {
+        server = http.createServer().on("request", async (request, response) => {
+            const duplex = new AskReply(null, request, response, request.headers, { objectMode: true });
+            duplex.on("read", () => {
+                duplex.respond({ statusCode: 403 }).end();
+            }).resume();
+        }).listen(3000);
 
         const response = await fetch(`http://localhost:3000/`, {
             method: "POST",

@@ -19,6 +19,11 @@ const pipeline = promisify(stream.pipeline);
 
 describe("writable-wrapper", () => {
 
+    let server;
+    afterEach(async () => {
+        server && server.close();
+    });
+
     it("write text", async () => {
         const filename = `${__dirname}/../data/output/2.json`
         if (fs.existsSync(filename))
@@ -87,7 +92,7 @@ describe("writable-wrapper", () => {
         const stringify = JSONStream.stringify();
         stringify.pipe(writable);
 
-        // Le point d'entrée est stringifyet et on pas writable.
+        // Le point d'entrée est stringify et et on pas writable.
         // Par contre stringify est considéré comme un flux de fin (writable).
         const output = new WritableWrapper(stringify);
         
@@ -165,7 +170,7 @@ describe("writable-wrapper", () => {
     }).timeout(20000);
 
     it("writable http request", async () => {
-        http.createServer().on("request", async (request, response) => {
+        server = http.createServer().on("request", async (request, response) => {
             const stream = new WritableWrapper(function* () {
                 yield response;
             }, { objectMode: true });

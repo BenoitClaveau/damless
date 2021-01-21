@@ -20,6 +20,11 @@ const pipeline = promisify(stream.pipeline);
 
 describe("readable-wrapper", () => {
 
+    let server;
+    afterEach(async () => {
+        server && server.close();
+    });
+    
     it("wrap standard readable stream and read with standard writable", async () => {
         const stream = fs.createReadStream(`${__dirname}/../data/npm.array.json`);
         const readable = new ReadableWrapper(stream);
@@ -122,7 +127,7 @@ describe("readable-wrapper", () => {
 
 
     it("readable http request", async () => {
-        const httpServer = http.createServer().on("request", async (request, response) => {
+        server = http.createServer().on("request", async (request, response) => {
             await pipeline(
                 new ReadableWrapper(function* () {
                     yield request;
