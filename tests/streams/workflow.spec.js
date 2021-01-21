@@ -9,14 +9,14 @@ const fs = require("fs");
 const { promisify } = require("util");
 const stream = require("stream");
 const { Transform, Readable, Writable, PassThrough } = require("stream");
-const TransformWrapper = require("../../lib/streams/transform-wrapper");
+const Workflow = require("../../lib/streams/workflow");
 const ReadableWrapper = require("../../lib/streams/readable-wrapper");
 const JSONStream = require("JSONStream");
 const pipeline = promisify(stream.pipeline);
 
-describe("transform-wrapper", () => {
+describe("workflow", () => {
 
-    it("transform", async () => {
+    it("workflow", async () => {
 
         let contentType;
         await pipeline(
@@ -32,7 +32,7 @@ describe("transform-wrapper", () => {
                     callback(null, chunk);
                 }
             }),
-            new TransformWrapper(function* () {
+            new Workflow(function* () {
                 if (contentType == "json")
                     yield JSONStream.parse("*")
             }, { writableObjectMode: true }),
@@ -62,13 +62,13 @@ describe("transform-wrapper", () => {
                         yield `{ "line": 2 },`;
                         yield `{ "line": 3 }]`;
                     }());
-                    yield new TransformWrapper(function* () {
+                    yield new Workflow(function* () {
                         yield JSONStream.parse("*");
                         yield new Transform({
                             objectMode: true,
                             transform(chunk, encoding, callback) {
-                                if (chunk.line == 2) callback(new Error("line == 2"))
-                                else callback(null, chunk);
+                                if (chunk.line == 2) return callback(new Error("line == 2"))
+                                callback(null, chunk);
                             }
                         });
                         yield new PassThrough({ objectMode: true });

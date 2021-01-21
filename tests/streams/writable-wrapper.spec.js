@@ -12,6 +12,9 @@ const stream = require("stream");
 const { Writable, Readable, Transform, finished, PassThrough } = require("stream");
 const WritableWrapper = require("../../lib/streams/writable-wrapper");
 const JSONStream = require("JSONStream");
+const FormData = require('form-data');
+const fetch = require("node-fetch");
+const http = require(`http`);
 const pipeline = promisify(stream.pipeline);
 
 describe("writable-wrapper", () => {
@@ -161,4 +164,19 @@ describe("writable-wrapper", () => {
         }
     }).timeout(20000);
 
+    it("writable http request", async () => {
+        http.createServer().on("request", async (request, response) => {
+            const stream = new WritableWrapper(function* () {
+                yield response;
+            }, { objectMode: true });
+            stream.end();
+        }).listen(3000);
+
+
+        const form = new FormData();
+        form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
+        const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
+        expect(response.status).to.eql(200);
+        
+    }).timeout(20000);
 });

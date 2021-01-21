@@ -71,7 +71,7 @@ describe("readable-writable", () => {
         const stream = new ReadableWritable(function* () {
             yield readable;
             yield JSONStream.parse("*");
-        }, writable);
+        }, writable, { objectMode: true });
 
         await pipeline(
             stream,

@@ -11,22 +11,36 @@ const { promisify } = require("util");
 const stream = require("stream");
 const { Writable, Transform } = require("stream");
 const request = require("request");
-const fetch = require("node-fetch");
-const FormData = require('form-data');
 const FileType = require("file-type")
 const pipeline = promisify(stream.pipeline);
 const finished = promisify(stream.finished);
 const JSONStream = require("JSONStream");
-const { resolve } = require("path");
+const FormData = require('form-data');
+const fetch = require("node-fetch");
+const http = require(`http`);
+const WritableWrapper = require("../../lib/streams/writable-wrapper");
+const ReadableWrapper = require("../../lib/streams/readable-wrapper");
+const ReadableWritable = require("../../lib/streams/readable-writable");
+const Workflow = require("../../lib/streams/workflow");
+const AskReply = require("../../lib/services/askreply");
+const { 
+    createDeflate, 
+    createGzip, 
+    createBrotliCompress 
+} = require("zlib");
 
 describe("askreply", () => {
 
     let damless;
+    let server;
     beforeEach(async () => {
         damless = new DamLess()
             .cwd(__dirname)
     })
-    afterEach(async () => await damless.stop());
+    afterEach(async () => {
+        await damless.stop()
+        server && server.close();
+    });
 
     xit("post json array", async () => {
         await damless
@@ -362,31 +376,31 @@ describe("askreply", () => {
     }).timeout(20000);
 
 
-    it("post file with form-data", async () => {
+    xit("post file with form-data", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, stream, headers) => {
-                stream.on("file", file=>{
-
-                    // stream.respond({ statusCode: 403 }).end();
-                }).on("end", () => {
+                // TODO faire un redable
+                // avec un pipe
+                stream.on("read", () => {
+                    // stream.response.writeHead(403);
+                    // stream.response.end();
                     stream.respond({ statusCode: 403 }).end();
-                })
-                .resume();
+                }).resume();
 
-            }, { readableObjectMode: false })
+            })
             .start();
 
         const form = new FormData();
         form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
         const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
-        expect(response.statusCode).to.eql(200);
+        expect(response.status).to.eql(403);
         // const json = await response.json();
 
 
     }).timeout(20000);
 
-    it("detect content-type", async () => {
+    xit("detect content-type", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .put("/", (context, s, headers) => {
@@ -435,6 +449,112 @@ describe("askreply", () => {
             );
             resolve();
         })
+
+    }).timeout(20000);
+
+    it("read and write http request", async () => {
+        server = http.createServer().on("request", async (request, response) => {
+            
+            // request.pipe(
+            //     new Writable({
+            //         objectMode: true,
+            //         write(chunk, encoding, callback) {
+            //             response.end()
+            //             callback();
+            //         }
+            //     })
+            // )
+            
+
+            // await pipeline(
+            //     request,
+            //     new Writable({
+            //         objectMode: true,
+            //         write(chunk, encoding, callback) {
+            //             response.end()
+            //             callback();
+            //         }
+            //     })
+            // )
+
+
+            /*
+            request.once("finish", () => {
+                console.log("FINISH")
+            })
+            request.once("close", () => {
+                console.log("CLOSE")
+            })
+            request.once("end", () => {
+                console.log("END")
+            })
+            
+
+            
+            const stream = new WritableWrapper(function* () {
+                yield response;
+            }, { objectMode: true });
+            */
+            // new ReadableWrapper(function* () {
+            //     yield request;
+            // }, { objectMode: true })
+            //     .on("end", () => {
+            //         stream.end();
+            //     })
+            //     .resume();
+
+            // const input = new ReadableWrapper(function* () {
+            //     yield request;
+            // }, { objectMode: true });
+
+            // const output = new WritableWrapper(function* () {
+            //     yield response;
+            // }, { objectMode: true });
+
+            const duplex = new ReadableWritable(function* () {
+                yield request;
+            }, function* () {
+                yield new Workflow(function* () {
+                    yield createDeflate();
+                });
+                yield response;
+            }, { objectMode: true })
+
+            // const duplex = new AskReply(null, request, response,  request.headers, { objectMode: true })
+
+            duplex.on("read", () => {
+                response.writeHead(403, {"content-encoding": "deflate"});
+                duplex.end();
+            }).resume();
+            /*
+            await pipeline(
+                duplex,
+                new Writable({
+                    objectMode: true,
+                    write(chunk, encoding, callback) {
+                        duplex.end();
+                        callback();
+                    }
+                })
+            )
+            */
+            
+        }).listen(3000);
+
+
+        // const form = new FormData();
+        // form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
+        // const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "POST",
+            body: JSON.stringify({
+                name: "ben",
+                value: 0,
+                test: 454566
+            })
+        })
+        expect(response.status).to.eql(403);
 
     }).timeout(20000);
 });

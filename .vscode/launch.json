@@ -29,7 +29,8 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "askreply",
+                // "read and write http request",
+                "workflow",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
