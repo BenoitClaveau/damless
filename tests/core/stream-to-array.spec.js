@@ -6,9 +6,10 @@
 
 const expect = require("expect.js");
 const { StreamToArray } = require("../../lib/streams");
-const { Transform, Readable, pipeline } = require("stream");
+const stream = require("stream");
+const { Transform, Readable } = require("stream");
 const { promisify } = require("util");
-const pipelineAsync = promisify(pipeline);
+const pipeline = promisify(stream.pipeline);
 
 describe("stream-to-array", () => {
 
@@ -23,7 +24,7 @@ describe("stream-to-array", () => {
             }
         });
         const output = new StreamToArray();
-        await pipelineAsync(
+        await pipeline(
             input,
             new Transform({ 
                 objectMode: true, 

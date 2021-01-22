@@ -53,7 +53,7 @@ xdescribe("oauth2", () => {
     })
     afterEach(async () => await damless.stop());
 
-    xit("should authenticate the request", async () => {
+    it("should authenticate the request", async () => {
         const res = await fetch("http://localhost:3000", {
             method: "GET",
             headers: {

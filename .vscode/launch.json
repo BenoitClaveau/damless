@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "askreply",
+                "50 clients",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

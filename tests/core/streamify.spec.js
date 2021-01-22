@@ -12,9 +12,9 @@ const {
     getAll,
     StreamToArray
 } = require("../../lib/streams");
-const { pipeline } = require("stream");
+const stream = require("stream");
 const { promisify } = require("util");
-const pipelineAsync = promisify(pipeline);
+const pipeline = promisify(stream.pipeline);
 
 describe("streamify", () => {
 
@@ -42,7 +42,7 @@ describe("streamify", () => {
     it("transform", async () => {
         const stream = streamify([1,2,3]);
         const output = new StreamToArray();
-        await pipelineAsync(
+        await pipeline(
             stream,
             transform((chunk, encoding) => {
                 return chunk - 1;
@@ -57,7 +57,7 @@ describe("streamify", () => {
         try {
             const stream = streamify([1,2,3]);
             const output = new StreamToArray();
-            await pipelineAsync(
+            await pipeline(
                 stream,
                 transform((chunk, encoding) => {
                     if (chunk == 2) throw new Error("Boom");

@@ -43,7 +43,7 @@ describe("askreply", () => {
         server && server.close();
     });
 
-    xit("post json array", async () => {
+    it("post json array", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -66,7 +66,7 @@ describe("askreply", () => {
         );
     }).timeout(20000);
 
-    xit("read and stream json", async () => {
+    it("read and stream json", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -107,7 +107,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("read and stream json without content-type", async () => {
+    it("read and stream json without content-type", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -147,7 +147,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("error not catch by user", async () => {
+    it("error not catch by user", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, stream, headers) => {
@@ -161,7 +161,7 @@ describe("askreply", () => {
         expect(response.status).to.be(500);
     }).timeout(20000);
 
-    xit("404", async () => {
+    it("404", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .start();
@@ -172,7 +172,7 @@ describe("askreply", () => {
         expect(response.status).to.be(404);
     }).timeout(20000);
 
-    xit("reading error in async pipeline", async () => {
+    it("reading error in async pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -198,7 +198,7 @@ describe("askreply", () => {
         expect(response.status).to.be(500);
     }).timeout(20000);
 
-    xit("reading error in async json pipeline", async () => {
+    it("reading error in async json pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -224,7 +224,7 @@ describe("askreply", () => {
         expect(response.status).to.be(500);
     }).timeout(20000);
 
-    xit("error in pipeline before 1st transform", async () => {
+    it("error in pipeline before 1st transform", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, s, headers) => {
@@ -255,7 +255,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("multiple respond with error in pipeline", async () => {
+    it("multiple respond with error in pipeline", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", async (context, stream, headers) => {
@@ -301,18 +301,19 @@ describe("askreply", () => {
     }).timeout(20000);
 
 
-    xit("post file with form-data", async () => {
+    it("post file with form-data", async () => {
         await damless
             .config({ http: { port: 3000 } })
             .post("/", (context, stream, headers) => {
-                // TODO faire un redable
-                // avec un pipe
-                stream.on("read", () => {
-                    // stream.response.writeHead(403);
-                    // stream.response.end();
+                let hasFile;
+                stream
+                .on("file", () => {
+                    hasFile = true;
+                })
+                .on("read", () => {
+                    expect(hasFile).to.eql(true);
                     stream.respond({ statusCode: 403 }).end();
                 }).resume();
-
             })
             .start();
 
@@ -325,7 +326,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("read and write http request deflate response", async () => {
+    it("read and write http request deflate response", async () => {
         server = http.createServer().on("request", async (request, response) => {
             const duplex = new ReadableWritable(function* () {
                 yield request;
@@ -355,7 +356,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("wrap request in ReadableWrapper", async () => {
+    it("wrap request in ReadableWrapper", async () => {
         server = http.createServer().on("request", async (request, response) => {
 
             const input = new ReadableWrapper(function* () {
@@ -381,22 +382,35 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    it("wrap request in ReadableWrapper with busboy", async () => {
+    it("bug with busboy", async () => {
         server = http.createServer().on("request", async (request, response) => {
 
+            let hasFile;
             const input = new ReadableWrapper(function* () {
                 yield request;
-                const busboy = new Busboy({ headers: request });
+                const busboy = new Busboy({ headers: request.headers });
                 busboy.on("file", (...args) => {
-                    console.log("file")
+                    hasFile = true;
                 });
-                yield busboy;
+
+                stream.pipeline(
+                    request,
+                    busboy,
+                    err => {
+                        // BUG Busboy never ended the stream
+                        console.log("terminated")
+                    }
+                )
             }, { objectMode: true });
 
             input.on("end", () => {
+                // I expect to have file
+                expect(hasFile).to.eql(true);
                 response.writeHead(403);
                 response.end();
             }).resume();
+
+            // await new Promise(r => setTimeout(r, 5000));
 
         }).listen(3000);
 
@@ -407,14 +421,14 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("wrap response in ReadableWrapper", async () => {
+    it("wrap response in ReadableWrapper", async () => {
         server = http.createServer().on("request", async (request, response) => {
 
             const output = new WritableWrapper(function* () {
                 yield response;
             }, { objectMode: true });
 
-            response.writeHead(403)
+            response.writeHead(403);
             output.end();
 
         }).listen(3000);
@@ -426,7 +440,7 @@ describe("askreply", () => {
 
     }).timeout(20000);
 
-    xit("AskReply", async () => {
+    it("AskReply", async () => {
         server = http.createServer().on("request", async (request, response) => {
             const duplex = new AskReply(null, request, response, request.headers, { objectMode: true });
             duplex.on("read", () => {

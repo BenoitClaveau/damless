@@ -5,12 +5,13 @@
  */
 
 const expect = require("expect.js");
-const DamLess = require("../../index");
-const { ending } = require("../../index");
+const DamLess = require("../index");
+const { ending } = require("../index");
 const request = require("request");
 const fs = require("fs");
+const fetch = require("node-fetch");
 
-describe("ask-reply", () => {
+describe("damless", () => {
 
     let damless;
     beforeEach(async () => {
@@ -21,7 +22,7 @@ describe("ask-reply", () => {
                     port: 3000, 
                 }
             })
-            .inject("info", "./info")
+            .inject("info", "./services/info")
             .post("/save", "info", "saveOne")
             .post("/saves", "info", "saveMany")
             .post("/upload", "info", "uploadImage")
@@ -29,16 +30,48 @@ describe("ask-reply", () => {
     })
     afterEach(async () => await damless.stop());
 
+    it("write json", async () => {
+        await damless
+            .get("/", (context, stream, headers) => {
+                stream.respond({
+                    contentType: "application/json"
+                })
+                stream.write({ text: "number 3." }),
+                stream.write({ text: "number 3." }),
+                stream.write({ text: "number 3." }),
+                stream.write({ text: "number 3." }),
+                stream.write({ text: "number 3." }),
+                stream.resume();
+                setTimeout(()=> {
+                    stream.end({ text: "number 3." })
+                }, 1000)
+            })
+            .start();
+
+        const response = await fetch(`http://localhost:3000/`, {
+            method: "GET",
+        })
+        expect(response.status).to.be(200);
+        const data = await response.json();
+        expect(data.length).to.be(6);
+    }).timeout(5000);
+
     it("post object -> object", async () => {
-        const client = await damless.resolve("client");
-        const res = await client.post({ url: "http://localhost:3000/save", json: {
-            name: "ben",
-            value: 0,
-            test: 454566
-        }});
-        expect(res.body.name).to.be("ben");
-        expect(res.body.value).to.be(0);
-        expect(res.body.test).to.be(454566);
+        const response = await fetch(`http://localhost:3000/save`, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                name: "ben",
+                value: 0,
+                test: 454566
+            })
+        })
+        expect(response.headers.get("content-type")).to.be("application/json; charset=utf-8");
+        const body = await response.json();
+        expect(body.name).to.be("ben");
+        expect(body.value).to.be(0);
+        expect(body.test).to.be(454566);
+
     });
 
     it("post object -> array", async () => {
@@ -104,7 +137,7 @@ describe("ask-reply", () => {
 
         let cpt = 0;
         await ending(
-            fs.createReadStream(`${__dirname}/../data/npm.array.json`)
+            fs.createReadStream(`${__dirname}/data/npm.array.json`)
                 // .on("data", data => {
                 //     if (!sending) console.log("FIRST SENDING", new Date())
                 //     sending = sending || true;
@@ -135,7 +168,7 @@ describe("ask-reply", () => {
         let sending = false;
 
         await ending(
-            fs.createReadStream(`${__dirname}/../data/npm.array.json`)
+            fs.createReadStream(`${__dirname}/data/npm.array.json`)
                 .on("data", data => {
                     if (!sending) console.log("FIRST SENDING", new Date())
                     sending = sending || true;
@@ -159,89 +192,4 @@ describe("ask-reply", () => {
             
     });
 
-    // it("upload json stream", async () => {
-    //     await damless
-    //         .inject("info", "./info")
-    //         .post("/upload", "info", "saveFile")
-    //         .start();
-
-    //     const requestOptions = {
-    //         formData : {
-    //           file : fs.createReadStream(`${__dirname}/../data/npm.array.json`)
-    //         },
-    //         method : "POST",
-    //         url    : "http://localhost:3000/upload",
-    //         json: true
-    //       };
-        
-    //     await ending(
-    //         request(requestOptions, (error, response, body) => {
-    //             expect(body.length).to.be(1);
-    //             expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.array.json`);
-    //         }).on("data", chunk => {
-    //             process.stdout.write(".");
-    //         }).on("response", response => {
-    //             expect(response.headers["content-type"]).to.be("application/json")
-    //         }).on("end", chunk => {
-    //             console.log("66666644444444444444555555555555555")
-    //         })
-    //     );
-    // });
-
-    // xit("upload json object", async () => {
-    //     await damless
-    //         .inject("info", "./info")
-    //         .post("/upload", "info", "saveFile")
-    //         .start();
-
-    //     const requestOptions = {
-    //         formData : {
-    //           file : fs.createReadStream(`${__dirname}/../data/npm.object.json`)
-    //         },
-    //         method : "POST",
-    //         url    : "http://localhost:3000/upload",
-    //         json: true
-    //       };
-        
-    //     request(requestOptions, (error, response, body) => {
-    //         expect(body.length).to.be(1);
-    //         expect(body[0].filepath).to.be(`${__dirname}/../data/output/npm.object.json`);
-    //     }).on("data", chunk => {
-    //         process.stdout.write(".");
-    //     }).on("response", response => {
-    //         expect(response.headers["content-type"]).to.be("application/json")
-    //     });
-    // });
-
-    // it("upload image stream", async () => {
-    //     await damless
-    //         .inject("info", "./info")
-    //         .post("/upload", "info", "uploadImage")
-    //         .start();
-
-    //     const requestOptions = {
-    //         formData : {
-    //             file : fs.createReadStream(`${__dirname}/../data/world.png`)
-    //         },
-    //         method : "POST",
-    //         url    : "http://localhost:3000/upload"
-    //     };
-        
-    //     const filepath = `${__dirname}/../data/output/world.png`;
-    //     if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-
-    //     const output = fs.createWriteStream(filepath);
-        
-    //     request(requestOptions, (error, response, body) => {
-    //         //console.log(body)
-    //     }).on("data", chunk => {
-    //         process.stdout.write(".");
-    //     }).on("response", response => {
-    //         expect(response.headers["content-type"]).to.be("image/png");
-    //     }).pipe(output).on("finish", () => {
-    //         expect(fs.existsSync(filepath)).to.be(true);
-    //     });
-    // });
-
-    
 });

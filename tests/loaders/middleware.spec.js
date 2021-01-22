@@ -34,7 +34,6 @@ describe("Load middleware", () => {
         }
         catch(error) {
             expect(error.statusCode).to.be(401);
-            expect(error.data.message).to.be("Authentication has failed for GET:/.");
         }
 
     }).timeout(5000);
@@ -70,7 +69,6 @@ describe("Load middleware", () => {
         }
         catch(error) {
             expect(error.statusCode).to.be(404);
-            expect(error.data.message).to.be("Failed to forward / to /main.html");
         }
 
     }).timeout(5000);
@@ -79,7 +77,7 @@ describe("Load middleware", () => {
 
         await damless
             .use((context, stream, headers) => {
-                stream.headers({ "x-custom-header": "1234" })
+                stream.headers["x-custom-header"] = "1234";
             })
             .get("/", (context, stream, header) => {
                 stream.end({ ok: true });
@@ -92,15 +90,17 @@ describe("Load middleware", () => {
         expect(res.headers["x-custom-header"]).to.be("1234");
     }).timeout(5000);
 
-    xit("Inject middleware for 404", async () => {
+    it("Inject middleware for 404", async () => {
 
         await damless
             .use((context, stream, headers) => {
                 if ("404" in context.route) {
+                    stream.mode("object");
                     stream.end({ ok: false });
                 }
             })
             .get("/", (context, stream, header) => {
+                stream.mode("object");
                 stream.end({ ok: true });
             })
             .start();
@@ -108,10 +108,10 @@ describe("Load middleware", () => {
         const client = await damless.resolve("client");
         const res = await client.get({ url: "http://localhost:3000/" });
         expect(res.statusCode).to.be(200);
-        expect(res.body).to.be('[\n{"ok":true}\n]\n');
+        expect(res.body).to.be('{\n    "ok": true\n}');
 
         const res2 = await client.get({ url: "http://localhost:3000/info" });
         expect(res2.statusCode).to.be(200);
-        expect(res2.body).to.be('[\n{"ok":false}\n]\n');
+        expect(res2.body).to.be('{\n    "ok": false\n}');
     }).timeout(5000);
 })

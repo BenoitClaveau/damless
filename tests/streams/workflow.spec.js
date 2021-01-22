@@ -68,6 +68,27 @@ describe("workflow", () => {
         expect(buffer.toString()).to.eql('buf:1, buf:2, buf:3, ');
     }).timeout(20000);
 
+    it("empty workflow", async () => {
+        let buffer = Buffer.from("");
+        await pipeline(
+            Readable.from(async function* () {
+                yield `[{ "line": 1 },`;
+                yield `{ "line": 2 },`;
+                yield `{ "line": 3 }]`;
+            }()),
+            new Workflow(function* () {
+            }, { readableObjectMode: true }),   // important quand workflow sera lu il émettra des objets.
+            new Writable({
+                objectMode: true,
+                write(chunk, encoding, callback) {
+                    buffer = Buffer.concat([buffer, chunk]);
+                    callback();
+                }
+            })
+        );
+        expect(buffer.toString()).to.eql('[{ "line": 1 },{ "line": 2 },{ "line": 3 }]');
+    }).timeout(20000);
+
     it("workflow parse and transform json ", async () => {
         let buffer = Buffer.from("");
         await pipeline(

@@ -17,9 +17,18 @@ new DamLess()
             .respond({
                 statusCode: 200,
                 contentType: "text/plain"
-            })
-            .write("Hello\n")
-            .end("World");
+            });
+            stream.write("Hello\n")
+            stream.end("World");
+    })
+    .get("/json", async (context, stream, headers) => {
+        stream
+            .respond({
+                statusCode: 200,
+                contentType: "application/json"
+            });
+        stream.write({ name:"ben" })
+        stream.end();
     })
     .post("/", async (context, stream, headers) => {
         stream.respond({ contentType: "application/json" }).mode("object")

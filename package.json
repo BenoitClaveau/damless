@@ -1,6 +1,6 @@
 {
     "name": "damless",
-    "version": "0.5.7",
+    "version": "0.6.0",
     "description": "Streamify your web server",
     "main": "index.js",
     "dependencies": {

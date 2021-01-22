@@ -8,11 +8,11 @@ const expect = require("expect.js");
 const { Error } = require("oups");
 const DamLess = require("../index");
 const { streamify, AskReply, transform } = require("../index");
-const { Transform, pipeline } = require("stream");
+const stream = require("stream");
+const { Transform } = require("stream");
 const fetch = require("node-fetch");
-const process = require("process");
 const { promisify } = require("util");
-const pipelineAsync = promisify(pipeline);
+const pipeline = promisify(stream.pipeline);
 
 describe("errors", () => {
 
@@ -40,44 +40,26 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In method");
         }
     }).timeout(5000);
 
-    xit("Throw error in get after setTimeout", async () => {
-        await damless
-            .get("/", (context, stream, headers) => {
-                // j'ajoute un timeout à la réponse.
-                setTimeout(() => {
-                    throw new Error("Uncaught error in timeout.");
-                })
-            })
-            .start();
-        const client = await damless.resolve("client");
-        try {
-            await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called.");
-        }
-        catch (error) {
-            expect(error.code).to.be("ECONNRESET");
-        }
-    }).timeout(5000);
-
-    it("Throw error in stream not the better pattern", async () => {
+    it("Forget to throw error", async () => {
         await damless
             .post("/", (context, stream, headers) => {
                 stream
                     .pipe(new Transform({
                         objectMode: true,
                         transform(chunk, encoding, callback) {
+                            expect(chunk.value).to.be(1);
                             callback(new Error("In stream"));
                         }
                     }))
                     .on("error", error => {
-                        stream.emit("error", error); // Must forward error manually
+                        // Request not close
+                        // I musthhave a request timeoutt
                     })
                     .pipe(stream)
-            })
+            }, { timeout: 3000 }) // Timeout de 3s
             .start();
         const client = await damless.resolve("client");
         try {
@@ -86,21 +68,23 @@ describe("errors", () => {
                     value: "1"
                 }
             });
+            throw new Error("Unexpected");
         }
         catch (error) {
-            expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In stream");
+            // Request tiemout
+            expect(error.code).to.be("ECONNRESET");
         }
-    }).timeout(5000);
+    }).timeout(6000);
 
     it("Throw error in stream via async pipeline", async () => {
         await damless
             .post("/", async (context, stream, headers) => {
-                await pipelineAsync(
+                await pipeline(
                     stream,
                     new Transform({
                         objectMode: true,
                         transform(chunk, encoding, callback) {
+                            expect(chunk.value).to.be(1);
                             callback(new Error("In stream"));
                         }
                     }),
@@ -115,11 +99,10 @@ describe("errors", () => {
                     value: "1"
                 }
             });
-            throw new Error("Mustn't be called.");
+            throw new Error("Unexpected");
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("In stream");
         }
     }).timeout(5000);
 
@@ -127,7 +110,7 @@ describe("errors", () => {
         await damless
             .get("/", async (context, stream, headers) => {
                 try {
-                    await pipelineAsync(
+                    await pipeline(
                         streamify(() => {
                             throw new Error("in streamify");
                         }),
@@ -146,15 +129,14 @@ describe("errors", () => {
         }
         catch (error) {
             expect(error.statusCode).to.be(500);
-            expect(error.data.message).to.be("after pipeline");
         }
     }).timeout(5000);
 
-    xit("Throw error after the header was sent", async () => {
+    it("Throw error after the header was sent", async () => {
         await damless
             .get("/", async (context, stream, headers) => {
                 try {
-                    await pipelineAsync(
+                    await pipeline(
                         streamify([1, 2, 3]),
                         transform((chunk, encoding) => {
                             if (chunk == 2)
@@ -162,85 +144,23 @@ describe("errors", () => {
                             return chunk.toString();
                         }),
                         stream.respond({
-                            contentType: "text/html"
+                            contentType: "text/plain"
                         })
                     )
                 }
                 catch (error) {
                     expect(error.message).to.be("In chunk 2.");
-                    throw error;
+                    stream.respond({ statusCode: 500 });
+                    stream.addTrailers({
+                        statusCode: 500
+                    })
+                    stream.end();
                 }
             })
             .start();
         const client = await damless.resolve("client");
-        try {
-            const res = await client.get("http://localhost:3000/");
-            throw new Error("Error after headerSent. statusCode: ${statusCode}, trailer status: ${trailers.status}.", { statusCode: res.statusCode, trailers: res.trailers });
-        }
-        catch (error) {
-            // expect(error.message).to.be("Error after headerSent. statusCode: 200, trailer status: 500.");
-            expect(error.message).to.be("aborted");
-        }
+        const res = await client.get("http://localhost:3000/");
+        expect(res.trailers).to.eql({ statuscode: "500" });
+
     }).timeout(5000);
-
-    it("Customize error page", async () => {
-        await damless
-            .get("/", (context, stream, headers) => {
-                throw new Error("Oops");
-            })
-            .error((error, context, stream, headers) => {
-                expect(error.message).to.be("Oops");
-
-                stream.respond({ 
-                    statusCode: 500,
-                    contentType: "text/plain"
-                }).end("BEURK");
-            })
-            .start();
-
-        const client = await damless.resolve("client");
-        try {
-            await client.get("http://localhost:3000/");
-            throw new Error("Mustn't be called.");
-        }
-        catch (error) {
-            expect(error.statusCode).to.be(500);
-            expect(error.data.body).to.be("BEURK");
-        }
-    }).timeout(5000);
-
-    xit("writableinit error", async () => {
-
-        let cpt=0;
-        await damless
-            .get("/", (context, stream, headers) => {
-                stream.respond({
-                    contentType: "application/json"
-                })
-                stream.write({ text: "number 3." }),
-                stream.write({ text: "number 3." }),
-                stream.write({ text: "number 3." }),
-                stream.write({ text: "number 3." }),
-                stream.write({ text: "number 3." }),
-                stream.resume();
-                setTimeout(()=> {
-                    if (++cpt % 3 == 2)
-                        stream.write("error")
-                    else 
-                        stream.end({ text: "number 3." })
-                }, 1000)
-            })
-            .start();
-
-            const client = await damless.resolve("client");
-            await client.get("http://localhost:3000/");
-
-        const response = await fetch(`http://localhost:3000/`, {
-            method: "GET",
-        })
-        expect(response.status).to.be(200);
-        const data = await response.json();
-        //await new Promise(r => setTimeout(r, 2000000))
-        expect(data.length).to.be(3);
-    }).timeout(2000000);
 });

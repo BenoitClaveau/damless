@@ -30,9 +30,6 @@ describe("get", () => {
     it("timeout option", async () => {
         await damless
             .get("/", (context, stream, headers) => {
-                // add timeout to the response.
-                //stream.setTimeout(3000);
-                // never repond
             }, { timeout: 3000 })
             .start();
         const client = await damless.resolve("client");

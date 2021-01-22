@@ -22,21 +22,22 @@ describe("stress test", () => {
         await damless
             .config({ http: { port: 3000 } })
             .get("/", (context, stream, headers) => {
-                fs.createReadStream(`${__dirname}/data/npm.array.json`).pipe(stream);
+                fs.createReadStream(`${__dirname}/data/npm.array.json`)
+                    .pipe(stream)
             })
             .start();
 
         
         function* requests() {
-            for(let i = 0; i < 200; i++) {
+            for(let i = 0; i < 50; i++) {
                 yield fetch(`http://localhost:3000?index=${i}`, {
                     method: "GET",
-                }).then(res => res.json()).then(e => console.log(i, e.length));
+                }).then(res => res.json());
             }
         }
 
         const values = await Promise.all(requests());
-        expect(values.length).eql(200)
+        expect(values.length).eql(50)
 
     }).timeout(20000);
 
