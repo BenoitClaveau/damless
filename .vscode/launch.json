@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "50 clients",
+                "post file with form-data",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",

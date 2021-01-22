@@ -324,7 +324,7 @@ describe("askreply", () => {
         // const json = await response.json();
 
 
-    }).timeout(20000);
+    }).timeout(200000);
 
     it("read and write http request deflate response", async () => {
         server = http.createServer().on("request", async (request, response) => {
