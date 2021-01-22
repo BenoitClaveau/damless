@@ -97,6 +97,7 @@ describe("Load middleware", () => {
                 if ("404" in context.route) {
                     stream.mode("object");
                     stream.end({ ok: false });
+                    return true;
                 }
             })
             .get("/", (context, stream, header) => {

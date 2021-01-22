@@ -444,7 +444,9 @@ describe("askreply", () => {
         server = http.createServer().on("request", async (request, response) => {
             const duplex = new AskReply(null, request, response, request.headers, { objectMode: true });
             duplex.on("read", () => {
-                duplex.respond({ statusCode: 403 }).end();
+                // content-type en text/plain pour ne pas faire de transformation
+                // et donc pas desoin d'appeler mount()
+                duplex.respond({ statusCode: 403, "content-type": "text/plain" }).end();
             }).resume();
         }).listen(3000);
 
