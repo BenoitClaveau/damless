@@ -5,7 +5,7 @@
  */
 
 const path = require("path");
-var fs = require('fs');
+const fs = require('fs');
 const GiveMeTheService = require("givemetheservice");
 const Commands = require("./lib/services/commands");
 
@@ -198,7 +198,11 @@ const {
     getBuffer,
     ending,
     ArrayToStream,
-    StreamToArray
+    StreamToArray,
+    ReadableWrapper,
+    WritableWrapper,
+    ReadableWritable,
+    Workflow
 } = require('./lib/streams');
 
 module.exports = DamLessServer;
@@ -239,3 +243,7 @@ module.exports.ending = ending;
 module.exports.noop = noop;
 module.exports.ArrayToStream = ArrayToStream;
 module.exports.StreamToArray = StreamToArray;
+module.exports.ReadableWrapper = ReadableWrapper;
+module.exports.WritableWrapper = WritableWrapper;
+module.exports.ReadableWritable = ReadableWritable;
+module.exports.Workflow = Workflow;
