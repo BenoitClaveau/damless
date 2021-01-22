@@ -13,7 +13,6 @@
         "jwt-simple": "latest",
         "oups": "latest",
         "request": "latest",
-        "stream-workflow": "latest",
         "vinyl": "latest"
     },
     "devDependencies": {
