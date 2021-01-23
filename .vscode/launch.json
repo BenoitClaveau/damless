@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "AskReply",
+                "writable http request",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
