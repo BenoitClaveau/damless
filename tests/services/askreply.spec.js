@@ -196,6 +196,7 @@ describe("askreply", () => {
             body: "text plain"
         })
         expect(response.status).to.be(500);
+        
     }).timeout(20000);
 
     it("reading error in async json pipeline", async () => {

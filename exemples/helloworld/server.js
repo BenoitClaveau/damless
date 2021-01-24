@@ -61,29 +61,16 @@ new DamLess()
         )
     })
     .post("/error2", async (context, s, headers) => {
-        s.respond({ contentType: "application/json" }).mode("object")
-        // s.on("close", () => {
-        //     // console.log("close", s.response.headersSent, s.response)
-        //     if (!s.response.headersSent)
-        //         process.exit(-1)
-        // })
-        try {
-            await pipeline(
-                s,
-                new Transform({
-                    objectMode: true,
-                    transform(chunk, encoding, callback) {
-                        callback(new Error("reading error"));
-                    }
-                }).once("error", error => {
-                    s.respond({ statusCode: 403 }).end();
-                }),
-                s
-            )
-        }
-        catch (error) {
-            // s.respond({ statusCode: 403 }).end();
-        }
+        await pipeline(
+            s,
+            new Transform({
+                objectMode: true,
+                transform(chunk, encoding, callback) {
+                    callback(new Error("reading error"));
+                }
+            }),
+            s
+        );
     })
     .use((context, stream, headers) => {
         if ("404" in context.route) {

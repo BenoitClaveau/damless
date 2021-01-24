@@ -29,7 +29,7 @@
                 "--color",
                 "--recursive",
                 "--grep",
-                "writable http request",
+                "reading error in async pipeline",
                 "${workspaceRoot}/tests/**/*.spec.js"
             ],
             "cwd": "${workspaceRoot}",
