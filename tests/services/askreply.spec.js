@@ -64,7 +64,7 @@ describe("askreply", () => {
             fs.createReadStream(`${__dirname}/../data/npm.light.array.json`),
             request.post('http://localhost:3000/')
         );
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("read and stream json", async () => {
         await damless
@@ -105,7 +105,7 @@ describe("askreply", () => {
             resolve();
         })
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("read and stream json without content-type", async () => {
         await damless
@@ -145,7 +145,7 @@ describe("askreply", () => {
             resolve();
         })
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("error not catch by user", async () => {
         await damless
@@ -159,7 +159,7 @@ describe("askreply", () => {
             method: "POST",
         })
         expect(response.status).to.be(500);
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("404", async () => {
         await damless
@@ -170,7 +170,7 @@ describe("askreply", () => {
             method: "GET",
         })
         expect(response.status).to.be(404);
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("reading error in async pipeline", async () => {
         await damless
@@ -197,7 +197,7 @@ describe("askreply", () => {
         })
         expect(response.status).to.be(500);
         
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("reading error in async json pipeline", async () => {
         await damless
@@ -223,7 +223,7 @@ describe("askreply", () => {
             body: JSON.stringify([1, 2, 3, 4])
         })
         expect(response.status).to.be(500);
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("error in pipeline before 1st transform", async () => {
         await damless
@@ -254,7 +254,7 @@ describe("askreply", () => {
         })
         expect(response.status).to.be(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("multiple respond with error in pipeline", async () => {
         await damless
@@ -299,7 +299,7 @@ describe("askreply", () => {
         // request error must be sent
         expect(response.status).to.be(403);
         expect(response.headers.get("content-disposition")).to.be("inline;filename=file.json");
-    }).timeout(20000);
+    }).timeout(2000);
 
 
     it("post file with form-data", async () => {
@@ -311,7 +311,7 @@ describe("askreply", () => {
                 .on("file", () => {
                     hasFile = true;
                 })
-                .on("read", () => {
+                .on("end", () => {
                     expect(hasFile).to.eql(true);
                     stream.respond({ statusCode: 403 }).end();
                 }).resume();
@@ -325,7 +325,7 @@ describe("askreply", () => {
         // const json = await response.json();
 
 
-    }).timeout(200000);
+    }).timeout(20000);
 
     it("read and write http request deflate response", async () => {
         server = http.createServer().on("request", async (request, response) => {
@@ -338,7 +338,7 @@ describe("askreply", () => {
                 yield response;
             }, { objectMode: true })
 
-            duplex.on("read", () => {
+            duplex.on("end", () => {
                 response.writeHead(403, { "content-encoding": "deflate" });
                 duplex.end();
             }).resume();
@@ -355,7 +355,7 @@ describe("askreply", () => {
         })
         expect(response.status).to.eql(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("wrap request in ReadableWrapper", async () => {
         server = http.createServer().on("request", async (request, response) => {
@@ -381,7 +381,7 @@ describe("askreply", () => {
         })
         expect(response.status).to.eql(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("bug with busboy", async () => {
         server = http.createServer().on("request", async (request, response) => {
@@ -420,7 +420,7 @@ describe("askreply", () => {
         const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
         expect(response.status).to.eql(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("wrap response in ReadableWrapper", async () => {
         server = http.createServer().on("request", async (request, response) => {
@@ -439,12 +439,12 @@ describe("askreply", () => {
         })
         expect(response.status).to.eql(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("AskReply", async () => {
         server = http.createServer().on("request", async (request, response) => {
             const duplex = new AskReply(null, request, response, request.headers, { objectMode: true });
-            duplex.on("read", () => {
+            duplex.on("end", () => {
                 // content-type en text/plain pour ne pas faire de transformation
                 // et donc pas desoin d'appeler mount()
                 duplex.respond({ statusCode: 403, "content-type": "text/plain" }).end();
@@ -461,5 +461,5 @@ describe("askreply", () => {
         })
         expect(response.status).to.eql(403);
 
-    }).timeout(20000);
+    }).timeout(2000);
 });

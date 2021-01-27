@@ -58,7 +58,7 @@ describe("writable-wrapper", () => {
             JSONStream.stringify(),
             writable
         )
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("JSONStream", async () => {
         const filename = `${__dirname}/../data/output/10.json`
@@ -78,7 +78,7 @@ describe("writable-wrapper", () => {
             finished(writable, resolve);
         });
 
-    }).timeout(20000);
+    }).timeout(2000);
 
 
     it("wrap JSONStream (though)", async () => {
@@ -101,7 +101,7 @@ describe("writable-wrapper", () => {
             JSONStream.parse("*"),
             output // write JS Object            
         );
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("throw error in pipeline", async () => {
         try {
@@ -133,7 +133,7 @@ describe("writable-wrapper", () => {
         catch(error) {
             expect(error.message).to.eql("line == 2")
         }
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("neasted writable wrapper", async () => {
         try {
@@ -167,7 +167,7 @@ describe("writable-wrapper", () => {
         catch(error) {
             expect(error.message).to.eql("line == 2")
         }
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("writable http request", async () => {
         server = http.createServer().on("request", async (request, response) => {
@@ -183,5 +183,5 @@ describe("writable-wrapper", () => {
         const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
         expect(response.status).to.eql(200);
         
-    }).timeout(20000);
+    }).timeout(10000);
 });

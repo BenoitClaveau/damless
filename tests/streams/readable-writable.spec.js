@@ -58,7 +58,7 @@ describe("readable-writable", () => {
 
         expect(fs.existsSync(filename)).to.eql(true);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("nested readable", async () => {
         const filename = `${__dirname}/../data/output/7.json`
@@ -87,7 +87,7 @@ describe("readable-writable", () => {
 
         expect(fs.existsSync(filename)).to.eql(true);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
 
     it("nested readable & writable", async () => {
@@ -119,6 +119,6 @@ describe("readable-writable", () => {
 
         expect(fs.existsSync(filename)).to.eql(true);
 
-    }).timeout(20000);
+    }).timeout(2000);
 
 });

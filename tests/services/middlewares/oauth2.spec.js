@@ -85,7 +85,7 @@ xdescribe("oauth2", () => {
             }
         })
         expect(obj.headers.Authorization).to.equal('Bearer ' + config.accessToken)
-    }).timeout(20000);
+    }).timeout(2000);
 
     xit("createToken", async () => {
         // https://www.oauth.com/playground/authorization-code.html
@@ -123,7 +123,7 @@ xdescribe("oauth2", () => {
 
 
         expect(res).to.be(undefined);
-    }).timeout(20000);
+    }).timeout(2000);
 
 
     /*

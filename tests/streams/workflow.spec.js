@@ -44,7 +44,7 @@ describe("workflow", () => {
         );
         expect(buffer.toString()).to.eql('[{ "LINE": 1 },{ "LINE": 2 },{ "LINE": 3 }]');
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("workflow parse json", async () => {
         let buffer = Buffer.from("");
@@ -66,7 +66,7 @@ describe("workflow", () => {
             })
         );
         expect(buffer.toString()).to.eql('buf:1, buf:2, buf:3, ');
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("empty workflow", async () => {
         let buffer = Buffer.from("");
@@ -87,7 +87,7 @@ describe("workflow", () => {
             })
         );
         expect(buffer.toString()).to.eql('[{ "line": 1 },{ "line": 2 },{ "line": 3 }]');
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("workflow parse and transform json ", async () => {
         let buffer = Buffer.from("");
@@ -116,7 +116,7 @@ describe("workflow", () => {
             })
         );
         expect(buffer.toString()).to.eql('[\n{"line":11}\n,\n{"line":12}\n,\n{"line":13}\n]\n');
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("neasted wrapper with error", async () => {
         try {
@@ -152,6 +152,6 @@ describe("workflow", () => {
         catch(error) {
             expect(error.message).to.eql("line == 2")
         }
-    }).timeout(20000);
+    }).timeout(2000);
 
 });

@@ -38,7 +38,7 @@ describe("readable-wrapper", () => {
                 }).on("finish", resolve)
             )
         })
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("wrap standard readable stream and read with JSONStream (though)", async () => {
         const stream = fs.createReadStream(`${__dirname}/../data/npm.array.json`);
@@ -53,7 +53,7 @@ describe("readable-wrapper", () => {
                 }
             })
         );
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("readable pipline", async () => {
         const file = fs.createReadStream(`${__dirname}/../data/npm.array.json`);
@@ -70,7 +70,7 @@ describe("readable-wrapper", () => {
                 }
             })
         )
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("error in readable pipeline", async () => {
         try {
@@ -105,7 +105,7 @@ describe("readable-wrapper", () => {
             expect(error.message).to.eql("line == 2")
         }
 
-    }).timeout(20000);
+    }).timeout(2000);
 
     it("readable pipeline with JSONStream (though)", async () => {
         const file = fs.createReadStream(`${__dirname}/../data/npm.array.json`);
@@ -123,7 +123,7 @@ describe("readable-wrapper", () => {
                 }
             })
         );
-    }).timeout(20000);
+    }).timeout(2000);
 
 
     it("readable http request", async () => {
@@ -149,5 +149,5 @@ describe("readable-wrapper", () => {
         const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
         expect(response.status).to.eql(403);
         
-    }).timeout(20000);
+    }).timeout(2000);
 });

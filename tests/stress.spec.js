@@ -39,7 +39,7 @@ describe("stress test", () => {
         const values = await Promise.all(requests());
         expect(values.length).eql(50)
 
-    }).timeout(20000);
+    }).timeout(10000);
 
 
 

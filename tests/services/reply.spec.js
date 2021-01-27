@@ -23,7 +23,6 @@ describe("eply", () => {
         await damless
             .config({ http: { port: 3000 } })
             .get("/", (context, stream, headers) => {
-                console.log("ok")
                 stream.write("SUPER");
                 stream.write("COOL");
                 stream.end("FIN")
@@ -42,7 +41,7 @@ describe("eply", () => {
                 .on("finish", resolve)
         })
 
-    }).timeout(20000);
+    }).timeout(2000);
 
 
 });

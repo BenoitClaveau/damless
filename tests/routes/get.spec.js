@@ -29,8 +29,25 @@ describe("get", () => {
 
     it("timeout option", async () => {
         await damless
+            .config({ http: { port: 3000 }})
             .get("/", (context, stream, headers) => {
-            }, { timeout: 3000 })
+            }, { request: { timeout: 3000 }})
+            .start();
+        const client = await damless.resolve("client");
+        try {
+            await client.get("http://localhost:3000/");
+            throw new Error("Mustn't be called.");
+        }
+        catch (error) {
+            expect(error.code).to.be("ECONNRESET");
+        }
+    }).timeout(5000);
+
+    it("global timeout", async () => {
+        await damless
+            .config({ http: { port: 3000, request: { timeout: 3000 }}})
+            .get("/", (context, stream, headers) => {
+            })
             .start();
         const client = await damless.resolve("client");
         try {

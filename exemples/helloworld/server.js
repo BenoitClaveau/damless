@@ -32,6 +32,12 @@ new DamLess()
     })
     .post("/", async (context, stream, headers) => {
         stream.respond({ contentType: "application/json" }).mode("object")
+
+        stream
+            .on("finish", () => console.log("* finish"))
+            .on("end", () => console.log("* end"))
+            .on("close", () => console.log("* close"))
+
         await pipeline(
             stream,
             new Transform({

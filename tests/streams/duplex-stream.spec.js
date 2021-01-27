@@ -1,41 +1,86 @@
 const expect = require("expect.js");
-const request = require("request");
-const fs = require("fs");
-const JSONStream = require("JSONStream");
-const process = require("process");
-const { inspect } = require('util');
-const { 
-    Readable, 
-    Transform, 
-    Duplex, 
-    Writable 
+const { promisify } = require("util");
+const stream = require('stream');
+const {
+    Readable,
+    Transform,
+    Duplex,
+    Writable
 } = require('stream');
+const pipeline = promisify(stream.pipeline);
+const Results = require("../../lib/promises/results");
 
 describe("duplex stream", () => {
 
     it("readable -> writable", async () => {
-        const readable = new Readable({ read() {}});
-        const writable = new Writable({ write(chunk, encoding, callback) {
-            callback();
-        }});
-
+        const results = new Results();
+        const readable = new Readable({ read() { } });
+        const writable = new Writable({
+            write(chunk, encoding, callback) {
+                results.inc(chunk.toString())
+                callback();
+            },
+            final() {
+                results.stop();
+            }
+        });
         readable.pipe(writable);
         readable.push("command 1");
         readable.push("command 2");
         readable.push(null);
+
+        const data = await results.promise;
+        expect(data).to.eql(['command 1', 'command 2']);
+
     });
 
-    it("readable -> transform -> writable", async () => {  
-        const readable = new Readable({ read: () => {}});
-        const transform = new Transform({ 
+    it("readable -> writable events", async () => {
+        const results = new Results();
+        const readable = new Readable({ read() { } });
+        readable
+            .on("end", () => console.log("readable.end()"))
+            .on("close", () => console.log("readable.close()"))
+            .on("finish", () => console.log("readable.finish()"))
+
+        const writable = new Writable({
+            write(chunk, encoding, callback) {
+                results.inc(chunk.toString())
+                callback();
+            },
+        });
+        readable
+            .on("end", () => console.log("writable.end()"))
+            .on("close", () => console.log("writable.close()"))
+            .on("finish", () => console.log("writable.finish()"))
+
+        setTimeout(() => {
+            readable.push("command 1");
+            readable.push("command 2");
+            readable.push(null);
+        }, 500)
+
+        await pipeline(
+            readable,
+            writable
+        )
+        const data = results.buffer;
+        expect(data).to.eql(['command 1', 'command 2']);
+
+    });
+
+    it("readable -> transform -> writable", async () => {
+        const readable = new Readable({ read: () => { } });
+        const transform = new Transform({
             transform(chunk, encoding, callback) {
                 this.push(chunk.toString().toUpperCase());
                 callback();
             }
         });
-        const writable = new Writable({ write(chunk, encoding, callback) {
-            callback();
-        }});
+        const writable = new Writable({
+            write(chunk, encoding, callback) {
+                callback();
+            }
+        });
 
         readable.pipe(transform).pipe(writable); //eror
         readable.push("command 1");
@@ -44,14 +89,14 @@ describe("duplex stream", () => {
     });
 
 
-    it("duplex -> transform -> duplex", async () => { 
-        const duplex = new Duplex({ 
-            read: () => {},
+    it("duplex -> transform -> duplex", async () => {
+        const duplex = new Duplex({
+            read: () => { },
             write(chunk, encoding, callback) {
                 callback();
             }
         });
-        const transform = new Transform({ 
+        const transform = new Transform({
             transform(chunk, encoding, callback) {
                 this.push(chunk.toString().toUpperCase());
                 callback();
@@ -89,7 +134,7 @@ describe("duplex stream", () => {
     }).timeout(30000);
 
     it("(duplex -> transform) as readable -> duplex", async () => {
-        const transform = new Transform({ 
+        const transform = new Transform({
             transform(chunk, encoding, callback) {
                 const data = chunk.toString().toUpperCase();
                 console.log("[transform]", data)
@@ -128,7 +173,7 @@ describe("duplex stream", () => {
     }).timeout(30000);
 
     it("duplex -> (transform + writable) as duplex", async () => {
-        const transform = new Transform({ 
+        const transform = new Transform({
             transform(chunk, encoding, callback) {
                 const data = chunk.toString().toUpperCase();
                 this.push("transformation#1:" + data);
@@ -136,10 +181,12 @@ describe("duplex stream", () => {
             },
         });
 
-        const response = new Writable({ write(chunk, encoding, callback) {
-            const data = chunk.toString();
-            callback();
-        }});
+        const response = new Writable({
+            write(chunk, encoding, callback) {
+                const data = chunk.toString();
+                callback();
+            }
+        });
 
         const data = ["command 1", "command 2"];
         const pile = [];
@@ -147,7 +194,7 @@ describe("duplex stream", () => {
             read(n) {
                 const value = data.pop();
                 this.push(value ? value : null) //Do not use emit to be able to buffer data
-            },            
+            },
             write(chunk, encoding, callback) {
                 //console.log("[write]", data.toString())
                 transform.write(chunk, encoding, callback);
@@ -168,7 +215,7 @@ describe("duplex stream", () => {
 
         duplex.pipe(duplex);
 
-        
+
 
     }).timeout(30000);
 });

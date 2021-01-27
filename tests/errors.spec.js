@@ -59,7 +59,7 @@ describe("errors", () => {
                         // I musthhave a request timeoutt
                     })
                     .pipe(stream)
-            }, { timeout: 3000 }) // Timeout de 3s
+            }, { request: { timeout: 3000 }}) // Timeout de 3s
             .start();
         const client = await damless.resolve("client");
         try {

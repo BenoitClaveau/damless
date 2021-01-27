@@ -130,5 +130,5 @@ describe("http-router", () => {
         catch(error) {
             expect(error.message).to.be("Failed the register helloworld of info for GET:/whoiam");
         }
-    }).timeout(20000);
+    }).timeout(2000);
 });
