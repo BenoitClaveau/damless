@@ -18,12 +18,6 @@ const http = require(`http`);
 const pipeline = promisify(stream.pipeline);
 
 describe("writable-wrapper", () => {
-
-    let server;
-    afterEach(async () => {
-        server && server.close();
-    });
-
     it("write text", async () => {
         const filename = `${__dirname}/../data/output/2.json`
         if (fs.existsSync(filename))
@@ -32,7 +26,7 @@ describe("writable-wrapper", () => {
         const stream = fs.createWriteStream(filename);
         const writable = new WritableWrapper(stream);
 
-        await new Promise((resolve) => {    
+        await new Promise((resolve) => {
             Readable.from(async function* () {
                 yield "cool";
                 yield "super";
@@ -70,8 +64,8 @@ describe("writable-wrapper", () => {
 
         const output = new WritableWrapper(writable);
         stream.pipe(output);
-        stream.write({ok: 1})
-        stream.write({ok: 2})
+        stream.write({ ok: 1 })
+        stream.write({ ok: 2 })
         stream.end();
 
         await new Promise(resolve => {
@@ -95,7 +89,7 @@ describe("writable-wrapper", () => {
         // Le point d'entrée est stringify et et on pas writable.
         // Par contre stringify est considéré comme un flux de fin (writable).
         const output = new WritableWrapper(stringify);
-        
+
         await pipeline(
             readable,
             JSONStream.parse("*"),
@@ -129,8 +123,8 @@ describe("writable-wrapper", () => {
                 }, { objectMode: true })
             );
             throw new Error("Unexpected behavior.")
-        } 
-        catch(error) {
+        }
+        catch (error) {
             expect(error.message).to.eql("line == 2")
         }
     }).timeout(2000);
@@ -159,29 +153,35 @@ describe("writable-wrapper", () => {
                                 expect(chunk.line).to.eql(1) // car erreur au 2ème chunk
                                 callback();
                             }
-                        })}, { objectMode: true })
+                        })
+                    }, { objectMode: true })
                 }, { objectMode: true })
             );
             throw new Error("Unexpected behavior.")
-        } 
-        catch(error) {
+        }
+        catch (error) {
             expect(error.message).to.eql("line == 2")
         }
     }).timeout(2000);
 
     it("writable http request", async () => {
-        server = http.createServer().on("request", async (request, response) => {
-            const stream = new WritableWrapper(function* () {
-                yield response;
-            }, { objectMode: true });
-            stream.end();
-        }).listen(3000);
+        try {
+            server = http.createServer().on("request", async (request, response) => {
+                const stream = new WritableWrapper(function* () {
+                    yield response;
+                }, { objectMode: true });
+                stream.end();
+            }).listen(4000);
 
 
-        const form = new FormData();
-        form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
-        const response = await fetch('http://localhost:3000/', { method: 'POST', body: form });
-        expect(response.status).to.eql(200);
-        
+            const form = new FormData();
+            form.append('file', fs.createReadStream(`${__dirname}/../data/world.png`));
+            const response = await fetch('http://localhost:4000/', { method: 'POST', body: form });
+            expect(response.status).to.eql(200);
+        }
+        finally {
+            await server.close();
+        }
+
     }).timeout(10000);
 });
