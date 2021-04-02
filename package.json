@@ -4,13 +4,14 @@
     "description": "Streamify your web server",
     "main": "index.js",
     "dependencies": {
+        "bcryptjs": "^2.4.3",
         "busboy": "latest",
         "file-type": "latest",
         "givemetheservice": "latest",
         "isitforme": "latest",
         "jimp": "latest",
         "jsonparse": "latest",
-        "jwt-simple": "latest",
+        "jsonwebtoken": "^8.5.1",
         "oups": "latest",
         "request": "latest",
         "vinyl": "latest"
